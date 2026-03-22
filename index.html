@@ -1051,16 +1051,28 @@
     .theme-toggle { width: 50px; height: 26px; }
     .theme-toggle-slider { width: 18px; height: 18px; font-size: 10px; }
     body.light-mode .theme-toggle-slider { left: 28px; }
-    .main-grid { grid-template-columns: 1fr; gap: 16px; }
-    .left-col { position: static; order: 1; }
-    .center-col { order: 2; min-height: auto; }
-    .right-col { display: none; }
-    .summary-grid { grid-template-columns: 1fr; gap: 10px; min-height: auto; }
+
+    /* MOBILE LAYOUT: summary → subs → add form */
+    .main-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    /* Order: center-col (summary+subs) first, then left-col (add form) */
+    .center-col { order: 1; min-height: auto; }
+    .left-col   { order: 2; position: static; }
+    /* Hide right col on mobile — subs shown in center-col only */
+    .right-col  { display: none !important; }
+
+    /* Summary cards side by side on mobile */
+    .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px; min-height: auto; }
     .summary-card { padding: 14px 12px; min-height: auto; }
     .summary-card .amount { font-size: 18px; }
     .summary-card .label { font-size: 11px; }
     .summary-card .sub-note { font-size: 10px; }
     .summary-card .count-badge { font-size: 9px; padding: 2px 6px; }
+
+    /* Add form */
     .add-card { padding: 16px; }
     .section-title { font-size: 12px; margin-bottom: 12px; }
     .form-label { font-size: 10px; margin-bottom: 5px; }
@@ -1068,6 +1080,8 @@
     .form-group { margin-bottom: 12px; }
     .payment-mode-btn { font-size: 10px; padding: 7px; }
     .add-btn { padding: 11px; font-size: 13px; }
+
+    /* Subscription cards */
     .sub-card { padding: 12px; margin-bottom: 8px; }
     .sub-logo { width: 38px; height: 38px; font-size: 18px; }
     .sub-name { font-size: 13px; }
@@ -1081,15 +1095,21 @@
     .detail-label { font-size: 9px; }
     .detail-value { font-size: 12px; }
     .sub-btn { padding: 8px; font-size: 11px; }
+
+    /* Chart modal */
     .chart-card { max-width: 95%; padding: 20px 16px; }
     .chart-canvas-wrap { width: 160px; height: 160px; }
     #pieChart { width: 160px !important; height: 160px !important; }
     .chart-legend { grid-template-columns: 1fr; }
+
+    /* Edit modal */
     .modal-content { max-width: 95%; padding: 20px 16px; }
     .modal-title { font-size: 16px; }
     .icon-upload-area { padding: 12px; }
     .icon-preview { width: 50px; height: 50px; }
     .icon-fallback { font-size: 20px; }
+
+    /* Notification panel */
     .notif-panel { width: 100%; }
     .notif-header { padding: 20px 16px; }
     .notif-header h3 { font-size: 16px; }
@@ -1097,7 +1117,8 @@
     .notif-emoji { width: 36px; height: 36px; font-size: 18px; }
     .notif-name { font-size: 12px; }
     .notif-desc { font-size: 10px; }
-    .subs-scroll { padding-right: 4px; }
+
+    .subs-scroll { padding-right: 4px; overflow-y: visible; }
     .subs-scroll::-webkit-scrollbar { width: 4px; }
     .toggle-btn { font-size: 11px; padding: 7px 0; }
     .empty-emoji { font-size: 40px; }
@@ -1615,10 +1636,19 @@ function renderSubs() {
   }
 
   const sorted = sortByStatus([...filtered]);
-  const col1 = [], col2 = [];
-  sorted.forEach((sub, i) => i % 2 === 0 ? col1.push(sub) : col2.push(sub));
-  container1.innerHTML = col1.map(renderSubCard).join('');
-  container2.innerHTML = col2.map(renderSubCard).join('');
+  const isMobile = window.innerWidth <= 768;
+
+  if (isMobile) {
+    // On mobile: show ALL subs in container1, nothing in container2
+    container1.innerHTML = sorted.map(renderSubCard).join('');
+    container2.innerHTML = '';
+  } else {
+    // On desktop: alternate between two columns
+    const col1 = [], col2 = [];
+    sorted.forEach((sub, i) => i % 2 === 0 ? col1.push(sub) : col2.push(sub));
+    container1.innerHTML = col1.map(renderSubCard).join('');
+    container2.innerHTML = col2.map(renderSubCard).join('');
+  }
 }
 
 function renderSubCard(s) {

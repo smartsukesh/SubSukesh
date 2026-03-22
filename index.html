@@ -1694,7 +1694,18 @@ function renderSubCard(s) {
 }
 
 function toggleCard(id) {
-  document.getElementById('sub-' + id).classList.toggle('expanded');
+  const clicked = document.getElementById('sub-' + id);
+  const wasExpanded = clicked.classList.contains('expanded');
+
+  // Close any currently expanded card
+  document.querySelectorAll('.sub-card.expanded').forEach(card => {
+    card.classList.remove('expanded');
+  });
+
+  // Open the clicked card only if it wasn't already open
+  if (!wasExpanded) {
+    clicked.classList.add('expanded');
+  }
 }
 
 function addSub() {

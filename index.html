@@ -1,0 +1,2604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>SubSukesh – Subscription Tracker</title>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0b0b12;
+    --card: #13131f;
+    --card2: #1a1a2a;
+    --border: rgba(255,255,255,0.07);
+    --gold: #f5c542;
+    --gold2: #e6a817;
+    --purple: #9b7fe8;
+    --purple2: #7c5cbf;
+    --text: #e8e8f0;
+    --muted: #7a7a9a;
+    --danger: #ff5e72;
+    --success: #4cd9a0;
+    --font-head: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  /* Light mode - Professional palette */
+  body.light-mode {
+    --bg: #d9934a;
+    --card: #4a5f7a;
+    --card2: #3d5066;
+    --border: rgba(255,255,255,0.2);
+    --text: #ffffff;
+    --muted: #f5f0e8;
+  }
+
+  body.light-mode::before {
+    background: radial-gradient(circle, rgba(74,95,122,0.15) 0%, transparent 70%);
+  }
+  body.light-mode::after {
+    background: radial-gradient(circle, rgba(217,147,74,0.2) 0%, transparent 70%);
+  }
+  
+  /* Light mode bright text for maximum contrast */
+  body.light-mode .summary-card .label,
+  body.light-mode .sub-cycle,
+  body.light-mode .sub-row-enddate,
+  body.light-mode .detail-label,
+  body.light-mode .form-label,
+  body.light-mode .notif-desc,
+  body.light-mode .cat-label {
+    color: #f5f0e8;
+  }
+  
+  body.light-mode .summary-card .amount,
+  body.light-mode .sub-name,
+  body.light-mode .detail-value,
+  body.light-mode .section-title,
+  body.light-mode .modal-title,
+  body.light-mode .notif-name,
+  body.light-mode header h1 {
+    color: #ffffff;
+  }
+  
+  body.light-mode header p {
+    color: #f5f0e8;
+  }
+  
+  body.light-mode .form-input,
+  body.light-mode .form-select {
+    color: #ffffff;
+    background: rgba(0,0,0,0.1);
+    border-color: rgba(255,255,255,0.2);
+  }
+  
+  body.light-mode .form-input::placeholder {
+    color: #d0c8bc;
+  }
+  
+  body.light-mode .pay-badge {
+    color: #f5f0e8;
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.25);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* BG decoration */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(155,127,232,0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -150px; left: -150px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(245,197,66,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* LANDSCAPE LAYOUT */
+  .app-wrapper {
+    max-width: 1680px;
+    margin: 0 auto;
+    padding: 20px 24px 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER - Compact for landscape */
+  header {
+    padding: 16px 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .logo-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--gold), var(--purple));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+    color: #0b0b12;
+  }
+  header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  header p {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    position: absolute;
+    right: 0;
+  }
+
+  /* Theme toggle switch */
+  .theme-toggle {
+    position: relative;
+    width: 56px;
+    height: 28px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .theme-toggle:hover {
+    background: var(--card);
+  }
+  .theme-toggle-slider {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    background: var(--gold);
+    border-radius: 50%;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+  }
+  body.light-mode .theme-toggle-slider {
+    left: 31px;
+    background: var(--purple);
+  }
+
+  /* MAIN GRID - Three columns */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* LEFT COLUMN - Forms and controls */
+  .left-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: 20px;
+  }
+
+  /* SUMMARY CARDS */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    min-height: 88px;
+  }
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
+  .summary-card:hover {
+    background: var(--card2);
+    border-color: rgba(255,255,255,0.12);
+  }
+  .summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--purple));
+  }
+  .summary-card.full {
+    grid-column: 1 / -1;
+    min-height: 88px;
+  }
+  .summary-card .label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .summary-card .amount {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+  .summary-card .amount span {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--muted);
+    margin-left: 2px;
+  }
+  .summary-card .sub-note {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+  .summary-card .sub-note b { color: var(--gold); font-weight: 600; }
+  .summary-card .count-badge {
+    position: absolute;
+    top: 16px; right: 14px;
+    background: rgba(245,197,66,0.1);
+    color: var(--gold);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 7px;
+    border-radius: 20px;
+    border: 1px solid rgba(245,197,66,0.2);
+  }
+
+  /* PIE CHART - Modal popup */
+  .chart-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .chart-modal.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    max-width: 500px;
+    width: 90%;
+    transform: scale(0.9);
+    transition: transform 0.3s;
+  }
+  .chart-modal.open .chart-card {
+    transform: scale(1);
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  .chart-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .chart-canvas-wrap {
+    width: 180px; height: 180px;
+    position: relative;
+  }
+  #pieChart { width: 180px !important; height: 180px !important; }
+  .chart-legend {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+  }
+  .legend-dot {
+    width: 9px; height: 9px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .legend-name {
+    color: var(--text);
+    font-weight: 500;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .legend-pct {
+    color: var(--muted);
+    font-size: 10px;
+  }
+  .no-data-msg {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 20px 0;
+  }
+
+  /* CENTER COLUMN - First subscriptions column */
+  .center-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 600px;
+  }
+
+  /* RIGHT COLUMN - Second subscriptions column */
+  .right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 600px;
+    position: sticky;
+    top: 20px;
+    align-self: start;
+  }
+
+  /* VIEW TOGGLE */
+  .view-toggle {
+    display: flex;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    gap: 4px;
+  }
+  .toggle-btn {
+    flex: 1;
+    padding: 8px 0;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .toggle-btn.active {
+    background: linear-gradient(135deg, var(--gold2), var(--gold));
+    color: #0b0b12;
+    font-weight: 600;
+  }
+
+  /* SUBSCRIPTIONS LIST */
+  .subs-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+  .subs-scroll::-webkit-scrollbar { width: 6px; }
+  .subs-scroll::-webkit-scrollbar-track { background: transparent; }
+  .subs-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .subs-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.12); }
+
+  .category-block { margin-bottom:18px; }
+  .cat-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .cat-label  { display:flex; align-items:center; gap:7px; font-size:11px; font-weight:600; color:var(--muted); }
+  .cat-icon   { font-size:13px; }
+  .cat-total  { font-size:11px; color:var(--gold); font-weight:600; }
+
+  .sub-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .sub-card:hover { background: var(--card2); border-color: rgba(255,255,255,0.12); }
+  .sub-card.just-renewed { 
+    background: rgba(76,217,160,0.1) !important; 
+    border-color: var(--success) !important; 
+  }
+
+  .sub-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sub-logo {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .sub-logo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+  }
+  .sub-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .sub-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sub-cycle {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .sub-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .sub-row-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gold);
+    white-space: nowrap;
+    min-width: 50px;
+    text-align: right;
+  }
+  .sub-row-enddate {
+    font-size: 12px;
+    color: #ffffff;
+    white-space: nowrap;
+    min-width: 60px;
+    text-align: right;
+  }
+  
+  body.light-mode .sub-row-enddate {
+    color: #f5f0e8;
+  }
+  .pay-badge {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--muted);
+    background: rgba(255,255,255,0.03);
+    padding: 3px 7px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+    min-width: 45px;
+    text-align: center;
+  }
+
+  .days-left-badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 7px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+    min-width: 60px;
+    text-align: center;
+  }
+  .days-left-badge.yellow {
+    color: var(--gold);
+    background: rgba(245,197,66,0.1);
+    border-color: rgba(245,197,66,0.3);
+  }
+  .days-left-badge.green {
+    color: var(--success);
+    background: rgba(76,217,160,0.1);
+    border-color: rgba(76,217,160,0.3);
+  }
+  .days-left-badge.red {
+    color: var(--danger);
+    background: rgba(255,94,114,0.1);
+    border-color: rgba(255,94,114,0.3);
+  }
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+  .status-dot.green {
+    background: var(--success);
+    box-shadow: 0 0 8px rgba(76,217,160,0.5);
+  }
+  .status-dot.yellow {
+    background: var(--gold);
+    box-shadow: 0 0 8px rgba(245,197,66,0.5);
+  }
+  .status-dot.red {
+    background: var(--danger);
+    box-shadow: 0 0 8px rgba(255,94,114,0.5);
+  }
+
+  /* Expanded details */
+  .sub-card.expanded .sub-meta { display: none; }
+
+  .sub-details {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    gap: 10px;
+  }
+  .sub-card.expanded .sub-details { display: flex; }
+
+  .detail-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .detail-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .detail-value {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .sub-actions {
+    display: none;
+    margin-top: 10px;
+    gap: 8px;
+  }
+  .sub-card.expanded .sub-actions { display: flex; }
+
+  .sub-btn {
+    flex: 1;
+    padding: 9px;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .sub-btn.edit { background: rgba(155,127,232,0.12); color: var(--purple); border: 1px solid rgba(155,127,232,0.2); }
+  .sub-btn.renew { background: rgba(76,217,160,0.12); color: var(--success); border: 1px solid rgba(76,217,160,0.2); }
+  .sub-btn.end { background: rgba(255,94,114,0.12); color: var(--danger); border: 1px solid rgba(255,94,114,0.2); }
+  .sub-btn:hover { opacity: 0.8; }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .empty-emoji {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+
+  /* RIGHT COLUMN - Add subscription form */
+  .right-col {
+    position: sticky;
+    top: 20px;
+  }
+
+  .add-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  
+  .add-card .section-title {
+    margin-bottom: 16px;
+  }
+
+  .form-group {
+    margin-bottom: 14px;
+  }
+  .form-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .form-input, .form-select {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: var(--card);
+  }
+  .form-input::placeholder { color: var(--muted); }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .days-input-wrapper {
+    display: none;
+  }
+  .days-input-wrapper.active {
+    display: block;
+  }
+
+  .payment-mode-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .payment-mode-btn {
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--card2);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .payment-mode-btn.active {
+    background: rgba(245,197,66,0.1);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .add-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--gold2), var(--gold));
+    color: #0b0b12;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+  .add-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(245,197,66,0.3); }
+
+  /* NOTIFICATION BELL */
+  .notif-bell-btn {
+    position: relative;
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .notif-bell-btn:hover { background: var(--card2); border-color: rgba(255,255,255,0.12); }
+  .notif-bell-btn.has-alerts { color: var(--gold); border-color: var(--gold); }
+  .notif-badge {
+    position: absolute;
+    top: -4px; right: -4px;
+    background: var(--danger);
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 5px;
+    border-radius: 10px;
+    display: none;
+  }
+
+  /* MODALS */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal-content {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    max-width: 480px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    transform: scale(0.9);
+    transition: transform 0.2s;
+  }
+  .modal-overlay.open .modal-content { transform: scale(1); }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .modal-close {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-close:hover { background: var(--bg); }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .modal-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .modal-btn.primary {
+    background: linear-gradient(135deg, var(--gold2), var(--gold));
+    color: #0b0b12;
+  }
+  .modal-btn.secondary {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .modal-btn:hover { opacity: 0.9; }
+
+  /* Icon upload */
+  .icon-upload-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+    padding: 14px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .icon-preview {
+    width: 60px; height: 60px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .icon-fallback {
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+  .icon-preview-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .icon-preview:hover .icon-preview-overlay {
+    background: rgba(0,0,0,0.5);
+  }
+  .icon-upload-btn {
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--card);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .icon-remove-btn {
+    padding: 8px 14px;
+    border: 1px solid var(--danger);
+    border-radius: 7px;
+    background: rgba(255,94,114,0.1);
+    color: var(--danger);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .icon-remove-btn.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* NOTIFICATION PANEL */
+  .notif-panel {
+    position: fixed;
+    top: 0; right: 0;
+    width: 420px;
+    height: 100vh;
+    background: var(--card);
+    border-left: 1px solid var(--border);
+    z-index: 1001;
+    transform: translateX(100%);
+    transition: transform 0.3s;
+    display: flex;
+    flex-direction: column;
+  }
+  .notif-panel.open { transform: translateX(0); }
+
+  .notif-header {
+    padding: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .notif-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .notif-count {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .notif-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+  }
+
+  .notif-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+  .notif-item.urgent { border-color: var(--danger); background: rgba(255,94,114,0.05); }
+  .notif-item.warning { border-color: var(--gold); background: rgba(245,197,66,0.05); }
+
+  .notif-emoji {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .notif-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .notif-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .notif-desc {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .notif-time {
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .notif-time.red { color: var(--danger); }
+  .notif-time.orange { color: var(--gold); }
+
+  .notif-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .notif-empty .big-emoji {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 2000;
+    opacity: 0;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.error {
+    background: rgba(255,94,114,0.15);
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
+  /* Responsive tweaks for smaller laptops */
+  @media (max-width: 1400px) {
+    .main-grid {
+      grid-template-columns: 300px 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .main-grid {
+      grid-template-columns: 280px 1fr;
+    }
+    .right-col {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .main-grid {
+      grid-template-columns: 1fr;
+    }
+    .left-col {
+      position: static;
+    }
+  }
+
+  /* Mobile portrait view (phones and small tablets) */
+  @media (max-width: 768px) {
+    body {
+      font-size: 14px;
+    }
+
+    .app-wrapper {
+      padding: 12px 12px 40px;
+    }
+
+    /* Header - Make compact for mobile */
+    header {
+      padding: 12px 0 16px;
+    }
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      font-size: 13px;
+    }
+    header h1 {
+      font-size: 18px;
+    }
+    header p {
+      font-size: 11px;
+    }
+    .notif-bell-btn {
+      width: 36px;
+      height: 36px;
+      font-size: 16px;
+    }
+    .theme-toggle {
+      width: 50px;
+      height: 26px;
+    }
+    .theme-toggle-slider {
+      width: 18px;
+      height: 18px;
+      font-size: 10px;
+    }
+    body.light-mode .theme-toggle-slider {
+      left: 28px;
+    }
+
+    /* Main grid - Single column on mobile */
+    .main-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    /* Left column - No longer sticky on mobile */
+    .left-col {
+      position: static;
+      order: 1;
+    }
+
+    /* Center column comes after left */
+    .center-col {
+      order: 2;
+      min-height: auto;
+    }
+
+    /* Right column hidden on mobile */
+    .right-col {
+      display: none;
+    }
+
+    /* Summary cards - Stack vertically on mobile */
+    .summary-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      min-height: auto;
+    }
+    .summary-card {
+      padding: 14px 12px;
+      min-height: auto;
+    }
+    .summary-card .amount {
+      font-size: 18px;
+    }
+    .summary-card .label {
+      font-size: 11px;
+    }
+    .summary-card .sub-note {
+      font-size: 10px;
+    }
+    .summary-card .count-badge {
+      font-size: 9px;
+      padding: 2px 6px;
+    }
+
+    /* Add subscription form - More compact */
+    .add-card {
+      padding: 16px;
+    }
+    .section-title {
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+    .form-label {
+      font-size: 10px;
+      margin-bottom: 5px;
+    }
+    .form-input, .form-select {
+      padding: 9px 10px;
+      font-size: 12px;
+    }
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .payment-mode-btn {
+      font-size: 10px;
+      padding: 7px;
+    }
+    .add-btn {
+      padding: 11px;
+      font-size: 13px;
+    }
+
+    /* Subscription cards - Optimize for mobile */
+    .sub-card {
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    .sub-logo {
+      width: 38px;
+      height: 38px;
+      font-size: 18px;
+    }
+    .sub-name {
+      font-size: 13px;
+    }
+    .sub-cycle {
+      font-size: 10px;
+    }
+    .sub-row-price {
+      font-size: 14px;
+      min-width: 45px;
+    }
+    .sub-row-enddate {
+      font-size: 11px;
+      min-width: 55px;
+    }
+    .pay-badge {
+      font-size: 9px;
+      padding: 2px 5px;
+      min-width: 40px;
+    }
+    .days-left-badge {
+      font-size: 9px;
+      padding: 2px 5px;
+      min-width: 50px;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+    }
+
+    /* Expanded details */
+    .sub-details {
+      margin-top: 10px;
+      padding-top: 10px;
+      gap: 8px;
+    }
+    .detail-label {
+      font-size: 9px;
+    }
+    .detail-value {
+      font-size: 12px;
+    }
+    .sub-btn {
+      padding: 8px;
+      font-size: 11px;
+    }
+
+    /* Chart modal - Full width on mobile */
+    .chart-card {
+      max-width: 95%;
+      padding: 20px 16px;
+    }
+    .chart-canvas-wrap {
+      width: 160px;
+      height: 160px;
+    }
+    #pieChart {
+      width: 160px !important;
+      height: 160px !important;
+    }
+    .chart-legend {
+      grid-template-columns: 1fr;
+    }
+
+    /* Edit modal - Optimize for mobile */
+    .modal-content {
+      max-width: 95%;
+      padding: 20px 16px;
+    }
+    .modal-title {
+      font-size: 16px;
+    }
+    .icon-upload-area {
+      padding: 12px;
+    }
+    .icon-preview {
+      width: 50px;
+      height: 50px;
+    }
+    .icon-fallback {
+      font-size: 20px;
+    }
+
+    /* Notification panel - Full width on mobile */
+    .notif-panel {
+      width: 100%;
+    }
+    .notif-header {
+      padding: 20px 16px;
+    }
+    .notif-header h3 {
+      font-size: 16px;
+    }
+    .notif-item {
+      padding: 12px;
+    }
+    .notif-emoji {
+      width: 36px;
+      height: 36px;
+      font-size: 18px;
+    }
+    .notif-name {
+      font-size: 12px;
+    }
+    .notif-desc {
+      font-size: 10px;
+    }
+
+    /* Scrollable areas */
+    .subs-scroll {
+      padding-right: 4px;
+    }
+    .subs-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    /* View toggle buttons */
+    .toggle-btn {
+      font-size: 11px;
+      padding: 7px 0;
+    }
+
+    /* Empty state */
+    .empty-emoji {
+      font-size: 40px;
+    }
+    .empty-state {
+      font-size: 12px;
+      padding: 30px 16px;
+    }
+  }
+
+  /* Very small phones */
+  @media (max-width: 375px) {
+    .app-wrapper {
+      padding: 10px 10px 40px;
+    }
+    
+    .sub-meta {
+      gap: 6px;
+    }
+    
+    .sub-row-price {
+      font-size: 13px;
+      min-width: 40px;
+    }
+    
+    .sub-row-enddate {
+      font-size: 10px;
+      min-width: 50px;
+    }
+    
+    .pay-badge, .days-left-badge {
+      font-size: 8px;
+      padding: 2px 4px;
+      min-width: 35px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-wrapper">
+  <header>
+    <div class="logo-mark">
+      <div class="logo-icon">S$</div>
+      <div>
+        <h1>SubSukesh</h1>
+        <p>Track your subscriptions</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+        <div class="theme-toggle-slider">🌙</div>
+      </div>
+      <button id="notifBellBtn" class="notif-bell-btn" onclick="openNotifPanel()">
+        🔔
+        <div id="notifBadge" class="notif-badge">0</div>
+      </button>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <!-- LEFT COLUMN - All Controls -->
+    <div class="left-col">
+      <!-- Add Subscription Form -->
+      <div class="add-card">
+        <div class="section-title">
+          <span class="dot"></span>
+          Add Subscription
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Name</label>
+          <input type="text" id="subName" class="form-input" placeholder="Netflix, Spotify, etc.">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Price (₹)</label>
+            <input type="number" id="subPrice" class="form-input" placeholder="499" step="0.01">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select id="subCategory" class="form-select">
+              <option value="Entertainment">Entertainment</option>
+              <option value="Productivity">Productivity</option>
+              <option value="Cloud">Cloud</option>
+              <option value="Education">Education</option>
+              <option value="Fitness">Fitness</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Billing Cycle</label>
+          <select id="subBilling" class="form-select" onchange="handleBillingChange('sub')">
+            <option value="monthly">Monthly</option>
+            <option value="annual">Annual</option>
+            <option value="weekly">Weekly</option>
+            <option value="days">Custom Days</option>
+          </select>
+        </div>
+
+        <div id="subDaysWrapper" class="days-input-wrapper form-group">
+          <label class="form-label">Every N Days</label>
+          <input type="number" id="subDays" class="form-input" placeholder="30" min="1" value="30">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Start Date</label>
+            <input type="date" id="subStartDate" class="form-input" onchange="autoCalcEndDateByCycle('sub')">
+          </div>
+          <div class="form-group">
+            <label class="form-label">End Date</label>
+            <input type="date" id="subEndDate" class="form-input">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Payment Mode</label>
+          <div class="payment-mode-grid" id="subPaymentMode">
+            <button type="button" class="payment-mode-btn active" data-mode="card" onclick="selectPaymentMode('sub','card')">Card</button>
+            <button type="button" class="payment-mode-btn" data-mode="upi" onclick="selectPaymentMode('sub','upi')">UPI</button>
+            <button type="button" class="payment-mode-btn" data-mode="other" onclick="selectPaymentMode('sub','other')">Other</button>
+          </div>
+        </div>
+
+        <button class="add-btn" onclick="addSub()">Add Subscription</button>
+      </div>
+    </div>
+
+    <!-- CENTER COLUMN - First Subscriptions Column -->
+    <div class="center-col">
+      <!-- Summary Cards -->
+      <div class="summary-grid">
+        <div class="summary-card" onclick="toggleChart()">
+          <div class="label">This Month</div>
+          <div class="amount" id="monthlyTotal">₹0<span>/mo</span></div>
+        </div>
+        <div class="summary-card" onclick="toggleChart()">
+          <div class="label">This Year</div>
+          <div class="amount" id="annualTotal">₹0<span>/yr</span></div>
+        </div>
+      </div>
+
+      <div class="subs-scroll" id="subsContainer1">
+        <div class="empty-state">
+          <div class="empty-emoji">📦</div>
+          <p>No subscriptions yet.<br>Add one to get started!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN - Second Subscriptions Column -->
+    <div class="right-col">
+      <!-- Total Active Card -->
+      <div class="summary-card full">
+        <div class="label">Total Active</div>
+        <div class="amount" id="subsCount">0</div>
+        <div class="sub-note">Next renewal: <b id="nextRenewal">—</b></div>
+        <div class="count-badge" id="activeCountBadge">0 active</div>
+      </div>
+
+      <div class="subs-scroll" id="subsContainer2">
+        <!-- Continuation of subscriptions -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHART MODAL POPUP -->
+<div id="chartModal" class="chart-modal" onclick="handleChartModalClick(event)">
+  <div class="chart-card">
+    <div class="section-title">
+      <span class="dot"></span>
+      Spending by Category
+    </div>
+    <div class="chart-inner" id="chartContainer">
+      <div class="no-data-msg">Add subscriptions to see breakdown</div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">Edit Subscription</div>
+      <button class="modal-close" onclick="closeEdit()">×</button>
+    </div>
+
+    <div class="icon-upload-area">
+      <div id="editIconPreview" class="icon-preview">
+        <div id="editIconFallback" class="icon-fallback">📦</div>
+        <div class="icon-preview-overlay"></div>
+      </div>
+      <div style="flex: 1;">
+        <input type="file" id="editIconInput" accept="image/*" style="display:none;" onchange="handleEditIconUpload(event)">
+        <button class="icon-upload-btn" onclick="document.getElementById('editIconInput').click()">Upload Icon</button>
+        <button id="editIconRemoveBtn" class="icon-remove-btn" onclick="removeEditIcon()">Remove</button>
+      </div>
+    </div>
+
+    <input type="hidden" id="editId">
+    
+    <div class="form-group">
+      <label class="form-label">Name</label>
+      <input type="text" id="editName" class="form-input">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Price (₹)</label>
+        <input type="number" id="editPrice" class="form-input" step="0.01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select id="editCategory" class="form-select">
+          <option value="Entertainment">Entertainment</option>
+          <option value="Productivity">Productivity</option>
+          <option value="Cloud">Cloud</option>
+          <option value="Education">Education</option>
+          <option value="Fitness">Fitness</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Billing Cycle</label>
+      <select id="editBilling" class="form-select" onchange="handleBillingChange('edit')">
+        <option value="monthly">Monthly</option>
+        <option value="annual">Annual</option>
+        <option value="weekly">Weekly</option>
+        <option value="days">Custom Days</option>
+      </select>
+    </div>
+
+    <div id="editDaysWrapper" class="days-input-wrapper form-group">
+      <label class="form-label">Every N Days</label>
+      <input type="number" id="editDays" class="form-input" min="1" value="30">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Start Date</label>
+        <input type="date" id="editStartDate" class="form-input" onchange="autoCalcEndDateByCycle('edit')">
+      </div>
+      <div class="form-group">
+        <label class="form-label">End Date</label>
+        <input type="date" id="editEndDate" class="form-input">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Payment Mode</label>
+      <div class="payment-mode-grid" id="editPaymentMode">
+        <button type="button" class="payment-mode-btn" data-mode="card" onclick="selectPaymentMode('edit','card')">Card</button>
+        <button type="button" class="payment-mode-btn" data-mode="upi" onclick="selectPaymentMode('edit','upi')">UPI</button>
+        <button type="button" class="payment-mode-btn" data-mode="other" onclick="selectPaymentMode('edit','other')">Other</button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeEdit()">Cancel</button>
+      <button class="modal-btn primary" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION PANEL -->
+<div id="notifPanel" class="notif-panel" onclick="handleNotifOverlayClick(event)">
+  <div class="notif-header">
+    <h3>Alerts <span id="notifPanelCount" class="notif-count"></span></h3>
+  </div>
+  <div id="notifList" class="notif-list"></div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// FIREBASE CONFIGURATION
+// ═══════════════════════════════════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyA-t7NepAe9mwKuiao04TmYhGucKZTJufo",
+  authDomain: "subsukesh.firebaseapp.com",
+  databaseURL: "https://subsukesh-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "subsukesh",
+  storageBucket: "subsukesh.firebasestorage.app",
+  messagingSenderId: "291568174592",
+  appId: "1:291568174592:web:74aff29d12bc6bf8dfbae5"
+};
+
+// Initialize Firebase
+let firebaseApp = null;
+let database = null;
+let auth = null;
+let currentUser = null;
+let isFirebaseEnabled = false;
+
+function initFirebase() {
+  // Check if config is set up
+  if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+    console.log("📦 Firebase not configured - using localStorage only");
+    console.log("ℹ️ See setup instructions in the browser console");
+    showFirebaseSetupInstructions();
+    return false;
+  }
+
+  try {
+    firebaseApp = firebase.initializeApp(firebaseConfig);
+    database = firebase.database();
+    auth = firebase.auth();
+    isFirebaseEnabled = true;
+    
+    // Anonymous authentication for simplicity
+    auth.signInAnonymously()
+      .then((userCredential) => {
+        currentUser = userCredential.user;
+        console.log("✅ Firebase connected! User ID:", currentUser.uid);
+        
+        // Load data from Firebase
+        loadFromFirebase();
+        
+        // Listen for real-time updates
+        setupFirebaseListener();
+      })
+      .catch((error) => {
+        console.error("❌ Firebase auth error:", error);
+        isFirebaseEnabled = false;
+      });
+    
+    return true;
+  } catch (error) {
+    console.error("❌ Firebase initialization error:", error);
+    isFirebaseEnabled = false;
+    return false;
+  }
+}
+
+function showFirebaseSetupInstructions() {
+  console.log(`
+╔════════════════════════════════════════════════════════════════════╗
+║                    🔥 FIREBASE SETUP INSTRUCTIONS                  ║
+╚════════════════════════════════════════════════════════════════════╝
+
+To enable real-time sync across your devices:
+
+1️⃣  GO TO FIREBASE CONSOLE
+   👉 https://console.firebase.google.com/
+
+2️⃣  CREATE A NEW PROJECT
+   • Click "Add project"
+   • Name it "SubSukesh" (or whatever you like)
+   • Disable Google Analytics (optional)
+   • Click "Create project"
+
+3️⃣  ADD A WEB APP
+   • Click the </> (Web) icon
+   • Name it "SubSukesh Web App"
+   • Click "Register app"
+   • Copy the firebaseConfig object
+
+4️⃣  ENABLE REALTIME DATABASE
+   • Go to "Realtime Database" in left menu
+   • Click "Create Database"
+   • Choose location closest to you
+   • Start in "Test mode" (we'll secure it later)
+   • Click "Enable"
+
+5️⃣  UPDATE THE CODE
+   • Open this HTML file in a text editor
+   • Find "const firebaseConfig = {" (around line 1060)
+   • Replace with your config from step 3
+   • Save the file
+
+6️⃣  OPEN THE APP
+   • Open the HTML file in your browser
+   • Check browser console (F12) for success message
+   • Your data will now sync across all devices! 🎉
+
+📱 USING ON MULTIPLE DEVICES:
+   • Open the same HTML file on MacBook and iPhone
+   • Or host it online (GitHub Pages, Netlify, Vercel)
+   • All changes sync in real-time automatically!
+
+🔒 SECURITY (Important!):
+   After testing, secure your database:
+   • Go to "Realtime Database" → "Rules"
+   • Replace with:
+   {
+     "rules": {
+       "users": {
+         "$uid": {
+           ".read": "$uid === auth.uid",
+           ".write": "$uid === auth.uid"
+         }
+       }
+     }
+   }
+
+Need help? Check: https://firebase.google.com/docs/web/setup
+╚════════════════════════════════════════════════════════════════════╝
+  `);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FIREBASE SYNC FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function loadFromFirebase() {
+  if (!isFirebaseEnabled || !currentUser) return;
+  
+  const userRef = database.ref('users/' + currentUser.uid + '/subscriptions');
+  userRef.once('value')
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        subs = snapshot.val() || [];
+        console.log("📥 Loaded", subs.length, "subscriptions from Firebase");
+        render();
+      } else {
+        // No data in Firebase, migrate from localStorage
+        const localData = localStorage.getItem('subsukesh_subs');
+        if (localData) {
+          subs = JSON.parse(localData);
+          saveToFirebase();
+          console.log("📤 Migrated", subs.length, "subscriptions to Firebase");
+        }
+      }
+    })
+    .catch((error) => {
+      console.error("❌ Error loading from Firebase:", error);
+      // Fallback to localStorage
+      subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+      render();
+    });
+}
+
+function saveToFirebase() {
+  if (!isFirebaseEnabled || !currentUser) {
+    // Fallback to localStorage
+    localStorage.setItem('subsukesh_subs', JSON.stringify(subs));
+    return;
+  }
+  
+  const userRef = database.ref('users/' + currentUser.uid + '/subscriptions');
+  userRef.set(subs)
+    .then(() => {
+      console.log("💾 Saved to Firebase");
+      // Also save to localStorage as backup
+      localStorage.setItem('subsukesh_subs', JSON.stringify(subs));
+    })
+    .catch((error) => {
+      console.error("❌ Error saving to Firebase:", error);
+      // Fallback to localStorage
+      localStorage.setItem('subsukesh_subs', JSON.stringify(subs));
+    });
+}
+
+function setupFirebaseListener() {
+  if (!isFirebaseEnabled || !currentUser) return;
+  
+  const userRef = database.ref('users/' + currentUser.uid + '/subscriptions');
+  userRef.on('value', (snapshot) => {
+    if (snapshot.exists()) {
+      const newSubs = snapshot.val() || [];
+      // Only update if data actually changed (avoid infinite loops)
+      if (JSON.stringify(newSubs) !== JSON.stringify(subs)) {
+        subs = newSubs;
+        console.log("🔄 Real-time update received!");
+        render();
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA & STATE
+// ═══════════════════════════════════════════════════════════════════════════
+let subs = [];
+let pieChartInstance = null;
+
+// ─── THEME TOGGLE ────────────────────────────────────────────────────────────
+function toggleTheme() {
+  const body = document.body;
+  const slider = document.querySelector('.theme-toggle-slider');
+  
+  if (body.classList.contains('light-mode')) {
+    body.classList.remove('light-mode');
+    slider.textContent = '🌙';
+    localStorage.setItem('subsukesh_theme', 'dark');
+  } else {
+    body.classList.add('light-mode');
+    slider.textContent = '☀️';
+    localStorage.setItem('subsukesh_theme', 'light');
+  }
+}
+
+// Load saved theme on page load
+function loadTheme() {
+  const savedTheme = localStorage.getItem('subsukesh_theme');
+  const slider = document.querySelector('.theme-toggle-slider');
+  
+  if (savedTheme === 'light') {
+    document.body.classList.add('light-mode');
+    slider.textContent = '☀️';
+  } else {
+    slider.textContent = '🌙';
+  }
+}
+
+// Known subscriptions database
+const knownSubs = [
+  { name: 'Netflix', emoji: '🎬', logo: null },
+  { name: 'Spotify', emoji: '🎵', logo: null },
+  { name: 'YouTube', emoji: '▶️', logo: null },
+  { name: 'YouTube Premium', emoji: '▶️', logo: null },
+  { name: 'Prime Video', emoji: '📺', logo: null },
+  { name: 'Disney+', emoji: '🏰', logo: null },
+  { name: 'Hotstar', emoji: '⭐', logo: null },
+  { name: 'Apple Music', emoji: '🍎', logo: null },
+  { name: 'iCloud', emoji: '☁️', logo: null },
+  { name: 'Google One', emoji: '📦', logo: null },
+  { name: 'Dropbox', emoji: '📁', logo: null },
+  { name: 'ChatGPT', emoji: '🤖', logo: null },
+  { name: 'GitHub', emoji: '🐙', logo: null },
+  { name: 'Adobe', emoji: '🎨', logo: null },
+  { name: 'Figma', emoji: '🎨', logo: null },
+  { name: 'Notion', emoji: '📝', logo: null },
+  { name: 'Canva', emoji: '🎨', logo: null }
+];
+
+function matchKnown(name) {
+  return knownSubs.find(k => k.name.toLowerCase() === name.toLowerCase());
+}
+
+// Category icons
+const catIcons = {
+  Entertainment: '🎬',
+  Productivity: '💼',
+  Cloud: '☁️',
+  Education: '📚',
+  Fitness: '💪',
+  Other: '📦'
+};
+
+function save() {
+  saveToFirebase();
+}
+
+function render() {
+  renderSummary();
+  renderChart();
+  renderSubs();
+  updateNotifBell();
+}
+
+// ─── SUMMARY CARDS ───────────────────────────────────────────────────────────
+function renderSummary() {
+  const active = subs.filter(s => !s.ended);
+  let monthly = 0, annual = 0;
+  active.forEach(s => {
+    if (s.billing === 'monthly') monthly += s.price;
+    else if (s.billing === 'annual') annual += s.price;
+    else if (s.billing === 'weekly') monthly += s.price * 4;
+    else if (s.billing === 'days') {
+      const perDay = s.price / (s.billingDays || 30);
+      monthly += perDay * 30;
+    }
+  });
+  annual += monthly * 12;
+
+  document.getElementById('monthlyTotal').innerHTML = `₹${monthly.toFixed(0)}<span>/mo</span>`;
+  document.getElementById('annualTotal').innerHTML = `₹${annual.toFixed(0)}<span>/yr</span>`;
+  document.getElementById('subsCount').textContent = active.length;
+  document.getElementById('activeCountBadge').textContent = `${active.length} active`;
+
+  const upcoming = active.filter(s => s.endDate).sort((a,b) => new Date(a.endDate) - new Date(b.endDate));
+  if (upcoming.length > 0) {
+    document.getElementById('nextRenewal').textContent = fmtDate(upcoming[0].endDate);
+  } else {
+    document.getElementById('nextRenewal').textContent = '—';
+  }
+}
+
+// ─── PIE CHART ───────────────────────────────────────────────────────────────
+function renderChart() {
+  const active = subs.filter(s => !s.ended);
+  if (active.length === 0) {
+    document.getElementById('chartContainer').innerHTML = `<div class="no-data-msg">Add subscriptions to see breakdown</div>`;
+    if (pieChartInstance) {
+      pieChartInstance.destroy();
+      pieChartInstance = null;
+    }
+    return;
+  }
+
+  const byCategory = {};
+  active.forEach(s => {
+    const monthly = toMonthly(s);
+    byCategory[s.category] = (byCategory[s.category] || 0) + monthly;
+  });
+
+  const labels = Object.keys(byCategory);
+  const data = Object.values(byCategory);
+  const total = data.reduce((a,b) => a+b, 0);
+  const colors = ['#f5c542','#9b7fe8','#4cd9a0','#ff5e72','#f09d51','#5eb3f6'];
+
+  const chartHTML = `
+    <div class="chart-canvas-wrap">
+      <canvas id="pieChart"></canvas>
+    </div>
+    <div class="chart-legend">
+      ${labels.map((label, i) => {
+        const pct = ((data[i] / total) * 100).toFixed(0);
+        return `
+          <div class="legend-item">
+            <div class="legend-dot" style="background:${colors[i % colors.length]}"></div>
+            <div class="legend-name">${label}</div>
+            <div class="legend-pct">${pct}%</div>
+          </div>`;
+      }).join('')}
+    </div>
+  `;
+  document.getElementById('chartContainer').innerHTML = chartHTML;
+
+  if (pieChartInstance) pieChartInstance.destroy();
+  const ctx = document.getElementById('pieChart').getContext('2d');
+  pieChartInstance = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: colors,
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: false,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const val = ctx.parsed;
+              const pct = ((val / total) * 100).toFixed(0);
+              return `₹${val.toFixed(0)} (${pct}%)`;
+            }
+          }
+        }
+      },
+      cutout: '65%'
+    }
+  });
+}
+
+function toMonthly(s) {
+  if (s.billing === 'monthly') return s.price;
+  if (s.billing === 'annual') return s.price / 12;
+  if (s.billing === 'weekly') return s.price * 4;
+  if (s.billing === 'days') {
+    const perDay = s.price / (s.billingDays || 30);
+    return perDay * 30;
+  }
+  return s.price;
+}
+
+// ─── SUBSCRIPTIONS LIST ──────────────────────────────────────────────────────
+function getSubStatus(s) {
+  if (s.ended) return 'red';
+  if (!s.endDate) return 'green';
+  
+  const h = hoursLeft(s.endDate);
+  if (h === null) return 'green';
+  if (h <= 168) return 'yellow'; // 7 days = 168 hours
+  return 'green';
+}
+
+function sortByStatus(subs) {
+  return subs.sort((a, b) => {
+    const statusOrder = { yellow: 0, green: 1, red: 2 };
+    const aStatus = getSubStatus(a);
+    const bStatus = getSubStatus(b);
+    
+    if (statusOrder[aStatus] !== statusOrder[bStatus]) {
+      return statusOrder[aStatus] - statusOrder[bStatus];
+    }
+    
+    // Within same status, sort by end date
+    if (a.endDate && b.endDate) {
+      return new Date(a.endDate) - new Date(b.endDate);
+    }
+    return 0;
+  });
+}
+
+function renderSubs() {
+  // Always show active subscriptions only
+  const filtered = subs.filter(s => !s.ended);
+
+  const container1 = document.getElementById('subsContainer1');
+  const container2 = document.getElementById('subsContainer2');
+
+  if (filtered.length === 0) {
+    container1.innerHTML = `<div class="empty-state"><div class="empty-emoji">📦</div><p>No subscriptions yet.<br>Add one to get started!</p></div>`;
+    container2.innerHTML = '';
+    return;
+  }
+
+  const sorted = sortByStatus([...filtered]);
+  
+  // Alternate between columns: center, right, center, right...
+  const col1 = [];
+  const col2 = [];
+  
+  sorted.forEach((sub, index) => {
+    if (index % 2 === 0) {
+      col1.push(sub);
+    } else {
+      col2.push(sub);
+    }
+  });
+  
+  container1.innerHTML = col1.map(s => renderSubCard(s)).join('');
+  container2.innerHTML = col2.map(s => renderSubCard(s)).join('');
+}
+
+function renderSubCard(s) {
+  const known = matchKnown(s.name);
+  const emoji = s.customLogo ? '' : ((known && known.emoji) || '📦');
+  const logo = s.customLogo || (known && known.logo);
+  const logoHTML = logo 
+    ? `<img src="${logo}" alt="${s.name}">` 
+    : emoji;
+
+  const cycle = s.billing === 'days' ? `Every ${s.billingDays} days` 
+    : s.billing.charAt(0).toUpperCase() + s.billing.slice(1);
+
+  const endDateHTML = s.endDate ? fmtDate(s.endDate) : '—';
+  const payBadge = s.paymentMode ? `<div class="pay-badge">${s.paymentMode.toUpperCase()}</div>` : '';
+  
+  // Days left badge
+  const daysLeft = getDaysLeft(s);
+  const daysText = formatDaysLeft(daysLeft);
+  let daysLeftBadge = '';
+  if (daysText) {
+    const status = getSubStatus(s);
+    daysLeftBadge = `<div class="days-left-badge ${status}">${daysText}</div>`;
+  }
+  
+  const status = getSubStatus(s);
+  const statusDot = `<div class="status-dot ${status}"></div>`;
+
+  return `
+    <div class="sub-card" id="sub-${s.id}" onclick="toggleCard('${s.id}')">
+      <div class="sub-row">
+        <div class="sub-logo">${logoHTML}</div>
+        <div class="sub-info">
+          <div class="sub-name">${escHtml(s.name)}</div>
+          <div class="sub-cycle">${cycle}</div>
+        </div>
+        <div class="sub-meta">
+          <div class="sub-row-price">₹${s.price.toFixed(0)}</div>
+          <div class="sub-row-enddate">${endDateHTML}</div>
+          ${payBadge}
+          ${daysLeftBadge}
+          ${statusDot}
+        </div>
+      </div>
+      <div class="sub-details">
+        <div class="detail-item">
+          <div class="detail-label">Category</div>
+          <div class="detail-value">${s.category}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Start</div>
+          <div class="detail-value">${fmtDate(s.startDate)}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">End</div>
+          <div class="detail-value">${endDateHTML}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Payment</div>
+          <div class="detail-value">${s.paymentMode ? s.paymentMode.toUpperCase() : '—'}</div>
+        </div>
+      </div>
+      <div class="sub-actions">
+        <button class="sub-btn edit" onclick="event.stopPropagation(); openEdit('${s.id}')">Edit</button>
+        ${!s.ended ? `<button class="sub-btn renew" onclick="event.stopPropagation(); renewSub('${s.id}')">Renew</button>` : ''}
+        ${!s.ended ? `<button class="sub-btn end" onclick="event.stopPropagation(); endSub('${s.id}')">End</button>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function toggleCard(id) {
+  const card = document.getElementById('sub-' + id);
+  card.classList.toggle('expanded');
+}
+
+// ─── ADD SUBSCRIPTION ────────────────────────────────────────────────────────
+function addSub() {
+  const name = document.getElementById('subName').value.trim();
+  const price = parseFloat(document.getElementById('subPrice').value);
+  const billing = document.getElementById('subBilling').value;
+  const category = document.getElementById('subCategory').value;
+  const startDate = document.getElementById('subStartDate').value;
+  const endDate = document.getElementById('subEndDate').value;
+  const billingDays = billing === 'days' ? parseInt(document.getElementById('subDays').value) || 30 : null;
+  const paymentMode = getPaymentMode('sub');
+
+  if (!name || isNaN(price) || price <= 0) {
+    showToast('Please enter a valid name and price', true);
+    return;
+  }
+
+  const newSub = {
+    id: Date.now().toString(),
+    name, price, billing, billingDays, category, startDate, endDate, paymentMode,
+    ended: false,
+    autoRenewed: false,
+    customLogo: null
+  };
+
+  subs.push(newSub);
+  save();
+  render();
+
+  document.getElementById('subName').value = '';
+  document.getElementById('subPrice').value = '';
+  document.getElementById('subBilling').value = 'monthly';
+  document.getElementById('subCategory').value = 'Entertainment';
+  handleBillingChange('sub');
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('subStartDate').value = today;
+  autoCalcEndDateByCycle('sub', 'monthly');
+  selectPaymentMode('sub', 'card');
+
+  showToast(`${name} added ✓`);
+}
+
+// ─── EDIT MODAL ──────────────────────────────────────────────────────────────
+function openEdit(id) {
+  const s = subs.find(sub => sub.id === id);
+  if (!s) return;
+
+  document.getElementById('editId').value = s.id;
+  document.getElementById('editName').value = s.name;
+  document.getElementById('editPrice').value = s.price;
+  document.getElementById('editBilling').value = s.billing;
+  document.getElementById('editCategory').value = s.category;
+  document.getElementById('editStartDate').value = s.startDate;
+  document.getElementById('editEndDate').value = s.endDate || '';
+  document.getElementById('editDays').value = s.billingDays || 30;
+
+  handleBillingChange('edit');
+  selectPaymentMode('edit', s.paymentMode || 'card');
+
+  document.getElementById('editIconInput')._pendingLogo = null;
+  document.getElementById('editIconInput')._removeLogo = false;
+
+  document.getElementById('editModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  updateEditIconPreview(s.customLogo || (matchKnown(s.name) && matchKnown(s.name).logo) || null, s.name);
+  
+  // Add ESC key listener
+  document.addEventListener('keydown', handleEditEscKey);
+}
+
+function closeEdit() {
+  document.getElementById('editModal').classList.remove('open');
+  document.body.style.overflow = '';
+  const inp = document.getElementById('editIconInput');
+  inp._pendingLogo = null;
+  inp._removeLogo = false;
+  
+  // Remove ESC key listener
+  document.removeEventListener('keydown', handleEditEscKey);
+}
+
+function handleEditEscKey(e) {
+  if (e.key === 'Escape') {
+    closeEdit();
+  }
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('editModal')) closeEdit();
+}
+
+function saveEdit() {
+  const id = document.getElementById('editId').value;
+  const name = document.getElementById('editName').value.trim();
+  const price = parseFloat(document.getElementById('editPrice').value);
+  const billing = document.getElementById('editBilling').value;
+  const category = document.getElementById('editCategory').value;
+  const startDate = document.getElementById('editStartDate').value;
+  const endDate = document.getElementById('editEndDate').value;
+  const billingDays = billing === 'days' ? parseInt(document.getElementById('editDays').value) || 30 : null;
+  const paymentMode = getPaymentMode('edit');
+
+  if (!name || isNaN(price) || price <= 0) {
+    showToast('Please enter a valid name and price', true);
+    return;
+  }
+
+  const idx = subs.findIndex(s => s.id === id);
+  if (idx === -1) return;
+
+  const pendingLogo = document.getElementById('editIconInput')._pendingLogo;
+  const removeLogo = document.getElementById('editIconInput')._removeLogo;
+  let customLogo = subs[idx].customLogo || null;
+  if (removeLogo) customLogo = null;
+  if (pendingLogo) customLogo = pendingLogo;
+
+  subs[idx] = { ...subs[idx], name, price, billing, billingDays, category, startDate, endDate, paymentMode, customLogo };
+  save();
+  render();
+  closeEdit();
+  showToast(`${name} updated ✓`);
+}
+
+// ─── RENEW / END ─────────────────────────────────────────────────────────────
+function renewSub(id) {
+  const idx = subs.findIndex(s => s.id === id);
+  if (idx === -1) return;
+  const s = subs[idx];
+  const newStart = s.endDate || new Date().toISOString().split('T')[0];
+  const newEnd = computeEndDateFrom(newStart, s);
+  subs[idx] = { ...s, startDate: newStart, endDate: newEnd, ended: false, autoRenewed: false };
+  save();
+  render();
+  setTimeout(() => {
+    const card = document.getElementById('sub-' + id);
+    if (card) card.classList.add('just-renewed');
+  }, 50);
+  showToast(`${s.name} renewed until ${fmtDate(newEnd)} 🎉`);
+}
+
+function endSub(id) {
+  const idx = subs.findIndex(s => s.id === id);
+  if (idx === -1) return;
+  const s = subs[idx];
+  subs[idx] = { ...s, ended: true };
+  save();
+  render();
+  showToast(`${s.name} marked as ended.`);
+}
+
+function computeEndDateFrom(startStr, s) {
+  const d = new Date(startStr);
+  if (s.billing === 'monthly') d.setDate(d.getDate() + 30);
+  else if (s.billing === 'annual') { d.setFullYear(d.getFullYear() + 1); d.setDate(d.getDate() - 1); }
+  else if (s.billing === 'weekly') d.setDate(d.getDate() + 7);
+  else if (s.billing === 'days') d.setDate(d.getDate() + (s.billingDays || 30));
+  else d.setDate(d.getDate() + 30);
+  return d.toISOString().split('T')[0];
+}
+
+function autoRenewExpired() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let renewed = [];
+  subs = subs.map(s => {
+    if (s.ended) return s;
+    if (!s.endDate) return s;
+    const end = new Date(s.endDate);
+    end.setHours(23, 59, 59, 0);
+    if (end < today) {
+      const newStart = s.endDate;
+      const newEnd = computeEndDateFrom(newStart, s);
+      renewed.push(s.name);
+      return { ...s, startDate: newStart, endDate: newEnd, autoRenewed: true };
+    }
+    return s;
+  });
+  if (renewed.length > 0) {
+    save();
+    if (renewed.length === 1) showToast(`Auto-renewed: ${renewed[0]} 🔄`);
+    else showToast(`Auto-renewed ${renewed.length} subscriptions 🔄`);
+  }
+}
+
+// ─── ICON UPLOAD ─────────────────────────────────────────────────────────────
+function handleEditIconUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const uri = e.target.result;
+    document.getElementById('editIconInput')._pendingLogo = uri;
+    document.getElementById('editIconInput')._removeLogo = false;
+    updateEditIconPreview(uri, document.getElementById('editName').value || '?');
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function removeEditIcon() {
+  document.getElementById('editIconInput')._pendingLogo = null;
+  document.getElementById('editIconInput')._removeLogo = true;
+  const name = document.getElementById('editName').value || '?';
+  updateEditIconPreview(null, name);
+}
+
+function updateEditIconPreview(logoUri, name) {
+  const preview = document.getElementById('editIconPreview');
+  const fallback = document.getElementById('editIconFallback');
+  const removeBtn = document.getElementById('editIconRemoveBtn');
+  if (logoUri) {
+    fallback.style.display = 'none';
+    const existing = preview.querySelector('img.icon-preview-img');
+    if (existing) existing.remove();
+    const img = document.createElement('img');
+    img.className = 'icon-preview-img';
+    img.src = logoUri;
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:10px;position:absolute;inset:0;';
+    preview.insertBefore(img, preview.querySelector('.icon-preview-overlay'));
+    removeBtn.classList.add('visible');
+  } else {
+    fallback.style.display = '';
+    const known = matchKnown(name);
+    fallback.textContent = (known && known.emoji) || name.slice(0,2).toUpperCase() || '📦';
+    const existing = preview.querySelector('img.icon-preview-img');
+    if (existing) existing.remove();
+    removeBtn.classList.remove('visible');
+  }
+}
+
+// ─── NOTIFICATIONS ───────────────────────────────────────────────────────────
+function getExpiringSoon() {
+  return subs
+    .filter(s => {
+      if (!s.endDate) return false;
+      const h = hoursLeft(s.endDate);
+      return h !== null && h <= 72 && h >= -24;
+    })
+    .sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+}
+
+function hoursLeft(dateStr) {
+  if (!dateStr) return null;
+  const end = new Date(dateStr);
+  end.setHours(23, 59, 59, 0);
+  return (end - new Date()) / 3600000;
+}
+
+function getDaysLeft(s) {
+  if (!s.endDate) return null;
+  const h = hoursLeft(s.endDate);
+  if (h === null) return null;
+  const days = Math.ceil(h / 24);
+  return days;
+}
+
+function formatDaysLeft(days) {
+  if (days === null) return null;
+  if (days < 0) return 'Expired';
+  if (days === 0) return 'Today';
+  if (days === 1) return '1 day';
+  if (days <= 7) return `${days} days`;
+  const weeks = Math.floor(days / 7);
+  if (weeks === 1) return '1 week';
+  if (days <= 30) return `${weeks} weeks`;
+  const months = Math.floor(days / 30);
+  if (months === 1) return '1 month';
+  return `${months} months`;
+}
+
+function updateNotifBell() {
+  const expiring = getExpiringSoon();
+  const btn = document.getElementById('notifBellBtn');
+  const badge = document.getElementById('notifBadge');
+  if (expiring.length > 0) {
+    btn.classList.add('has-alerts');
+    badge.style.display = 'flex';
+    badge.textContent = expiring.length;
+  } else {
+    btn.classList.remove('has-alerts');
+    badge.style.display = 'none';
+  }
+}
+
+function openNotifPanel() {
+  const expiring = getExpiringSoon();
+  const list = document.getElementById('notifList');
+  const countEl = document.getElementById('notifPanelCount');
+
+  if (expiring.length === 0) {
+    countEl.textContent = '';
+    list.innerHTML = `
+      <div class="notif-empty">
+        <div class="big-emoji">✅</div>
+        <p>No subscriptions expiring<br>within the next 72 hours!</p>
+      </div>`;
+  } else {
+    countEl.textContent = `· ${expiring.length} alert${expiring.length !== 1 ? 's' : ''}`;
+    list.innerHTML = expiring.map(s => {
+      const known = matchKnown(s.name);
+      const emoji = known ? known.emoji : '📦';
+      const h = hoursLeft(s.endDate);
+      let timeLabel, timeClass, itemClass;
+      if (h < 0) {
+        timeLabel = 'Expired';
+        timeClass = 'red'; itemClass = 'urgent';
+      } else if (h <= 1) {
+        timeLabel = '< 1 hr left';
+        timeClass = 'red'; itemClass = 'today';
+      } else if (h <= 24) {
+        const hrs = Math.ceil(h);
+        timeLabel = `${hrs}h left`;
+        timeClass = 'red'; itemClass = 'urgent';
+      } else {
+        const hrs = Math.round(h);
+        timeLabel = `~${Math.floor(hrs/24)}d ${hrs%24}h left`;
+        timeClass = 'orange'; itemClass = 'warning';
+      }
+      return `
+        <div class="notif-item ${itemClass}">
+          <div class="notif-emoji">${emoji}</div>
+          <div class="notif-info">
+            <div class="notif-name">${escHtml(s.name)}</div>
+            <div class="notif-desc">${s.category} · ends ${fmtDate(s.endDate)}</div>
+          </div>
+          <div class="notif-time ${timeClass}">${timeLabel}</div>
+        </div>`;
+    }).join('');
+  }
+
+  document.getElementById('notifPanel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  
+  // Add keyboard listener for ESC key
+  document.addEventListener('keydown', handleNotifEscKey);
+}
+
+function closeNotifPanel() {
+  document.getElementById('notifPanel').classList.remove('open');
+  document.body.style.overflow = '';
+  
+  // Remove keyboard listener
+  document.removeEventListener('keydown', handleNotifEscKey);
+}
+
+function handleNotifEscKey(e) {
+  if (e.key === 'Escape') {
+    closeNotifPanel();
+  }
+}
+
+function handleNotifOverlayClick(e) {
+  if (e.target === document.getElementById('notifPanel')) closeNotifPanel();
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function toggleChart() {
+  const chartModal = document.getElementById('chartModal');
+  const isOpen = chartModal.classList.contains('open');
+  
+  if (isOpen) {
+    chartModal.classList.remove('open');
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', handleChartEscKey);
+  } else {
+    chartModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleChartEscKey);
+  }
+}
+
+function handleChartEscKey(e) {
+  if (e.key === 'Escape') {
+    toggleChart();
+  }
+}
+
+function handleChartModalClick(e) {
+  if (e.target === document.getElementById('chartModal')) {
+    toggleChart();
+  }
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}/${y.slice(2)}`;
+}
+
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast' + (isError ? ' error' : '');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function handleBillingChange(prefix) {
+  const val = document.getElementById(prefix + 'Billing').value;
+  const wrapper = document.getElementById(prefix + 'DaysWrapper');
+  if (val === 'days') {
+    wrapper.classList.add('active');
+  } else {
+    wrapper.classList.remove('active');
+  }
+  autoCalcEndDateByCycle(prefix);
+}
+
+function autoCalcEndDateByCycle(prefix, overrideBilling) {
+  const startInput = document.getElementById(prefix + 'StartDate');
+  const endInput = document.getElementById(prefix + 'EndDate');
+  const billingInput = document.getElementById(prefix + 'Billing');
+  const daysInput = document.getElementById(prefix + 'Days');
+
+  const startVal = startInput.value;
+  if (!startVal) return;
+
+  const billing = overrideBilling || billingInput.value;
+  const d = new Date(startVal);
+
+  if (billing === 'monthly') d.setDate(d.getDate() + 30);
+  else if (billing === 'annual') { d.setFullYear(d.getFullYear() + 1); d.setDate(d.getDate() - 1); }
+  else if (billing === 'weekly') d.setDate(d.getDate() + 7);
+  else if (billing === 'days') {
+    const days = parseInt(daysInput.value) || 30;
+    d.setDate(d.getDate() + days);
+  }
+
+  endInput.value = d.toISOString().split('T')[0];
+}
+
+function selectPaymentMode(prefix, mode) {
+  const container = document.getElementById(prefix + 'PaymentMode');
+  container.querySelectorAll('.payment-mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+}
+
+function getPaymentMode(prefix) {
+  const container = document.getElementById(prefix + 'PaymentMode');
+  const active = container.querySelector('.payment-mode-btn.active');
+  return active ? active.dataset.mode : 'card';
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+(function init() {
+  // Initialize Firebase first
+  initFirebase();
+  
+  // If Firebase is not configured, load from localStorage
+  if (!isFirebaseEnabled) {
+    subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+  }
+  
+  loadTheme();
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('subStartDate').value = today;
+  autoCalcEndDateByCycle('sub', 'monthly');
+  autoRenewExpired();
+  
+  // Render after a short delay to let Firebase load
+  setTimeout(() => {
+    render();
+  }, 500);
+})();
+</script>
+</body>
+</html>

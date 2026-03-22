@@ -48,7 +48,6 @@
     background: radial-gradient(circle, rgba(217,147,74,0.2) 0%, transparent 70%);
   }
   
-  /* Light mode bright text for maximum contrast */
   body.light-mode .summary-card .label,
   body.light-mode .sub-cycle,
   body.light-mode .sub-row-enddate,
@@ -99,7 +98,6 @@
     overflow-x: hidden;
   }
 
-  /* BG decoration */
   body::before {
     content: '';
     position: fixed;
@@ -119,7 +117,6 @@
     z-index: 0;
   }
 
-  /* LANDSCAPE LAYOUT */
   .app-wrapper {
     max-width: 1680px;
     margin: 0 auto;
@@ -128,7 +125,6 @@
     z-index: 1;
   }
 
-  /* HEADER - Compact for landscape */
   header {
     padding: 16px 0 20px;
     display: flex;
@@ -170,7 +166,6 @@
     right: 0;
   }
 
-  /* Theme toggle switch */
   .theme-toggle {
     position: relative;
     width: 56px;
@@ -203,7 +198,6 @@
     background: var(--purple);
   }
 
-  /* MAIN GRID - Three columns */
   .main-grid {
     display: grid;
     grid-template-columns: 320px 1fr 1fr;
@@ -211,7 +205,6 @@
     align-items: start;
   }
 
-  /* LEFT COLUMN - Forms and controls */
   .left-col {
     display: flex;
     flex-direction: column;
@@ -220,7 +213,6 @@
     top: 20px;
   }
 
-  /* SUMMARY CARDS */
   .summary-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -290,7 +282,6 @@
     border: 1px solid rgba(245,197,66,0.2);
   }
 
-  /* PIE CHART - Modal popup */
   .chart-modal {
     position: fixed;
     inset: 0;
@@ -382,7 +373,6 @@
     padding: 20px 0;
   }
 
-  /* CENTER COLUMN - First subscriptions column */
   .center-col {
     display: flex;
     flex-direction: column;
@@ -390,7 +380,6 @@
     min-height: 600px;
   }
 
-  /* RIGHT COLUMN - Second subscriptions column */
   .right-col {
     display: flex;
     flex-direction: column;
@@ -401,7 +390,6 @@
     align-self: start;
   }
 
-  /* VIEW TOGGLE */
   .view-toggle {
     display: flex;
     background: var(--card);
@@ -429,7 +417,6 @@
     font-weight: 600;
   }
 
-  /* SUBSCRIPTIONS LIST */
   .subs-scroll {
     flex: 1;
     overflow-y: auto;
@@ -586,7 +573,6 @@
     box-shadow: 0 0 8px rgba(255,94,114,0.5);
   }
 
-  /* Expanded details */
   .sub-card.expanded .sub-meta { display: none; }
 
   .sub-details {
@@ -649,7 +635,6 @@
     margin-bottom: 12px;
   }
 
-  /* RIGHT COLUMN - Add subscription form */
   .right-col {
     position: sticky;
     top: 20px;
@@ -747,7 +732,6 @@
   }
   .add-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(245,197,66,0.3); }
 
-  /* NOTIFICATION BELL */
   .notif-bell-btn {
     position: relative;
     width: 40px; height: 40px;
@@ -776,7 +760,6 @@
     display: none;
   }
 
-  /* MODALS */
   .modal-overlay {
     position: fixed;
     inset: 0;
@@ -858,7 +841,6 @@
   }
   .modal-btn:hover { opacity: 0.9; }
 
-  /* Icon upload */
   .icon-upload-area {
     display: flex;
     align-items: center;
@@ -925,7 +907,6 @@
     pointer-events: all;
   }
 
-  /* NOTIFICATION PANEL */
   .notif-panel {
     position: fixed;
     top: 0; right: 0;
@@ -1020,7 +1001,6 @@
     margin-bottom: 16px;
   }
 
-  /* TOAST */
   .toast {
     position: fixed;
     bottom: 30px;
@@ -1048,315 +1028,88 @@
     color: var(--danger);
   }
 
-  /* Responsive tweaks for smaller laptops */
   @media (max-width: 1400px) {
-    .main-grid {
-      grid-template-columns: 300px 1fr 1fr;
-    }
+    .main-grid { grid-template-columns: 300px 1fr 1fr; }
   }
-
   @media (max-width: 1200px) {
-    .main-grid {
-      grid-template-columns: 280px 1fr;
-    }
-    .right-col {
-      display: none;
-    }
+    .main-grid { grid-template-columns: 280px 1fr; }
+    .right-col { display: none; }
   }
-
   @media (max-width: 1000px) {
-    .main-grid {
-      grid-template-columns: 1fr;
-    }
-    .left-col {
-      position: static;
-    }
+    .main-grid { grid-template-columns: 1fr; }
+    .left-col { position: static; }
   }
 
-  /* Mobile portrait view (phones and small tablets) */
   @media (max-width: 768px) {
-    body {
-      font-size: 14px;
-    }
-
-    .app-wrapper {
-      padding: 12px 12px 40px;
-    }
-
-    /* Header - Make compact for mobile */
-    header {
-      padding: 12px 0 16px;
-    }
-    .logo-icon {
-      width: 28px;
-      height: 28px;
-      font-size: 13px;
-    }
-    header h1 {
-      font-size: 18px;
-    }
-    header p {
-      font-size: 11px;
-    }
-    .notif-bell-btn {
-      width: 36px;
-      height: 36px;
-      font-size: 16px;
-    }
-    .theme-toggle {
-      width: 50px;
-      height: 26px;
-    }
-    .theme-toggle-slider {
-      width: 18px;
-      height: 18px;
-      font-size: 10px;
-    }
-    body.light-mode .theme-toggle-slider {
-      left: 28px;
-    }
-
-    /* Main grid - Single column on mobile */
-    .main-grid {
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    /* Left column - No longer sticky on mobile */
-    .left-col {
-      position: static;
-      order: 1;
-    }
-
-    /* Center column comes after left */
-    .center-col {
-      order: 2;
-      min-height: auto;
-    }
-
-    /* Right column hidden on mobile */
-    .right-col {
-      display: none;
-    }
-
-    /* Summary cards - Stack vertically on mobile */
-    .summary-grid {
-      grid-template-columns: 1fr;
-      gap: 10px;
-      min-height: auto;
-    }
-    .summary-card {
-      padding: 14px 12px;
-      min-height: auto;
-    }
-    .summary-card .amount {
-      font-size: 18px;
-    }
-    .summary-card .label {
-      font-size: 11px;
-    }
-    .summary-card .sub-note {
-      font-size: 10px;
-    }
-    .summary-card .count-badge {
-      font-size: 9px;
-      padding: 2px 6px;
-    }
-
-    /* Add subscription form - More compact */
-    .add-card {
-      padding: 16px;
-    }
-    .section-title {
-      font-size: 12px;
-      margin-bottom: 12px;
-    }
-    .form-label {
-      font-size: 10px;
-      margin-bottom: 5px;
-    }
-    .form-input, .form-select {
-      padding: 9px 10px;
-      font-size: 12px;
-    }
-    .form-group {
-      margin-bottom: 12px;
-    }
-    .payment-mode-btn {
-      font-size: 10px;
-      padding: 7px;
-    }
-    .add-btn {
-      padding: 11px;
-      font-size: 13px;
-    }
-
-    /* Subscription cards - Optimize for mobile */
-    .sub-card {
-      padding: 12px;
-      margin-bottom: 8px;
-    }
-    .sub-logo {
-      width: 38px;
-      height: 38px;
-      font-size: 18px;
-    }
-    .sub-name {
-      font-size: 13px;
-    }
-    .sub-cycle {
-      font-size: 10px;
-    }
-    .sub-row-price {
-      font-size: 14px;
-      min-width: 45px;
-    }
-    .sub-row-enddate {
-      font-size: 11px;
-      min-width: 55px;
-    }
-    .pay-badge {
-      font-size: 9px;
-      padding: 2px 5px;
-      min-width: 40px;
-    }
-    .days-left-badge {
-      font-size: 9px;
-      padding: 2px 5px;
-      min-width: 50px;
-    }
-    .status-dot {
-      width: 8px;
-      height: 8px;
-    }
-
-    /* Expanded details */
-    .sub-details {
-      margin-top: 10px;
-      padding-top: 10px;
-      gap: 8px;
-    }
-    .detail-label {
-      font-size: 9px;
-    }
-    .detail-value {
-      font-size: 12px;
-    }
-    .sub-btn {
-      padding: 8px;
-      font-size: 11px;
-    }
-
-    /* Chart modal - Full width on mobile */
-    .chart-card {
-      max-width: 95%;
-      padding: 20px 16px;
-    }
-    .chart-canvas-wrap {
-      width: 160px;
-      height: 160px;
-    }
-    #pieChart {
-      width: 160px !important;
-      height: 160px !important;
-    }
-    .chart-legend {
-      grid-template-columns: 1fr;
-    }
-
-    /* Edit modal - Optimize for mobile */
-    .modal-content {
-      max-width: 95%;
-      padding: 20px 16px;
-    }
-    .modal-title {
-      font-size: 16px;
-    }
-    .icon-upload-area {
-      padding: 12px;
-    }
-    .icon-preview {
-      width: 50px;
-      height: 50px;
-    }
-    .icon-fallback {
-      font-size: 20px;
-    }
-
-    /* Notification panel - Full width on mobile */
-    .notif-panel {
-      width: 100%;
-    }
-    .notif-header {
-      padding: 20px 16px;
-    }
-    .notif-header h3 {
-      font-size: 16px;
-    }
-    .notif-item {
-      padding: 12px;
-    }
-    .notif-emoji {
-      width: 36px;
-      height: 36px;
-      font-size: 18px;
-    }
-    .notif-name {
-      font-size: 12px;
-    }
-    .notif-desc {
-      font-size: 10px;
-    }
-
-    /* Scrollable areas */
-    .subs-scroll {
-      padding-right: 4px;
-    }
-    .subs-scroll::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    /* View toggle buttons */
-    .toggle-btn {
-      font-size: 11px;
-      padding: 7px 0;
-    }
-
-    /* Empty state */
-    .empty-emoji {
-      font-size: 40px;
-    }
-    .empty-state {
-      font-size: 12px;
-      padding: 30px 16px;
-    }
+    body { font-size: 14px; }
+    .app-wrapper { padding: 12px 12px 40px; }
+    header { padding: 12px 0 16px; }
+    .logo-icon { width: 28px; height: 28px; font-size: 13px; }
+    header h1 { font-size: 18px; }
+    header p { font-size: 11px; }
+    .notif-bell-btn { width: 36px; height: 36px; font-size: 16px; }
+    .theme-toggle { width: 50px; height: 26px; }
+    .theme-toggle-slider { width: 18px; height: 18px; font-size: 10px; }
+    body.light-mode .theme-toggle-slider { left: 28px; }
+    .main-grid { grid-template-columns: 1fr; gap: 16px; }
+    .left-col { position: static; order: 1; }
+    .center-col { order: 2; min-height: auto; }
+    .right-col { display: none; }
+    .summary-grid { grid-template-columns: 1fr; gap: 10px; min-height: auto; }
+    .summary-card { padding: 14px 12px; min-height: auto; }
+    .summary-card .amount { font-size: 18px; }
+    .summary-card .label { font-size: 11px; }
+    .summary-card .sub-note { font-size: 10px; }
+    .summary-card .count-badge { font-size: 9px; padding: 2px 6px; }
+    .add-card { padding: 16px; }
+    .section-title { font-size: 12px; margin-bottom: 12px; }
+    .form-label { font-size: 10px; margin-bottom: 5px; }
+    .form-input, .form-select { padding: 9px 10px; font-size: 12px; }
+    .form-group { margin-bottom: 12px; }
+    .payment-mode-btn { font-size: 10px; padding: 7px; }
+    .add-btn { padding: 11px; font-size: 13px; }
+    .sub-card { padding: 12px; margin-bottom: 8px; }
+    .sub-logo { width: 38px; height: 38px; font-size: 18px; }
+    .sub-name { font-size: 13px; }
+    .sub-cycle { font-size: 10px; }
+    .sub-row-price { font-size: 14px; min-width: 45px; }
+    .sub-row-enddate { font-size: 11px; min-width: 55px; }
+    .pay-badge { font-size: 9px; padding: 2px 5px; min-width: 40px; }
+    .days-left-badge { font-size: 9px; padding: 2px 5px; min-width: 50px; }
+    .status-dot { width: 8px; height: 8px; }
+    .sub-details { margin-top: 10px; padding-top: 10px; gap: 8px; }
+    .detail-label { font-size: 9px; }
+    .detail-value { font-size: 12px; }
+    .sub-btn { padding: 8px; font-size: 11px; }
+    .chart-card { max-width: 95%; padding: 20px 16px; }
+    .chart-canvas-wrap { width: 160px; height: 160px; }
+    #pieChart { width: 160px !important; height: 160px !important; }
+    .chart-legend { grid-template-columns: 1fr; }
+    .modal-content { max-width: 95%; padding: 20px 16px; }
+    .modal-title { font-size: 16px; }
+    .icon-upload-area { padding: 12px; }
+    .icon-preview { width: 50px; height: 50px; }
+    .icon-fallback { font-size: 20px; }
+    .notif-panel { width: 100%; }
+    .notif-header { padding: 20px 16px; }
+    .notif-header h3 { font-size: 16px; }
+    .notif-item { padding: 12px; }
+    .notif-emoji { width: 36px; height: 36px; font-size: 18px; }
+    .notif-name { font-size: 12px; }
+    .notif-desc { font-size: 10px; }
+    .subs-scroll { padding-right: 4px; }
+    .subs-scroll::-webkit-scrollbar { width: 4px; }
+    .toggle-btn { font-size: 11px; padding: 7px 0; }
+    .empty-emoji { font-size: 40px; }
+    .empty-state { font-size: 12px; padding: 30px 16px; }
   }
 
-  /* Very small phones */
   @media (max-width: 375px) {
-    .app-wrapper {
-      padding: 10px 10px 40px;
-    }
-    
-    .sub-meta {
-      gap: 6px;
-    }
-    
-    .sub-row-price {
-      font-size: 13px;
-      min-width: 40px;
-    }
-    
-    .sub-row-enddate {
-      font-size: 10px;
-      min-width: 50px;
-    }
-    
-    .pay-badge, .days-left-badge {
-      font-size: 8px;
-      padding: 2px 4px;
-      min-width: 35px;
-    }
+    .app-wrapper { padding: 10px 10px 40px; }
+    .sub-meta { gap: 6px; }
+    .sub-row-price { font-size: 13px; min-width: 40px; }
+    .sub-row-enddate { font-size: 10px; min-width: 50px; }
+    .pay-badge, .days-left-badge { font-size: 8px; padding: 2px 4px; min-width: 35px; }
   }
 </style>
 </head>
@@ -1383,9 +1136,7 @@
   </header>
 
   <div class="main-grid">
-    <!-- LEFT COLUMN - All Controls -->
     <div class="left-col">
-      <!-- Add Subscription Form -->
       <div class="add-card">
         <div class="section-title">
           <span class="dot"></span>
@@ -1454,9 +1205,7 @@
       </div>
     </div>
 
-    <!-- CENTER COLUMN - First Subscriptions Column -->
     <div class="center-col">
-      <!-- Summary Cards -->
       <div class="summary-grid">
         <div class="summary-card" onclick="toggleChart()">
           <div class="label">This Month</div>
@@ -1476,9 +1225,7 @@
       </div>
     </div>
 
-    <!-- RIGHT COLUMN - Second Subscriptions Column -->
     <div class="right-col">
-      <!-- Total Active Card -->
       <div class="summary-card full">
         <div class="label">Total Active</div>
         <div class="amount" id="subsCount">0</div>
@@ -1486,14 +1233,12 @@
         <div class="count-badge" id="activeCountBadge">0 active</div>
       </div>
 
-      <div class="subs-scroll" id="subsContainer2">
-        <!-- Continuation of subscriptions -->
-      </div>
+      <div class="subs-scroll" id="subsContainer2"></div>
     </div>
   </div>
 </div>
 
-<!-- CHART MODAL POPUP -->
+<!-- CHART MODAL -->
 <div id="chartModal" class="chart-modal" onclick="handleChartModalClick(event)">
   <div class="chart-card">
     <div class="section-title">
@@ -1618,45 +1363,18 @@ const firebaseConfig = {
   appId: "1:291568174592:web:74aff29d12bc6bf8dfbae5"
 };
 
-// Initialize Firebase
 let firebaseApp = null;
 let database = null;
-let auth = null;
-let currentUser = null;
 let isFirebaseEnabled = false;
 
 function initFirebase() {
-  // Check if config is set up
-  if (firebaseConfig.apiKey === "YOUR_API_KEY") {
-    console.log("📦 Firebase not configured - using localStorage only");
-    console.log("ℹ️ See setup instructions in the browser console");
-    showFirebaseSetupInstructions();
-    return false;
-  }
-
   try {
     firebaseApp = firebase.initializeApp(firebaseConfig);
     database = firebase.database();
-    auth = firebase.auth();
     isFirebaseEnabled = true;
-    
-    // Anonymous authentication for simplicity
-    auth.signInAnonymously()
-      .then((userCredential) => {
-        currentUser = userCredential.user;
-        console.log("✅ Firebase connected! User ID:", currentUser.uid);
-        
-        // Load data from Firebase
-        loadFromFirebase();
-        
-        // Listen for real-time updates
-        setupFirebaseListener();
-      })
-      .catch((error) => {
-        console.error("❌ Firebase auth error:", error);
-        isFirebaseEnabled = false;
-      });
-    
+    console.log("✅ Firebase initialized!");
+    loadFromFirebase();
+    setupFirebaseListener();
     return true;
   } catch (error) {
     console.error("❌ Firebase initialization error:", error);
@@ -1665,88 +1383,22 @@ function initFirebase() {
   }
 }
 
-function showFirebaseSetupInstructions() {
-  console.log(`
-╔════════════════════════════════════════════════════════════════════╗
-║                    🔥 FIREBASE SETUP INSTRUCTIONS                  ║
-╚════════════════════════════════════════════════════════════════════╝
-
-To enable real-time sync across your devices:
-
-1️⃣  GO TO FIREBASE CONSOLE
-   👉 https://console.firebase.google.com/
-
-2️⃣  CREATE A NEW PROJECT
-   • Click "Add project"
-   • Name it "SubSukesh" (or whatever you like)
-   • Disable Google Analytics (optional)
-   • Click "Create project"
-
-3️⃣  ADD A WEB APP
-   • Click the </> (Web) icon
-   • Name it "SubSukesh Web App"
-   • Click "Register app"
-   • Copy the firebaseConfig object
-
-4️⃣  ENABLE REALTIME DATABASE
-   • Go to "Realtime Database" in left menu
-   • Click "Create Database"
-   • Choose location closest to you
-   • Start in "Test mode" (we'll secure it later)
-   • Click "Enable"
-
-5️⃣  UPDATE THE CODE
-   • Open this HTML file in a text editor
-   • Find "const firebaseConfig = {" (around line 1060)
-   • Replace with your config from step 3
-   • Save the file
-
-6️⃣  OPEN THE APP
-   • Open the HTML file in your browser
-   • Check browser console (F12) for success message
-   • Your data will now sync across all devices! 🎉
-
-📱 USING ON MULTIPLE DEVICES:
-   • Open the same HTML file on MacBook and iPhone
-   • Or host it online (GitHub Pages, Netlify, Vercel)
-   • All changes sync in real-time automatically!
-
-🔒 SECURITY (Important!):
-   After testing, secure your database:
-   • Go to "Realtime Database" → "Rules"
-   • Replace with:
-   {
-     "rules": {
-       "users": {
-         "$uid": {
-           ".read": "$uid === auth.uid",
-           ".write": "$uid === auth.uid"
-         }
-       }
-     }
-   }
-
-Need help? Check: https://firebase.google.com/docs/web/setup
-╚════════════════════════════════════════════════════════════════════╝
-  `);
-}
-
 // ═══════════════════════════════════════════════════════════════════════════
-// FIREBASE SYNC FUNCTIONS
+// FIREBASE SYNC — SHARED PATH (all devices see the same data)
 // ═══════════════════════════════════════════════════════════════════════════
 
 function loadFromFirebase() {
-  if (!isFirebaseEnabled || !currentUser) return;
-  
-  const userRef = database.ref('users/' + currentUser.uid + '/subscriptions');
-  userRef.once('value')
+  if (!isFirebaseEnabled) return;
+
+  const sharedRef = database.ref('subsukesh/subscriptions');
+  sharedRef.once('value')
     .then((snapshot) => {
       if (snapshot.exists()) {
         subs = snapshot.val() || [];
         console.log("📥 Loaded", subs.length, "subscriptions from Firebase");
         render();
       } else {
-        // No data in Firebase, migrate from localStorage
+        // No data in Firebase yet — migrate from localStorage if any
         const localData = localStorage.getItem('subsukesh_subs');
         if (localData) {
           subs = JSON.parse(localData);
@@ -1757,41 +1409,36 @@ function loadFromFirebase() {
     })
     .catch((error) => {
       console.error("❌ Error loading from Firebase:", error);
-      // Fallback to localStorage
       subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
       render();
     });
 }
 
 function saveToFirebase() {
-  if (!isFirebaseEnabled || !currentUser) {
-    // Fallback to localStorage
+  if (!isFirebaseEnabled) {
     localStorage.setItem('subsukesh_subs', JSON.stringify(subs));
     return;
   }
-  
-  const userRef = database.ref('users/' + currentUser.uid + '/subscriptions');
-  userRef.set(subs)
+
+  const sharedRef = database.ref('subsukesh/subscriptions');
+  sharedRef.set(subs)
     .then(() => {
       console.log("💾 Saved to Firebase");
-      // Also save to localStorage as backup
       localStorage.setItem('subsukesh_subs', JSON.stringify(subs));
     })
     .catch((error) => {
       console.error("❌ Error saving to Firebase:", error);
-      // Fallback to localStorage
       localStorage.setItem('subsukesh_subs', JSON.stringify(subs));
     });
 }
 
 function setupFirebaseListener() {
-  if (!isFirebaseEnabled || !currentUser) return;
-  
-  const userRef = database.ref('users/' + currentUser.uid + '/subscriptions');
-  userRef.on('value', (snapshot) => {
+  if (!isFirebaseEnabled) return;
+
+  const sharedRef = database.ref('subsukesh/subscriptions');
+  sharedRef.on('value', (snapshot) => {
     if (snapshot.exists()) {
       const newSubs = snapshot.val() || [];
-      // Only update if data actually changed (avoid infinite loops)
       if (JSON.stringify(newSubs) !== JSON.stringify(subs)) {
         subs = newSubs;
         console.log("🔄 Real-time update received!");
@@ -1807,11 +1454,9 @@ function setupFirebaseListener() {
 let subs = [];
 let pieChartInstance = null;
 
-// ─── THEME TOGGLE ────────────────────────────────────────────────────────────
 function toggleTheme() {
   const body = document.body;
   const slider = document.querySelector('.theme-toggle-slider');
-  
   if (body.classList.contains('light-mode')) {
     body.classList.remove('light-mode');
     slider.textContent = '🌙';
@@ -1823,11 +1468,9 @@ function toggleTheme() {
   }
 }
 
-// Load saved theme on page load
 function loadTheme() {
   const savedTheme = localStorage.getItem('subsukesh_theme');
   const slider = document.querySelector('.theme-toggle-slider');
-  
   if (savedTheme === 'light') {
     document.body.classList.add('light-mode');
     slider.textContent = '☀️';
@@ -1836,44 +1479,31 @@ function loadTheme() {
   }
 }
 
-// Known subscriptions database
 const knownSubs = [
-  { name: 'Netflix', emoji: '🎬', logo: null },
-  { name: 'Spotify', emoji: '🎵', logo: null },
-  { name: 'YouTube', emoji: '▶️', logo: null },
-  { name: 'YouTube Premium', emoji: '▶️', logo: null },
-  { name: 'Prime Video', emoji: '📺', logo: null },
-  { name: 'Disney+', emoji: '🏰', logo: null },
-  { name: 'Hotstar', emoji: '⭐', logo: null },
-  { name: 'Apple Music', emoji: '🍎', logo: null },
-  { name: 'iCloud', emoji: '☁️', logo: null },
-  { name: 'Google One', emoji: '📦', logo: null },
-  { name: 'Dropbox', emoji: '📁', logo: null },
-  { name: 'ChatGPT', emoji: '🤖', logo: null },
-  { name: 'GitHub', emoji: '🐙', logo: null },
-  { name: 'Adobe', emoji: '🎨', logo: null },
-  { name: 'Figma', emoji: '🎨', logo: null },
-  { name: 'Notion', emoji: '📝', logo: null },
-  { name: 'Canva', emoji: '🎨', logo: null }
+  { name: 'Netflix', emoji: '🎬' },
+  { name: 'Spotify', emoji: '🎵' },
+  { name: 'YouTube', emoji: '▶️' },
+  { name: 'YouTube Premium', emoji: '▶️' },
+  { name: 'Prime Video', emoji: '📺' },
+  { name: 'Disney+', emoji: '🏰' },
+  { name: 'Hotstar', emoji: '⭐' },
+  { name: 'Apple Music', emoji: '🍎' },
+  { name: 'iCloud', emoji: '☁️' },
+  { name: 'Google One', emoji: '📦' },
+  { name: 'Dropbox', emoji: '📁' },
+  { name: 'ChatGPT', emoji: '🤖' },
+  { name: 'GitHub', emoji: '🐙' },
+  { name: 'Adobe', emoji: '🎨' },
+  { name: 'Figma', emoji: '🎨' },
+  { name: 'Notion', emoji: '📝' },
+  { name: 'Canva', emoji: '🎨' }
 ];
 
 function matchKnown(name) {
   return knownSubs.find(k => k.name.toLowerCase() === name.toLowerCase());
 }
 
-// Category icons
-const catIcons = {
-  Entertainment: '🎬',
-  Productivity: '💼',
-  Cloud: '☁️',
-  Education: '📚',
-  Fitness: '💪',
-  Other: '📦'
-};
-
-function save() {
-  saveToFirebase();
-}
+function save() { saveToFirebase(); }
 
 function render() {
   renderSummary();
@@ -1882,7 +1512,6 @@ function render() {
   updateNotifBell();
 }
 
-// ─── SUMMARY CARDS ───────────────────────────────────────────────────────────
 function renderSummary() {
   const active = subs.filter(s => !s.ended);
   let monthly = 0, annual = 0;
@@ -1890,10 +1519,7 @@ function renderSummary() {
     if (s.billing === 'monthly') monthly += s.price;
     else if (s.billing === 'annual') annual += s.price;
     else if (s.billing === 'weekly') monthly += s.price * 4;
-    else if (s.billing === 'days') {
-      const perDay = s.price / (s.billingDays || 30);
-      monthly += perDay * 30;
-    }
+    else if (s.billing === 'days') monthly += (s.price / (s.billingDays || 30)) * 30;
   });
   annual += monthly * 12;
 
@@ -1903,29 +1529,20 @@ function renderSummary() {
   document.getElementById('activeCountBadge').textContent = `${active.length} active`;
 
   const upcoming = active.filter(s => s.endDate).sort((a,b) => new Date(a.endDate) - new Date(b.endDate));
-  if (upcoming.length > 0) {
-    document.getElementById('nextRenewal').textContent = fmtDate(upcoming[0].endDate);
-  } else {
-    document.getElementById('nextRenewal').textContent = '—';
-  }
+  document.getElementById('nextRenewal').textContent = upcoming.length > 0 ? fmtDate(upcoming[0].endDate) : '—';
 }
 
-// ─── PIE CHART ───────────────────────────────────────────────────────────────
 function renderChart() {
   const active = subs.filter(s => !s.ended);
   if (active.length === 0) {
     document.getElementById('chartContainer').innerHTML = `<div class="no-data-msg">Add subscriptions to see breakdown</div>`;
-    if (pieChartInstance) {
-      pieChartInstance.destroy();
-      pieChartInstance = null;
-    }
+    if (pieChartInstance) { pieChartInstance.destroy(); pieChartInstance = null; }
     return;
   }
 
   const byCategory = {};
   active.forEach(s => {
-    const monthly = toMonthly(s);
-    byCategory[s.category] = (byCategory[s.category] || 0) + monthly;
+    byCategory[s.category] = (byCategory[s.category] || 0) + toMonthly(s);
   });
 
   const labels = Object.keys(byCategory);
@@ -1933,50 +1550,26 @@ function renderChart() {
   const total = data.reduce((a,b) => a+b, 0);
   const colors = ['#f5c542','#9b7fe8','#4cd9a0','#ff5e72','#f09d51','#5eb3f6'];
 
-  const chartHTML = `
-    <div class="chart-canvas-wrap">
-      <canvas id="pieChart"></canvas>
-    </div>
+  document.getElementById('chartContainer').innerHTML = `
+    <div class="chart-canvas-wrap"><canvas id="pieChart"></canvas></div>
     <div class="chart-legend">
-      ${labels.map((label, i) => {
-        const pct = ((data[i] / total) * 100).toFixed(0);
-        return `
-          <div class="legend-item">
-            <div class="legend-dot" style="background:${colors[i % colors.length]}"></div>
-            <div class="legend-name">${label}</div>
-            <div class="legend-pct">${pct}%</div>
-          </div>`;
-      }).join('')}
-    </div>
-  `;
-  document.getElementById('chartContainer').innerHTML = chartHTML;
+      ${labels.map((label, i) => `
+        <div class="legend-item">
+          <div class="legend-dot" style="background:${colors[i % colors.length]}"></div>
+          <div class="legend-name">${label}</div>
+          <div class="legend-pct">${((data[i]/total)*100).toFixed(0)}%</div>
+        </div>`).join('')}
+    </div>`;
 
   if (pieChartInstance) pieChartInstance.destroy();
-  const ctx = document.getElementById('pieChart').getContext('2d');
-  pieChartInstance = new Chart(ctx, {
+  pieChartInstance = new Chart(document.getElementById('pieChart').getContext('2d'), {
     type: 'doughnut',
-    data: {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor: colors,
-        borderWidth: 0
-      }]
-    },
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
     options: {
-      responsive: false,
-      maintainAspectRatio: false,
+      responsive: false, maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: (ctx) => {
-              const val = ctx.parsed;
-              const pct = ((val / total) * 100).toFixed(0);
-              return `₹${val.toFixed(0)} (${pct}%)`;
-            }
-          }
-        }
+        tooltip: { callbacks: { label: (ctx) => `₹${ctx.parsed.toFixed(0)} (${((ctx.parsed/total)*100).toFixed(0)}%)` } }
       },
       cutout: '65%'
     }
@@ -1987,46 +1580,31 @@ function toMonthly(s) {
   if (s.billing === 'monthly') return s.price;
   if (s.billing === 'annual') return s.price / 12;
   if (s.billing === 'weekly') return s.price * 4;
-  if (s.billing === 'days') {
-    const perDay = s.price / (s.billingDays || 30);
-    return perDay * 30;
-  }
+  if (s.billing === 'days') return (s.price / (s.billingDays || 30)) * 30;
   return s.price;
 }
 
-// ─── SUBSCRIPTIONS LIST ──────────────────────────────────────────────────────
 function getSubStatus(s) {
   if (s.ended) return 'red';
   if (!s.endDate) return 'green';
-  
   const h = hoursLeft(s.endDate);
   if (h === null) return 'green';
-  if (h <= 168) return 'yellow'; // 7 days = 168 hours
+  if (h <= 168) return 'yellow';
   return 'green';
 }
 
-function sortByStatus(subs) {
-  return subs.sort((a, b) => {
-    const statusOrder = { yellow: 0, green: 1, red: 2 };
-    const aStatus = getSubStatus(a);
-    const bStatus = getSubStatus(b);
-    
-    if (statusOrder[aStatus] !== statusOrder[bStatus]) {
-      return statusOrder[aStatus] - statusOrder[bStatus];
-    }
-    
-    // Within same status, sort by end date
-    if (a.endDate && b.endDate) {
-      return new Date(a.endDate) - new Date(b.endDate);
-    }
+function sortByStatus(arr) {
+  return arr.sort((a, b) => {
+    const order = { yellow: 0, green: 1, red: 2 };
+    const diff = order[getSubStatus(a)] - order[getSubStatus(b)];
+    if (diff !== 0) return diff;
+    if (a.endDate && b.endDate) return new Date(a.endDate) - new Date(b.endDate);
     return 0;
   });
 }
 
 function renderSubs() {
-  // Always show active subscriptions only
   const filtered = subs.filter(s => !s.ended);
-
   const container1 = document.getElementById('subsContainer1');
   const container2 = document.getElementById('subsContainer2');
 
@@ -2037,48 +1615,23 @@ function renderSubs() {
   }
 
   const sorted = sortByStatus([...filtered]);
-  
-  // Alternate between columns: center, right, center, right...
-  const col1 = [];
-  const col2 = [];
-  
-  sorted.forEach((sub, index) => {
-    if (index % 2 === 0) {
-      col1.push(sub);
-    } else {
-      col2.push(sub);
-    }
-  });
-  
-  container1.innerHTML = col1.map(s => renderSubCard(s)).join('');
-  container2.innerHTML = col2.map(s => renderSubCard(s)).join('');
+  const col1 = [], col2 = [];
+  sorted.forEach((sub, i) => i % 2 === 0 ? col1.push(sub) : col2.push(sub));
+  container1.innerHTML = col1.map(renderSubCard).join('');
+  container2.innerHTML = col2.map(renderSubCard).join('');
 }
 
 function renderSubCard(s) {
   const known = matchKnown(s.name);
   const emoji = s.customLogo ? '' : ((known && known.emoji) || '📦');
-  const logo = s.customLogo || (known && known.logo);
-  const logoHTML = logo 
-    ? `<img src="${logo}" alt="${s.name}">` 
-    : emoji;
-
-  const cycle = s.billing === 'days' ? `Every ${s.billingDays} days` 
-    : s.billing.charAt(0).toUpperCase() + s.billing.slice(1);
-
+  const logo = s.customLogo || null;
+  const logoHTML = logo ? `<img src="${logo}" alt="${s.name}">` : emoji;
+  const cycle = s.billing === 'days' ? `Every ${s.billingDays} days` : s.billing.charAt(0).toUpperCase() + s.billing.slice(1);
   const endDateHTML = s.endDate ? fmtDate(s.endDate) : '—';
   const payBadge = s.paymentMode ? `<div class="pay-badge">${s.paymentMode.toUpperCase()}</div>` : '';
-  
-  // Days left badge
-  const daysLeft = getDaysLeft(s);
-  const daysText = formatDaysLeft(daysLeft);
-  let daysLeftBadge = '';
-  if (daysText) {
-    const status = getSubStatus(s);
-    daysLeftBadge = `<div class="days-left-badge ${status}">${daysText}</div>`;
-  }
-  
+  const daysText = formatDaysLeft(getDaysLeft(s));
   const status = getSubStatus(s);
-  const statusDot = `<div class="status-dot ${status}"></div>`;
+  const daysLeftBadge = daysText ? `<div class="days-left-badge ${status}">${daysText}</div>` : '';
 
   return `
     <div class="sub-card" id="sub-${s.id}" onclick="toggleCard('${s.id}')">
@@ -2093,42 +1646,27 @@ function renderSubCard(s) {
           <div class="sub-row-enddate">${endDateHTML}</div>
           ${payBadge}
           ${daysLeftBadge}
-          ${statusDot}
+          <div class="status-dot ${status}"></div>
         </div>
       </div>
       <div class="sub-details">
-        <div class="detail-item">
-          <div class="detail-label">Category</div>
-          <div class="detail-value">${s.category}</div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">Start</div>
-          <div class="detail-value">${fmtDate(s.startDate)}</div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">End</div>
-          <div class="detail-value">${endDateHTML}</div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">Payment</div>
-          <div class="detail-value">${s.paymentMode ? s.paymentMode.toUpperCase() : '—'}</div>
-        </div>
+        <div class="detail-item"><div class="detail-label">Category</div><div class="detail-value">${s.category}</div></div>
+        <div class="detail-item"><div class="detail-label">Start</div><div class="detail-value">${fmtDate(s.startDate)}</div></div>
+        <div class="detail-item"><div class="detail-label">End</div><div class="detail-value">${endDateHTML}</div></div>
+        <div class="detail-item"><div class="detail-label">Payment</div><div class="detail-value">${s.paymentMode ? s.paymentMode.toUpperCase() : '—'}</div></div>
       </div>
       <div class="sub-actions">
         <button class="sub-btn edit" onclick="event.stopPropagation(); openEdit('${s.id}')">Edit</button>
         ${!s.ended ? `<button class="sub-btn renew" onclick="event.stopPropagation(); renewSub('${s.id}')">Renew</button>` : ''}
         ${!s.ended ? `<button class="sub-btn end" onclick="event.stopPropagation(); endSub('${s.id}')">End</button>` : ''}
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
 function toggleCard(id) {
-  const card = document.getElementById('sub-' + id);
-  card.classList.toggle('expanded');
+  document.getElementById('sub-' + id).classList.toggle('expanded');
 }
 
-// ─── ADD SUBSCRIPTION ────────────────────────────────────────────────────────
 function addSub() {
   const name = document.getElementById('subName').value.trim();
   const price = parseFloat(document.getElementById('subPrice').value);
@@ -2139,20 +1677,9 @@ function addSub() {
   const billingDays = billing === 'days' ? parseInt(document.getElementById('subDays').value) || 30 : null;
   const paymentMode = getPaymentMode('sub');
 
-  if (!name || isNaN(price) || price <= 0) {
-    showToast('Please enter a valid name and price', true);
-    return;
-  }
+  if (!name || isNaN(price) || price <= 0) { showToast('Please enter a valid name and price', true); return; }
 
-  const newSub = {
-    id: Date.now().toString(),
-    name, price, billing, billingDays, category, startDate, endDate, paymentMode,
-    ended: false,
-    autoRenewed: false,
-    customLogo: null
-  };
-
-  subs.push(newSub);
+  subs.push({ id: Date.now().toString(), name, price, billing, billingDays, category, startDate, endDate, paymentMode, ended: false, autoRenewed: false, customLogo: null });
   save();
   render();
 
@@ -2161,19 +1688,15 @@ function addSub() {
   document.getElementById('subBilling').value = 'monthly';
   document.getElementById('subCategory').value = 'Entertainment';
   handleBillingChange('sub');
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('subStartDate').value = today;
+  document.getElementById('subStartDate').value = new Date().toISOString().split('T')[0];
   autoCalcEndDateByCycle('sub', 'monthly');
   selectPaymentMode('sub', 'card');
-
   showToast(`${name} added ✓`);
 }
 
-// ─── EDIT MODAL ──────────────────────────────────────────────────────────────
 function openEdit(id) {
   const s = subs.find(sub => sub.id === id);
   if (!s) return;
-
   document.getElementById('editId').value = s.id;
   document.getElementById('editName').value = s.name;
   document.getElementById('editPrice').value = s.price;
@@ -2182,42 +1705,26 @@ function openEdit(id) {
   document.getElementById('editStartDate').value = s.startDate;
   document.getElementById('editEndDate').value = s.endDate || '';
   document.getElementById('editDays').value = s.billingDays || 30;
-
   handleBillingChange('edit');
   selectPaymentMode('edit', s.paymentMode || 'card');
-
   document.getElementById('editIconInput')._pendingLogo = null;
   document.getElementById('editIconInput')._removeLogo = false;
-
   document.getElementById('editModal').classList.add('open');
   document.body.style.overflow = 'hidden';
-
-  updateEditIconPreview(s.customLogo || (matchKnown(s.name) && matchKnown(s.name).logo) || null, s.name);
-  
-  // Add ESC key listener
+  updateEditIconPreview(s.customLogo || null, s.name);
   document.addEventListener('keydown', handleEditEscKey);
 }
 
 function closeEdit() {
   document.getElementById('editModal').classList.remove('open');
   document.body.style.overflow = '';
-  const inp = document.getElementById('editIconInput');
-  inp._pendingLogo = null;
-  inp._removeLogo = false;
-  
-  // Remove ESC key listener
+  document.getElementById('editIconInput')._pendingLogo = null;
+  document.getElementById('editIconInput')._removeLogo = false;
   document.removeEventListener('keydown', handleEditEscKey);
 }
 
-function handleEditEscKey(e) {
-  if (e.key === 'Escape') {
-    closeEdit();
-  }
-}
-
-function handleOverlayClick(e) {
-  if (e.target === document.getElementById('editModal')) closeEdit();
-}
+function handleEditEscKey(e) { if (e.key === 'Escape') closeEdit(); }
+function handleOverlayClick(e) { if (e.target === document.getElementById('editModal')) closeEdit(); }
 
 function saveEdit() {
   const id = document.getElementById('editId').value;
@@ -2230,10 +1737,7 @@ function saveEdit() {
   const billingDays = billing === 'days' ? parseInt(document.getElementById('editDays').value) || 30 : null;
   const paymentMode = getPaymentMode('edit');
 
-  if (!name || isNaN(price) || price <= 0) {
-    showToast('Please enter a valid name and price', true);
-    return;
-  }
+  if (!name || isNaN(price) || price <= 0) { showToast('Please enter a valid name and price', true); return; }
 
   const idx = subs.findIndex(s => s.id === id);
   if (idx === -1) return;
@@ -2245,13 +1749,10 @@ function saveEdit() {
   if (pendingLogo) customLogo = pendingLogo;
 
   subs[idx] = { ...subs[idx], name, price, billing, billingDays, category, startDate, endDate, paymentMode, customLogo };
-  save();
-  render();
-  closeEdit();
+  save(); render(); closeEdit();
   showToast(`${name} updated ✓`);
 }
 
-// ─── RENEW / END ─────────────────────────────────────────────────────────────
 function renewSub(id) {
   const idx = subs.findIndex(s => s.id === id);
   if (idx === -1) return;
@@ -2259,23 +1760,17 @@ function renewSub(id) {
   const newStart = s.endDate || new Date().toISOString().split('T')[0];
   const newEnd = computeEndDateFrom(newStart, s);
   subs[idx] = { ...s, startDate: newStart, endDate: newEnd, ended: false, autoRenewed: false };
-  save();
-  render();
-  setTimeout(() => {
-    const card = document.getElementById('sub-' + id);
-    if (card) card.classList.add('just-renewed');
-  }, 50);
+  save(); render();
+  setTimeout(() => { const card = document.getElementById('sub-' + id); if (card) card.classList.add('just-renewed'); }, 50);
   showToast(`${s.name} renewed until ${fmtDate(newEnd)} 🎉`);
 }
 
 function endSub(id) {
   const idx = subs.findIndex(s => s.id === id);
   if (idx === -1) return;
-  const s = subs[idx];
-  subs[idx] = { ...s, ended: true };
-  save();
-  render();
-  showToast(`${s.name} marked as ended.`);
+  subs[idx] = { ...subs[idx], ended: true };
+  save(); render();
+  showToast(`${subs[idx].name} marked as ended.`);
 }
 
 function computeEndDateFrom(startStr, s) {
@@ -2289,39 +1784,31 @@ function computeEndDateFrom(startStr, s) {
 }
 
 function autoRenewExpired() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = new Date(); today.setHours(0,0,0,0);
   let renewed = [];
   subs = subs.map(s => {
-    if (s.ended) return s;
-    if (!s.endDate) return s;
-    const end = new Date(s.endDate);
-    end.setHours(23, 59, 59, 0);
+    if (s.ended || !s.endDate) return s;
+    const end = new Date(s.endDate); end.setHours(23,59,59,0);
     if (end < today) {
-      const newStart = s.endDate;
-      const newEnd = computeEndDateFrom(newStart, s);
       renewed.push(s.name);
-      return { ...s, startDate: newStart, endDate: newEnd, autoRenewed: true };
+      return { ...s, startDate: s.endDate, endDate: computeEndDateFrom(s.endDate, s), autoRenewed: true };
     }
     return s;
   });
   if (renewed.length > 0) {
     save();
-    if (renewed.length === 1) showToast(`Auto-renewed: ${renewed[0]} 🔄`);
-    else showToast(`Auto-renewed ${renewed.length} subscriptions 🔄`);
+    showToast(renewed.length === 1 ? `Auto-renewed: ${renewed[0]} 🔄` : `Auto-renewed ${renewed.length} subscriptions 🔄`);
   }
 }
 
-// ─── ICON UPLOAD ─────────────────────────────────────────────────────────────
 function handleEditIconUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    const uri = e.target.result;
-    document.getElementById('editIconInput')._pendingLogo = uri;
+    document.getElementById('editIconInput')._pendingLogo = e.target.result;
     document.getElementById('editIconInput')._removeLogo = false;
-    updateEditIconPreview(uri, document.getElementById('editName').value || '?');
+    updateEditIconPreview(e.target.result, document.getElementById('editName').value || '?');
   };
   reader.readAsDataURL(file);
   event.target.value = '';
@@ -2330,18 +1817,17 @@ function handleEditIconUpload(event) {
 function removeEditIcon() {
   document.getElementById('editIconInput')._pendingLogo = null;
   document.getElementById('editIconInput')._removeLogo = true;
-  const name = document.getElementById('editName').value || '?';
-  updateEditIconPreview(null, name);
+  updateEditIconPreview(null, document.getElementById('editName').value || '?');
 }
 
 function updateEditIconPreview(logoUri, name) {
   const preview = document.getElementById('editIconPreview');
   const fallback = document.getElementById('editIconFallback');
   const removeBtn = document.getElementById('editIconRemoveBtn');
+  const existing = preview.querySelector('img.icon-preview-img');
+  if (existing) existing.remove();
   if (logoUri) {
     fallback.style.display = 'none';
-    const existing = preview.querySelector('img.icon-preview-img');
-    if (existing) existing.remove();
     const img = document.createElement('img');
     img.className = 'icon-preview-img';
     img.src = logoUri;
@@ -2352,36 +1838,28 @@ function updateEditIconPreview(logoUri, name) {
     fallback.style.display = '';
     const known = matchKnown(name);
     fallback.textContent = (known && known.emoji) || name.slice(0,2).toUpperCase() || '📦';
-    const existing = preview.querySelector('img.icon-preview-img');
-    if (existing) existing.remove();
     removeBtn.classList.remove('visible');
   }
 }
 
-// ─── NOTIFICATIONS ───────────────────────────────────────────────────────────
 function getExpiringSoon() {
-  return subs
-    .filter(s => {
-      if (!s.endDate) return false;
-      const h = hoursLeft(s.endDate);
-      return h !== null && h <= 72 && h >= -24;
-    })
-    .sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+  return subs.filter(s => {
+    if (!s.endDate) return false;
+    const h = hoursLeft(s.endDate);
+    return h !== null && h <= 72 && h >= -24;
+  }).sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
 }
 
 function hoursLeft(dateStr) {
   if (!dateStr) return null;
-  const end = new Date(dateStr);
-  end.setHours(23, 59, 59, 0);
+  const end = new Date(dateStr); end.setHours(23,59,59,0);
   return (end - new Date()) / 3600000;
 }
 
 function getDaysLeft(s) {
   if (!s.endDate) return null;
   const h = hoursLeft(s.endDate);
-  if (h === null) return null;
-  const days = Math.ceil(h / 24);
-  return days;
+  return h === null ? null : Math.ceil(h / 24);
 }
 
 function formatDaysLeft(days) {
@@ -2394,8 +1872,7 @@ function formatDaysLeft(days) {
   if (weeks === 1) return '1 week';
   if (days <= 30) return `${weeks} weeks`;
   const months = Math.floor(days / 30);
-  if (months === 1) return '1 month';
-  return `${months} months`;
+  return months === 1 ? '1 month' : `${months} months`;
 }
 
 function updateNotifBell() {
@@ -2419,11 +1896,7 @@ function openNotifPanel() {
 
   if (expiring.length === 0) {
     countEl.textContent = '';
-    list.innerHTML = `
-      <div class="notif-empty">
-        <div class="big-emoji">✅</div>
-        <p>No subscriptions expiring<br>within the next 72 hours!</p>
-      </div>`;
+    list.innerHTML = `<div class="notif-empty"><div class="big-emoji">✅</div><p>No subscriptions expiring<br>within the next 72 hours!</p></div>`;
   } else {
     countEl.textContent = `· ${expiring.length} alert${expiring.length !== 1 ? 's' : ''}`;
     list.innerHTML = expiring.map(s => {
@@ -2431,21 +1904,10 @@ function openNotifPanel() {
       const emoji = known ? known.emoji : '📦';
       const h = hoursLeft(s.endDate);
       let timeLabel, timeClass, itemClass;
-      if (h < 0) {
-        timeLabel = 'Expired';
-        timeClass = 'red'; itemClass = 'urgent';
-      } else if (h <= 1) {
-        timeLabel = '< 1 hr left';
-        timeClass = 'red'; itemClass = 'today';
-      } else if (h <= 24) {
-        const hrs = Math.ceil(h);
-        timeLabel = `${hrs}h left`;
-        timeClass = 'red'; itemClass = 'urgent';
-      } else {
-        const hrs = Math.round(h);
-        timeLabel = `~${Math.floor(hrs/24)}d ${hrs%24}h left`;
-        timeClass = 'orange'; itemClass = 'warning';
-      }
+      if (h < 0) { timeLabel = 'Expired'; timeClass = 'red'; itemClass = 'urgent'; }
+      else if (h <= 1) { timeLabel = '< 1 hr left'; timeClass = 'red'; itemClass = 'urgent'; }
+      else if (h <= 24) { timeLabel = `${Math.ceil(h)}h left`; timeClass = 'red'; itemClass = 'urgent'; }
+      else { const hrs = Math.round(h); timeLabel = `~${Math.floor(hrs/24)}d ${hrs%24}h left`; timeClass = 'orange'; itemClass = 'warning'; }
       return `
         <div class="notif-item ${itemClass}">
           <div class="notif-emoji">${emoji}</div>
@@ -2460,34 +1922,21 @@ function openNotifPanel() {
 
   document.getElementById('notifPanel').classList.add('open');
   document.body.style.overflow = 'hidden';
-  
-  // Add keyboard listener for ESC key
   document.addEventListener('keydown', handleNotifEscKey);
 }
 
 function closeNotifPanel() {
   document.getElementById('notifPanel').classList.remove('open');
   document.body.style.overflow = '';
-  
-  // Remove keyboard listener
   document.removeEventListener('keydown', handleNotifEscKey);
 }
 
-function handleNotifEscKey(e) {
-  if (e.key === 'Escape') {
-    closeNotifPanel();
-  }
-}
+function handleNotifEscKey(e) { if (e.key === 'Escape') closeNotifPanel(); }
+function handleNotifOverlayClick(e) { if (e.target === document.getElementById('notifPanel')) closeNotifPanel(); }
 
-function handleNotifOverlayClick(e) {
-  if (e.target === document.getElementById('notifPanel')) closeNotifPanel();
-}
-
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
 function toggleChart() {
   const chartModal = document.getElementById('chartModal');
   const isOpen = chartModal.classList.contains('open');
-  
   if (isOpen) {
     chartModal.classList.remove('open');
     document.body.style.overflow = '';
@@ -2499,17 +1948,8 @@ function toggleChart() {
   }
 }
 
-function handleChartEscKey(e) {
-  if (e.key === 'Escape') {
-    toggleChart();
-  }
-}
-
-function handleChartModalClick(e) {
-  if (e.target === document.getElementById('chartModal')) {
-    toggleChart();
-  }
-}
+function handleChartEscKey(e) { if (e.key === 'Escape') toggleChart(); }
+function handleChartModalClick(e) { if (e.target === document.getElementById('chartModal')) toggleChart(); }
 
 function fmtDate(d) {
   if (!d) return '—';
@@ -2533,71 +1973,47 @@ function showToast(msg, isError = false) {
 
 function handleBillingChange(prefix) {
   const val = document.getElementById(prefix + 'Billing').value;
-  const wrapper = document.getElementById(prefix + 'DaysWrapper');
-  if (val === 'days') {
-    wrapper.classList.add('active');
-  } else {
-    wrapper.classList.remove('active');
-  }
+  document.getElementById(prefix + 'DaysWrapper').classList.toggle('active', val === 'days');
   autoCalcEndDateByCycle(prefix);
 }
 
 function autoCalcEndDateByCycle(prefix, overrideBilling) {
-  const startInput = document.getElementById(prefix + 'StartDate');
-  const endInput = document.getElementById(prefix + 'EndDate');
-  const billingInput = document.getElementById(prefix + 'Billing');
-  const daysInput = document.getElementById(prefix + 'Days');
-
-  const startVal = startInput.value;
+  const startVal = document.getElementById(prefix + 'StartDate').value;
   if (!startVal) return;
-
-  const billing = overrideBilling || billingInput.value;
+  const billing = overrideBilling || document.getElementById(prefix + 'Billing').value;
   const d = new Date(startVal);
-
   if (billing === 'monthly') d.setDate(d.getDate() + 30);
   else if (billing === 'annual') { d.setFullYear(d.getFullYear() + 1); d.setDate(d.getDate() - 1); }
   else if (billing === 'weekly') d.setDate(d.getDate() + 7);
-  else if (billing === 'days') {
-    const days = parseInt(daysInput.value) || 30;
-    d.setDate(d.getDate() + days);
-  }
-
-  endInput.value = d.toISOString().split('T')[0];
+  else if (billing === 'days') d.setDate(d.getDate() + (parseInt(document.getElementById(prefix + 'Days').value) || 30));
+  document.getElementById(prefix + 'EndDate').value = d.toISOString().split('T')[0];
 }
 
 function selectPaymentMode(prefix, mode) {
-  const container = document.getElementById(prefix + 'PaymentMode');
-  container.querySelectorAll('.payment-mode-btn').forEach(btn => {
+  document.getElementById(prefix + 'PaymentMode').querySelectorAll('.payment-mode-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.mode === mode);
   });
 }
 
 function getPaymentMode(prefix) {
-  const container = document.getElementById(prefix + 'PaymentMode');
-  const active = container.querySelector('.payment-mode-btn.active');
+  const active = document.getElementById(prefix + 'PaymentMode').querySelector('.payment-mode-btn.active');
   return active ? active.dataset.mode : 'card';
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
 (function init() {
-  // Initialize Firebase first
   initFirebase();
-  
-  // If Firebase is not configured, load from localStorage
+
   if (!isFirebaseEnabled) {
     subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
   }
-  
+
   loadTheme();
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('subStartDate').value = today;
+  document.getElementById('subStartDate').value = new Date().toISOString().split('T')[0];
   autoCalcEndDateByCycle('sub', 'monthly');
   autoRenewExpired();
-  
-  // Render after a short delay to let Firebase load
-  setTimeout(() => {
-    render();
-  }, 500);
+
+  setTimeout(() => { render(); }, 500);
 })();
 </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-<title>SubTracker&reg; – Track Your Subscription</title>
+<title>SUBTracker&reg; – Developed by Sukesh</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -195,6 +195,60 @@
   body.light-mode .theme-toggle-slider {
     left: 31px;
     background: var(--purple);
+  }
+
+  /* DROPDOWN MENU STYLES */
+  .menu-container {
+    position: relative;
+  }
+  .dropdown-menu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    min-width: 160px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+  }
+  .dropdown-menu.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+  }
+  .dropdown-item {
+    padding: 12px 16px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.2s;
+  }
+  .dropdown-item:hover {
+    background: var(--card2);
+  }
+
+  /* FOOTER STYLES */
+  .app-footer {
+    text-align: center;
+    padding-top: 24px;
+    margin-top: 40px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
   }
 
   .main-grid {
@@ -1027,22 +1081,6 @@
     color: var(--danger);
   }
 
-  /* LOCK BUTTON */
-  .lock-btn {
-    width: 40px; height: 40px;
-    border-radius: 10px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .lock-btn:hover { background: var(--card2); border-color: rgba(255,255,255,0.12); }
-
   /* LOCK SCREEN */
   .lock-screen {
     position: fixed;
@@ -1120,16 +1158,7 @@
   }
   .biometric-btn:hover { background: var(--border); }
   .lock-error { font-size: 12px; color: var(--danger); text-align: center; min-height: 18px; }
-.app-footer {
-    text-align: center;
-    padding-top: 24px;
-    margin-top: 40px;
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-  }
+
   @media (max-width: 1400px) {
     .main-grid { grid-template-columns: 300px 1fr 1fr; }
   }
@@ -1154,19 +1183,15 @@
     .theme-toggle-slider { width: 18px; height: 18px; font-size: 10px; }
     body.light-mode .theme-toggle-slider { left: 28px; }
 
-    /* MOBILE LAYOUT: summary → subs → add form */
     .main-grid {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
-    /* Order: center-col (summary+subs) first, then left-col (add form) */
     .center-col { order: 1; min-height: auto; }
     .left-col   { order: 2; position: static; }
-    /* Hide right col on mobile — subs shown in center-col only */
     .right-col  { display: none !important; }
 
-    /* Summary cards side by side on mobile */
     .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px; min-height: auto; }
     .summary-card { padding: 14px 12px; min-height: auto; }
     .summary-card .amount { font-size: 18px; }
@@ -1174,7 +1199,6 @@
     .summary-card .sub-note { font-size: 10px; }
     .summary-card .count-badge { font-size: 9px; padding: 2px 6px; }
 
-    /* Add form */
     .add-card { padding: 16px; }
     .section-title { font-size: 12px; margin-bottom: 12px; }
     .form-label { font-size: 10px; margin-bottom: 5px; }
@@ -1183,7 +1207,6 @@
     .payment-mode-btn { font-size: 10px; padding: 7px; }
     .add-btn { padding: 11px; font-size: 13px; }
 
-    /* Subscription cards */
     .sub-card { padding: 12px; margin-bottom: 8px; }
     .sub-logo { width: 38px; height: 38px; font-size: 18px; }
     .sub-name { font-size: 13px; }
@@ -1198,20 +1221,17 @@
     .detail-value { font-size: 12px; }
     .sub-btn { padding: 8px; font-size: 11px; }
 
-    /* Chart modal */
     .chart-card { max-width: 95%; padding: 20px 16px; }
     .chart-canvas-wrap { width: 160px; height: 160px; }
     #pieChart { width: 160px !important; height: 160px !important; }
     .chart-legend { grid-template-columns: 1fr; }
 
-    /* Edit modal */
     .modal-content { max-width: 95%; padding: 20px 16px; }
     .modal-title { font-size: 16px; }
     .icon-upload-area { padding: 12px; }
     .icon-preview { width: 50px; height: 50px; }
     .icon-fallback { font-size: 20px; }
 
-    /* Notification panel */
     .notif-panel { width: 100%; }
     .notif-header { padding: 20px 16px; }
     .notif-header h3 { font-size: 16px; }
@@ -1246,19 +1266,35 @@
     <div class="logo-mark">
       <div class="logo-icon">S$</div>
       <div>
-        <h1>SubTracker&reg;</h1>
-        <p style="font-size: 11px;">Track Your Subscriptions</p>
+        <h1>SUBTracker&reg;</h1>
+        <p style="font-size: 11px;">Developed by Sukesh</p>
       </div>
     </div>
+    
     <div class="header-actions">
-      <button class="notif-bell-btn" onclick="exportToCSV()" title="Export to Spreadsheet">📊</button>
-      
-      <button id="authBtn" class="notif-bell-btn" onclick="toggleAuth()" title="Sign In">👤</button>
-      <button class="lock-btn" onclick="lockApp()" title="Lock app">🔒</button>
       <button id="notifBellBtn" class="notif-bell-btn" onclick="openNotifPanel()">
         🔔
         <div id="notifBadge" class="notif-badge">0</div>
       </button>
+
+      <div class="menu-container">
+        <button class="notif-bell-btn" onclick="toggleMenu()" title="Menu">⋮</button>
+        
+        <div id="dropdownMenu" class="dropdown-menu">
+          <div class="dropdown-item" id="menuAuthBtn" onclick="toggleAuth(); toggleMenu();">
+            👤 Sign In
+          </div>
+          <div class="dropdown-item" onclick="lockApp(); toggleMenu();">
+            🔒 Lock App
+          </div>
+          <div class="dropdown-item" onclick="exportToCSV(); toggleMenu();">
+            📊 Export Data
+          </div>
+          <div class="dropdown-item" onclick="contactUs(); toggleMenu();">
+            ✉️ Contact Us
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -1300,7 +1336,8 @@
             <option value="annual">Annual</option>
             <option value="weekly">Weekly</option>
             <option value="days">Custom Days</option>
-            <option value="one-time">One-time</option> </select>
+            <option value="one-time">One-time</option>
+          </select>
         </div>
 
         <div id="subDaysWrapper" class="days-input-wrapper form-group">
@@ -1364,12 +1401,12 @@
 
       <div class="subs-scroll" id="subsContainer2"></div>
     </div>
-  </div> 
-  
+  </div>
+
   <footer class="app-footer">
     Created & Developed by Sukesh Gautam S
   </footer>
-  
+
 </div>
 
 <div id="chartModal" class="chart-modal" onclick="handleChartModalClick(event)">
@@ -1435,7 +1472,8 @@
         <option value="annual">Annual</option>
         <option value="weekly">Weekly</option>
         <option value="days">Custom Days</option>
-        <option value="one-time">One-time</option> </select>
+        <option value="one-time">One-time</option>
+      </select>
     </div>
 
     <div id="editDaysWrapper" class="days-input-wrapper form-group">
@@ -1541,7 +1579,6 @@ function initFirebase() {
     isFirebaseEnabled = true;
     console.log("✅ Firebase initialized!");
     
-    // Start listening for logins ONLY after Firebase is ready
     setupAuthListener();
     
     return true;
@@ -1554,14 +1591,13 @@ function initFirebase() {
 
 function setupAuthListener() {
   firebase.auth().onAuthStateChanged((user) => {
-    const authBtn = document.getElementById('authBtn');
+    const menuAuthBtn = document.getElementById('menuAuthBtn');
     
     if (user) {
       currentUser = user;
-      if (authBtn) {
-        // Use custom logout image instead of default emoji
-        authBtn.innerHTML = '<img src="logout.png" alt="Sign Out" style="width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0 0 2px rgba(255,255,255,0.2));">'; 
-        authBtn.title = `Sign Out (${user.displayName ? user.displayName.split(' ')[0] : 'User'})`;
+      if (menuAuthBtn) {
+        menuAuthBtn.innerHTML = '<img src="logout.png" alt="Sign Out" style="width: 16px; height: 16px; object-fit: contain;"> Sign Out'; 
+        menuAuthBtn.title = `Sign Out (${user.displayName ? user.displayName.split(' ')[0] : 'User'})`;
       }
       showToast(`Welcome, ${user.displayName ? user.displayName.split(' ')[0] : 'User'}!`);
       
@@ -1569,15 +1605,13 @@ function setupAuthListener() {
       setupFirebaseListener();
     } else {
       currentUser = null;
-      if (authBtn) {
-        // Revert back to the default profile emoji when signed out
-        authBtn.innerHTML = '👤'; 
-        authBtn.title = 'Sign In with Google';
+      if (menuAuthBtn) {
+        menuAuthBtn.innerHTML = '👤 Sign In'; 
+        menuAuthBtn.title = 'Sign In with Google';
       }
       
-      if (dbListenerRef) dbListenerRef.off(); // Stop listening to old data
+      if (dbListenerRef) dbListenerRef.off(); 
       
-      // Load local storage fallback when logged out
       subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
       render();
     }
@@ -1610,7 +1644,6 @@ function loadFromFirebase() {
         console.log("📥 Loaded", subs.length, "subscriptions from Cloud");
         render();
       } else {
-        // If cloud is empty, migrate local data up to the cloud
         const localData = localStorage.getItem('subsukesh_subs');
         if (localData) {
           subs = JSON.parse(localData);
@@ -1623,7 +1656,6 @@ function loadFromFirebase() {
 }
 
 function saveToFirebase() {
-  // Always save locally as a backup
   localStorage.setItem('subsukesh_subs', JSON.stringify(subs));
   
   if (!isFirebaseEnabled || !currentUser) return;
@@ -1689,6 +1721,25 @@ function exportToCSV() {
   document.body.removeChild(link);
 
   showToast('Spreadsheet downloaded! 📊');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DROPDOWN MENU & CONTACT
+// ═══════════════════════════════════════════════════════════════════════════
+function toggleMenu() {
+  document.getElementById('dropdownMenu').classList.toggle('open');
+}
+
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('dropdownMenu');
+  const menuBtnContainer = document.querySelector('.menu-container');
+  if (menu && menu.classList.contains('open') && !menuBtnContainer.contains(e.target)) {
+    menu.classList.remove('open');
+  }
+});
+
+function contactUs() {
+  window.location.href = "mailto:sukeshgautams@gmail.com?subject=SubSukesh Support Request";
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1833,7 +1884,7 @@ function toMonthly(s) {
   if (s.billing === 'annual') return s.price / 12;
   if (s.billing === 'weekly') return s.price * 4;
   if (s.billing === 'days') return (s.price / (s.billingDays || 30)) * 30;
-  if (s.billing === 'one-time') return 0; // Exclude from recurring chart totals
+  if (s.billing === 'one-time') return 0;
   return s.price;
 }
 

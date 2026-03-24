@@ -2150,6 +2150,175 @@ function getPaymentMode(prefix) {
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LOCK / AUTH SYSTEM
+// ═══════════════════════════════════════════════════════════════════════════
+const LOCK_DURATION = 30 * 24 * 60 * 60 * 1000;
+const PIN_KEY = 'subsukesh_pin';
+const UNLOCK_KEY = 'subsukesh_unlocked_until';
+const SETTING_KEY = 'subsukesh_pin_set';
+
+let pinBuffer = '';
+let isSettingPin = false;
+let pinConfirmBuffer = '';
+let awaitingConfirm = false;
+
+function initLock() {
+  const pinSet = localStorage.getItem(SETTING_KEY);
+  const unlockedUntil = parseInt(localStorage.getItem(UNLOCK_KEY) || '0');
+  const now = Date.now();
+  if (!pinSet) {
+    showLockScreen(true);
+  } else if (now < unlockedUntil) {
+    hideLockScreen();
+  } else {
+    showLockScreen(false);
+    setTimeout(() => triggerBiometric(), 400);
+  }
+}
+
+function showLockScreen(setup) {
+  isSettingPin = setup;
+  awaitingConfirm = false;
+  pinBuffer = '';
+  pinConfirmBuffer = '';
+  document.getElementById('lockScreen').classList.remove('hidden');
+  document.getElementById('lockError').textContent = '';
+  updateDots();
+  if (setup) {
+    document.getElementById('lockTitle').textContent = 'Set your PIN';
+    document.getElementById('lockSubtitle').textContent = 'Choose a 4-digit PIN to protect your app';
+    document.getElementById('biometricBtn').style.display = 'none';
+  } else {
+    document.getElementById('lockTitle').textContent = 'Welcome back';
+    document.getElementById('lockSubtitle').textContent = 'Enter your PIN to continue';
+    checkBiometricSupport();
+  }
+}
+
+function hideLockScreen() {
+  document.getElementById('lockScreen').classList.add('hidden');
+}
+
+function lockApp() {
+  localStorage.removeItem(UNLOCK_KEY);
+  pinBuffer = '';
+  showLockScreen(false);
+  setTimeout(() => triggerBiometric(), 400);
+}
+
+function pinKey(digit) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += digit;
+  updateDots();
+  document.getElementById('lockError').textContent = '';
+  if (pinBuffer.length === 4) setTimeout(() => handlePinComplete(), 150);
+}
+
+function pinBackspace() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  updateDots();
+}
+
+function updateDots() {
+  const len = isSettingPin && awaitingConfirm ? pinConfirmBuffer.length : pinBuffer.length;
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('dot' + i);
+    dot.classList.toggle('filled', i < len);
+    dot.classList.remove('error');
+  }
+}
+
+function handlePinComplete() {
+  if (isSettingPin) {
+    if (!awaitingConfirm) {
+      pinConfirmBuffer = pinBuffer;
+      pinBuffer = '';
+      awaitingConfirm = true;
+      document.getElementById('lockSubtitle').textContent = 'Confirm your PIN';
+      updateDots();
+    } else {
+      const confirm = pinBuffer;
+      if (confirm === pinConfirmBuffer) {
+        localStorage.setItem(PIN_KEY, hashPin(pinConfirmBuffer));
+        localStorage.setItem(SETTING_KEY, '1');
+        unlockSuccess();
+      } else {
+        showPinError('PINs do not match. Try again.');
+        pinBuffer = '';
+        pinConfirmBuffer = '';
+        awaitingConfirm = false;
+        document.getElementById('lockSubtitle').textContent = 'Choose a 4-digit PIN to protect your app';
+      }
+    }
+  } else {
+    const stored = localStorage.getItem(PIN_KEY);
+    if (hashPin(pinBuffer) === stored) {
+      unlockSuccess();
+    } else {
+      showPinError('Incorrect PIN. Try again.');
+      pinBuffer = '';
+    }
+  }
+}
+
+function unlockSuccess() {
+  localStorage.setItem(UNLOCK_KEY, Date.now() + LOCK_DURATION);
+  hideLockScreen();
+}
+
+function showPinError(msg) {
+  document.getElementById('lockError').textContent = msg;
+  for (let i = 0; i < 4; i++) document.getElementById('dot' + i).classList.add('error');
+  setTimeout(() => {
+    for (let i = 0; i < 4; i++) document.getElementById('dot' + i).classList.remove('error', 'filled');
+  }, 600);
+}
+
+function hashPin(pin) {
+  let hash = 0;
+  const str = pin + 'subsukesh_salt_2024';
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash.toString(36);
+}
+
+async function checkBiometricSupport() {
+  const btn = document.getElementById('biometricBtn');
+  if (window.PublicKeyCredential) {
+    try {
+      const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+      if (available) {
+        btn.style.display = 'flex';
+        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+        document.getElementById('biometricIcon').textContent = isIOS ? '🔐' : '👆';
+        document.getElementById('biometricLabel').textContent = isIOS ? 'Use Face ID' : 'Use Fingerprint';
+      }
+    } catch(e) {}
+  }
+}
+
+async function triggerBiometric() {
+  if (!localStorage.getItem(SETTING_KEY)) return;
+  try {
+    const challenge = new Uint8Array(32);
+    crypto.getRandomValues(challenge);
+    const credential = await navigator.credentials.get({
+      publicKey: {
+        challenge,
+        timeout: 30000,
+        userVerification: 'required',
+        rpId: window.location.hostname || 'localhost'
+      }
+    });
+    if (credential) unlockSuccess();
+  } catch(e) {}
+}
+
+// ─── MAIN INIT ───────────────────────────────────────────────────────────────
 (function init() {
   initLock();
   initFirebase();
@@ -2199,203 +2368,6 @@ function getPaymentMode(prefix) {
     </button>
   </div>
 </div>
-
-<script>
-// ═══════════════════════════════════════════════════════════════════════════
-// LOCK / AUTH SYSTEM
-// ═══════════════════════════════════════════════════════════════════════════
-const LOCK_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days in ms
-const PIN_KEY = 'subsukesh_pin';
-const UNLOCK_KEY = 'subsukesh_unlocked_until';
-const SETTING_KEY = 'subsukesh_pin_set';
-
-let pinBuffer = '';
-let isSettingPin = false;
-let pinConfirmBuffer = '';
-let awaitingConfirm = false;
-
-function initLock() {
-  const pinSet = localStorage.getItem(SETTING_KEY);
-  const unlockedUntil = parseInt(localStorage.getItem(UNLOCK_KEY) || '0');
-  const now = Date.now();
-
-  if (!pinSet) {
-    // First time — set up PIN
-    showLockScreen(true);
-  } else if (now < unlockedUntil) {
-    // Still within trusted window — let them in
-    hideLockScreen();
-  } else {
-    // PIN set but session expired — show unlock screen
-    showLockScreen(false);
-    setTimeout(() => triggerBiometric(), 400);
-  }
-}
-
-function showLockScreen(setup) {
-  isSettingPin = setup;
-  awaitingConfirm = false;
-  pinBuffer = '';
-  pinConfirmBuffer = '';
-  document.getElementById('lockScreen').classList.remove('hidden');
-  document.getElementById('lockError').textContent = '';
-  updateDots();
-
-  if (setup) {
-    document.getElementById('lockTitle').textContent = 'Set your PIN';
-    document.getElementById('lockSubtitle').textContent = 'Choose a 4-digit PIN to protect your app';
-    document.getElementById('biometricBtn').style.display = 'none';
-  } else {
-    document.getElementById('lockTitle').textContent = 'Welcome back';
-    document.getElementById('lockSubtitle').textContent = 'Enter your PIN to continue';
-    checkBiometricSupport();
-  }
-}
-
-function hideLockScreen() {
-  document.getElementById('lockScreen').classList.add('hidden');
-}
-
-function lockApp() {
-  localStorage.removeItem(UNLOCK_KEY);
-  pinBuffer = '';
-  showLockScreen(false);
-  setTimeout(() => triggerBiometric(), 400);
-}
-
-function pinKey(digit) {
-  if (pinBuffer.length >= 4) return;
-  pinBuffer += digit;
-  updateDots();
-  document.getElementById('lockError').textContent = '';
-
-  if (pinBuffer.length === 4) {
-    setTimeout(() => handlePinComplete(), 150);
-  }
-}
-
-function pinBackspace() {
-  pinBuffer = pinBuffer.slice(0, -1);
-  updateDots();
-}
-
-function updateDots() {
-  const len = isSettingPin && awaitingConfirm ? pinConfirmBuffer.length : pinBuffer.length;
-  for (let i = 0; i < 4; i++) {
-    const dot = document.getElementById('dot' + i);
-    dot.classList.toggle('filled', i < len);
-    dot.classList.remove('error');
-  }
-}
-
-function handlePinComplete() {
-  if (isSettingPin) {
-    if (!awaitingConfirm) {
-      // First entry — ask to confirm
-      pinConfirmBuffer = pinBuffer;
-      pinBuffer = '';
-      awaitingConfirm = true;
-      document.getElementById('lockSubtitle').textContent = 'Confirm your PIN';
-      updateDots();
-    } else {
-      // Confirmation entry
-      const confirm = pinBuffer;
-      if (confirm === pinConfirmBuffer) {
-        // Save PIN hash and unlock
-        localStorage.setItem(PIN_KEY, hashPin(pinConfirmBuffer));
-        localStorage.setItem(SETTING_KEY, '1');
-        unlockSuccess();
-      } else {
-        // Mismatch
-        showPinError('PINs do not match. Try again.');
-        pinBuffer = '';
-        pinConfirmBuffer = '';
-        awaitingConfirm = false;
-        document.getElementById('lockSubtitle').textContent = 'Choose a 4-digit PIN to protect your app';
-      }
-    }
-  } else {
-    // Verify PIN
-    const stored = localStorage.getItem(PIN_KEY);
-    if (hashPin(pinBuffer) === stored) {
-      unlockSuccess();
-    } else {
-      showPinError('Incorrect PIN. Try again.');
-      pinBuffer = '';
-    }
-  }
-}
-
-function unlockSuccess() {
-  localStorage.setItem(UNLOCK_KEY, Date.now() + LOCK_DURATION);
-  hideLockScreen();
-}
-
-function showPinError(msg) {
-  document.getElementById('lockError').textContent = msg;
-  for (let i = 0; i < 4; i++) {
-    document.getElementById('dot' + i).classList.add('error');
-  }
-  setTimeout(() => {
-    for (let i = 0; i < 4; i++) {
-      document.getElementById('dot' + i).classList.remove('error', 'filled');
-    }
-  }, 600);
-}
-
-function hashPin(pin) {
-  // Simple hash — good enough for local PIN protection
-  let hash = 0;
-  const str = pin + 'subsukesh_salt_2024';
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0;
-  }
-  return hash.toString(36);
-}
-
-async function checkBiometricSupport() {
-  const btn = document.getElementById('biometricBtn');
-  if (window.PublicKeyCredential) {
-    try {
-      const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-      if (available) {
-        btn.style.display = 'flex';
-        // Detect if iOS (Face ID) or Android (Fingerprint)
-        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-        document.getElementById('biometricIcon').textContent = isIOS ? '🔐' : '👆';
-        document.getElementById('biometricLabel').textContent = isIOS ? 'Use Face ID' : 'Use Fingerprint';
-      }
-    } catch(e) {}
-  }
-}
-
-async function triggerBiometric() {
-  const pinSet = localStorage.getItem(SETTING_KEY);
-  if (!pinSet) return;
-
-  try {
-    // Use WebAuthn to trigger biometric
-    const challenge = new Uint8Array(32);
-    crypto.getRandomValues(challenge);
-
-    const credential = await navigator.credentials.get({
-      publicKey: {
-        challenge,
-        timeout: 30000,
-        userVerification: 'required',
-        rpId: window.location.hostname || 'localhost'
-      }
-    });
-
-    if (credential) {
-      unlockSuccess();
-    }
-  } catch(e) {
-    // User cancelled or not available — just show PIN pad silently
-  }
-}
-</script>
 
 </body>
 </html>

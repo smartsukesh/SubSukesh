@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-<title>SubTracker – Subscription Tracker</title>
+<title>SubTracker&reg; – Track Your Subscription</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -153,7 +153,7 @@
   }
   header p {
     color: var(--muted);
-    font-size: 12px;
+    font-size: 11px;
     margin-top: 2px;
   }
   
@@ -1234,7 +1234,7 @@
     <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" style="position:absolute; left:0;">
       <div class="theme-toggle-slider">🌙</div>
     </div>
-<div class="logo-mark">
+    <div class="logo-mark">
       <div class="logo-icon">S$</div>
       <div>
         <h1>SubTracker&reg;</h1>
@@ -1291,7 +1291,7 @@
             <option value="annual">Annual</option>
             <option value="weekly">Weekly</option>
             <option value="days">Custom Days</option>
-          </select>
+            <option value="one-time">One-time</option> </select>
         </div>
 
         <div id="subDaysWrapper" class="days-input-wrapper form-group">
@@ -1421,7 +1421,7 @@
         <option value="annual">Annual</option>
         <option value="weekly">Weekly</option>
         <option value="days">Custom Days</option>
-      </select>
+        <option value="one-time">One-time</option> </select>
     </div>
 
     <div id="editDaysWrapper" class="days-input-wrapper form-group">
@@ -1545,8 +1545,8 @@ function setupAuthListener() {
     if (user) {
       currentUser = user;
       if (authBtn) {
-        // Use the custom image instead of the door emoji
-        authBtn.innerHTML = '<img src="pngegg (2).png" alt="Sign Out" style="width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0 0 2px rgba(255,255,255,0.2));">'; 
+        // Use custom logout image instead of default emoji
+        authBtn.innerHTML = '<img src="logout.png" alt="Sign Out" style="width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0 0 2px rgba(255,255,255,0.2));">'; 
         authBtn.title = `Sign Out (${user.displayName ? user.displayName.split(' ')[0] : 'User'})`;
       }
       showToast(`Welcome, ${user.displayName ? user.displayName.split(' ')[0] : 'User'}!`);
@@ -1636,6 +1636,45 @@ function setupFirebaseListener() {
       }
     }
   });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA EXPORT (CSV)
+// ═══════════════════════════════════════════════════════════════════════════
+function exportToCSV() {
+  if (!subs || subs.length === 0) {
+    showToast('No subscriptions to export!', true);
+    return;
+  }
+
+  let csvContent = "Name,Price (₹),Billing Cycle,Category,Start Date,End Date,Payment Mode,Status\n";
+
+  subs.forEach(s => {
+    const name = `"${s.name.replace(/"/g, '""')}"`; 
+    const price = s.price.toFixed(2);
+    const cycle = s.billing === 'days' ? `Every ${s.billingDays} days` : s.billing;
+    const category = s.category;
+    const start = s.startDate;
+    const end = s.endDate || "N/A";
+    const payMode = (s.paymentMode || "N/A").toUpperCase();
+    const status = s.ended ? "Ended" : "Active";
+
+    csvContent += `${name},${price},${cycle},${category},${start},${end},${payMode},${status}\n`;
+  });
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  
+  const dateStr = new Date().toISOString().split('T')[0];
+  link.setAttribute("download", `SubSukesh_Export_${dateStr}.csv`);
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  showToast('Spreadsheet downloaded! 📊');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1780,6 +1819,7 @@ function toMonthly(s) {
   if (s.billing === 'annual') return s.price / 12;
   if (s.billing === 'weekly') return s.price * 4;
   if (s.billing === 'days') return (s.price / (s.billingDays || 30)) * 30;
+  if (s.billing === 'one-time') return 0; // Exclude from recurring chart totals
   return s.price;
 }
 
@@ -1832,7 +1872,7 @@ function renderSubCard(s) {
   const emoji = s.customLogo ? '' : ((known && known.emoji) || '📦');
   const logo = s.customLogo || null;
   const logoHTML = logo ? `<img src="${logo}" alt="${s.name}">` : emoji;
-  const cycle = s.billing === 'days' ? `Every ${s.billingDays} days` : s.billing.charAt(0).toUpperCase() + s.billing.slice(1);
+  const cycle = s.billing === 'days' ? `Every ${s.billingDays} days` : (s.billing === 'one-time' ? 'One-time' : s.billing.charAt(0).toUpperCase() + s.billing.slice(1));
   const endDateHTML = s.endDate ? fmtDate(s.endDate) : '—';
   const payBadge = s.paymentMode ? `<div class="pay-badge">${s.paymentMode.toUpperCase()}</div>` : '';
   const daysText = formatDaysLeft(getDaysLeft(s));
@@ -1994,6 +2034,7 @@ function computeEndDateFrom(startStr, s) {
   else if (s.billing === 'annual') { d.setFullYear(d.getFullYear() + 1); d.setDate(d.getDate() - 1); }
   else if (s.billing === 'weekly') d.setDate(d.getDate() + 7);
   else if (s.billing === 'days') d.setDate(d.getDate() + (s.billingDays || 30));
+  else if (s.billing === 'one-time') return; 
   else d.setDate(d.getDate() + 30);
   return d.toISOString().split('T')[0];
 }
@@ -2001,18 +2042,29 @@ function computeEndDateFrom(startStr, s) {
 function autoRenewExpired() {
   const today = new Date(); today.setHours(0,0,0,0);
   let renewed = [];
+  let updated = false;
+  
   subs = subs.map(s => {
     if (s.ended || !s.endDate) return s;
     const end = new Date(s.endDate); end.setHours(23,59,59,0);
+    
     if (end < today) {
+      if (s.billing === 'one-time') {
+        updated = true;
+        return { ...s, ended: true }; 
+      }
       renewed.push(s.name);
+      updated = true;
       return { ...s, startDate: s.endDate, endDate: computeEndDateFrom(s.endDate, s), autoRenewed: true };
     }
     return s;
   });
-  if (renewed.length > 0) {
+  
+  if (updated) {
     save();
-    showToast(renewed.length === 1 ? `Auto-renewed: ${renewed[0]} 🔄` : `Auto-renewed ${renewed.length} subscriptions 🔄`);
+    if (renewed.length > 0) {
+      showToast(renewed.length === 1 ? `Auto-renewed: ${renewed[0]} 🔄` : `Auto-renewed ${renewed.length} subscriptions 🔄`);
+    }
   }
 }
 
@@ -2201,6 +2253,8 @@ function autoCalcEndDateByCycle(prefix, overrideBilling) {
   else if (billing === 'annual') { d.setFullYear(d.getFullYear() + 1); d.setDate(d.getDate() - 1); }
   else if (billing === 'weekly') d.setDate(d.getDate() + 7);
   else if (billing === 'days') d.setDate(d.getDate() + (parseInt(document.getElementById(prefix + 'Days').value) || 30));
+  else if (billing === 'one-time') return; 
+  else d.setDate(d.getDate() + 30);
   document.getElementById(prefix + 'EndDate').value = d.toISOString().split('T')[0];
 }
 
@@ -2214,53 +2268,7 @@ function getPaymentMode(prefix) {
   const active = document.getElementById(prefix + 'PaymentMode').querySelector('.payment-mode-btn.active');
   return active ? active.dataset.mode : 'debit';
 }
-// ═══════════════════════════════════════════════════════════════════════════
-// DATA EXPORT (CSV)
-// ═══════════════════════════════════════════════════════════════════════════
-function exportToCSV() {
-  if (!subs || subs.length === 0) {
-    showToast('No subscriptions to export!', true);
-    return;
-  }
 
-  // 1. Set up the column headers for the spreadsheet
-  let csvContent = "Name,Price (₹),Billing Cycle,Category,Start Date,End Date,Payment Mode,Status\n";
-
-  // 2. Loop through all subscriptions and format them as rows
-  subs.forEach(s => {
-    // Escape quotes in names (e.g., if a sub is named "My Sub") to prevent CSV breaking
-    const name = `"${s.name.replace(/"/g, '""')}"`; 
-    const price = s.price.toFixed(2);
-    const cycle = s.billing === 'days' ? `Every ${s.billingDays} days` : s.billing;
-    const category = s.category;
-    const start = s.startDate;
-    const end = s.endDate || "N/A";
-    const payMode = (s.paymentMode || "N/A").toUpperCase();
-    const status = s.ended ? "Ended" : "Active";
-
-    // Add the row to our CSV string
-    csvContent += `${name},${price},${cycle},${category},${start},${end},${payMode},${status}\n`;
-  });
-
-  // 3. Create a Blob (a file-like object) containing the CSV data
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  
-  // 4. Create a temporary invisible link to trigger the download
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.setAttribute("href", url);
-  
-  // Generate a filename with today's date
-  const dateStr = new Date().toISOString().split('T')[0];
-  link.setAttribute("download", `SubSukesh_Export_${dateStr}.csv`);
-  
-  // Click the link and clean up
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  showToast('Spreadsheet downloaded! 📊');
-}
 // ─── INIT ────────────────────────────────────────────────────────────────────
 
 // ═══════════════════════════════════════════════════════════════════════════

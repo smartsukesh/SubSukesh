@@ -1232,6 +1232,9 @@
 
 <div class="app-wrapper">
   <header>
+    <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" style="position:absolute; left:0;">
+      <div class="theme-toggle-slider">🌙</div>
+    </div>
     <div class="logo-mark">
       <div class="logo-icon">S$</div>
       <div>
@@ -1240,9 +1243,6 @@
       </div>
     </div>
     <div class="header-actions">
-      <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
-        <div class="theme-toggle-slider">🌙</div>
-      </div>
       <button class="lock-btn" onclick="lockApp()" title="Lock app">🔒</button>
       <button id="notifBellBtn" class="notif-bell-btn" onclick="openNotifPanel()">
         🔔
@@ -2207,8 +2207,8 @@ function initLock() {
   } else if (now < unlockedUntil) {
     hideLockScreen();
   } else {
+    // PIN set but session expired — show unlock screen (biometric auto-triggers inside showLockScreen)
     showLockScreen(false);
-    setTimeout(() => triggerBiometric(), 400);
   }
 }
 
@@ -2227,7 +2227,10 @@ function showLockScreen(setup) {
   } else {
     document.getElementById('lockTitle').textContent = 'Welcome back';
     document.getElementById('lockSubtitle').textContent = 'Enter your PIN to continue';
-    checkBiometricSupport();
+    // Auto-trigger biometric immediately when lock screen shows
+    checkBiometricSupport().then(() => {
+      triggerBiometric();
+    });
   }
 }
 
@@ -2239,7 +2242,6 @@ function lockApp() {
   localStorage.removeItem(UNLOCK_KEY);
   pinBuffer = '';
   showLockScreen(false);
-  setTimeout(() => triggerBiometric(), 400);
 }
 
 function pinKey(digit) {
@@ -2266,27 +2268,12 @@ function updateDots() {
 
 function handlePinComplete() {
   if (isSettingPin) {
-    if (!awaitingConfirm) {
-      pinConfirmBuffer = pinBuffer;
-      pinBuffer = '';
-      awaitingConfirm = true;
-      document.getElementById('lockSubtitle').textContent = 'Confirm your PIN';
-      updateDots();
-    } else {
-      const confirm = pinBuffer;
-      if (confirm === pinConfirmBuffer) {
-        localStorage.setItem(PIN_KEY, hashPin(pinConfirmBuffer));
-        localStorage.setItem(SETTING_KEY, '1');
-        unlockSuccess();
-      } else {
-        showPinError('PINs do not match. Try again.');
-        pinBuffer = '';
-        pinConfirmBuffer = '';
-        awaitingConfirm = false;
-        document.getElementById('lockSubtitle').textContent = 'Choose a 4-digit PIN to protect your app';
-      }
-    }
+    // Save PIN immediately on first entry — no confirm needed
+    localStorage.setItem(PIN_KEY, hashPin(pinBuffer));
+    localStorage.setItem(SETTING_KEY, '1');
+    unlockSuccess();
   } else {
+    // Verify PIN
     const stored = localStorage.getItem(PIN_KEY);
     if (hashPin(pinBuffer) === stored) {
       unlockSuccess();
@@ -2297,9 +2284,21 @@ function handlePinComplete() {
   }
 }
 
-function unlockSuccess() {
+async function unlockSuccess() {
   localStorage.setItem(UNLOCK_KEY, Date.now() + LOCK_DURATION);
   hideLockScreen();
+
+  // If biometric not yet registered, offer to set it up after PIN unlock
+  const hasRegistered = localStorage.getItem(WEBAUTHN_KEY);
+  if (!hasRegistered && localStorage.getItem(SETTING_KEY)) {
+    const available = await isBiometricAvailable();
+    if (available) {
+      setTimeout(async () => {
+        const registered = await registerBiometric();
+        if (registered) showToast('Face ID / Fingerprint enabled for next time! 🔐');
+      }, 800);
+    }
+  }
 }
 
 function showPinError(msg) {
@@ -2320,36 +2319,128 @@ function hashPin(pin) {
   return hash.toString(36);
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// WEBAUTHN — FULL BIOMETRIC REGISTRATION & AUTHENTICATION
+// ═══════════════════════════════════════════════════════════════════════════
+const WEBAUTHN_KEY = 'subsukesh_webauthn_id';
+
+function getRpId() {
+  const host = window.location.hostname;
+  return host === '' || host === 'localhost' ? 'localhost' : host;
+}
+
+async function isBiometricAvailable() {
+  if (!window.PublicKeyCredential) return false;
+  try {
+    return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+  } catch(e) { return false; }
+}
+
+async function registerBiometric() {
+  // Creates a new WebAuthn credential tied to THIS device's biometric
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const userId = crypto.getRandomValues(new Uint8Array(16));
+
+    const credential = await navigator.credentials.create({
+      publicKey: {
+        challenge,
+        rp: { name: 'SubSukesh', id: getRpId() },
+        user: {
+          id: userId,
+          name: 'subsukesh_user',
+          displayName: 'SubSukesh User'
+        },
+        pubKeyCredParams: [
+          { type: 'public-key', alg: -7 },   // ES256
+          { type: 'public-key', alg: -257 }  // RS256
+        ],
+        authenticatorSelection: {
+          authenticatorAttachment: 'platform', // device biometric only
+          userVerification: 'required',         // must verify face/fingerprint
+          requireResidentKey: false
+        },
+        timeout: 60000,
+        attestation: 'none'
+      }
+    });
+
+    if (credential) {
+      // Store the credential ID so we can use it to authenticate later
+      const credId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+      localStorage.setItem(WEBAUTHN_KEY, credId);
+      console.log('✅ Biometric registered!');
+      return true;
+    }
+  } catch(e) {
+    console.log('Biometric registration skipped:', e.message);
+  }
+  return false;
+}
+
+async function authenticateBiometric() {
+  // Verifies using the registered biometric credential
+  const storedCredId = localStorage.getItem(WEBAUTHN_KEY);
+  if (!storedCredId) return false;
+
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    // Decode stored credential ID back to ArrayBuffer
+    const credIdBytes = Uint8Array.from(atob(storedCredId), c => c.charCodeAt(0));
+
+    const assertion = await navigator.credentials.get({
+      publicKey: {
+        challenge,
+        rpId: getRpId(),
+        allowCredentials: [{
+          type: 'public-key',
+          id: credIdBytes,
+          transports: ['internal']
+        }],
+        userVerification: 'required', // forces Face ID / Fingerprint
+        timeout: 60000
+      }
+    });
+
+    return !!assertion;
+  } catch(e) {
+    console.log('Biometric auth failed:', e.message);
+    return false;
+  }
+}
+
 async function checkBiometricSupport() {
   const btn = document.getElementById('biometricBtn');
-  if (window.PublicKeyCredential) {
-    try {
-      const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-      if (available) {
-        btn.style.display = 'flex';
-        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-        document.getElementById('biometricIcon').textContent = isIOS ? '🔐' : '👆';
-        document.getElementById('biometricLabel').textContent = isIOS ? 'Use Face ID' : 'Use Fingerprint';
-      }
-    } catch(e) {}
+  const available = await isBiometricAvailable();
+  if (available) {
+    btn.style.display = 'flex';
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    document.getElementById('biometricIcon').textContent = isIOS ? '🔐' : '👆';
+    document.getElementById('biometricLabel').textContent = isIOS ? 'Use Face ID' : 'Use Fingerprint';
   }
+  return available;
 }
 
 async function triggerBiometric() {
   if (!localStorage.getItem(SETTING_KEY)) return;
-  try {
-    const challenge = new Uint8Array(32);
-    crypto.getRandomValues(challenge);
-    const credential = await navigator.credentials.get({
-      publicKey: {
-        challenge,
-        timeout: 30000,
-        userVerification: 'required',
-        rpId: window.location.hostname || 'localhost'
-      }
-    });
-    if (credential) unlockSuccess();
-  } catch(e) {}
+  const available = await isBiometricAvailable();
+  if (!available) return;
+
+  const hasRegistered = localStorage.getItem(WEBAUTHN_KEY);
+
+  if (!hasRegistered) {
+    // First time — register biometric on this device
+    document.getElementById('lockSubtitle').textContent = 'Setting up biometric for this device...';
+    const registered = await registerBiometric();
+    if (registered) {
+      unlockSuccess();
+      showToast('Face ID / Fingerprint set up! 🎉');
+    }
+  } else {
+    // Already registered — just authenticate
+    const success = await authenticateBiometric();
+    if (success) unlockSuccess();
+  }
 }
 
 // ─── MAIN INIT ───────────────────────────────────────────────────────────────

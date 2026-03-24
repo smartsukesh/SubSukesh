@@ -694,7 +694,7 @@
 
   .payment-mode-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 8px;
     margin-top: 6px;
   }
@@ -1028,6 +1028,100 @@
     color: var(--danger);
   }
 
+  /* LOCK BUTTON */
+  .lock-btn {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lock-btn:hover { background: var(--card2); border-color: rgba(255,255,255,0.12); }
+
+  /* LOCK SCREEN */
+  .lock-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lock-screen.hidden { display: none; }
+  .lock-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    width: 90%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .lock-logo {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--gold), var(--purple));
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700;
+    color: #0b0b12;
+  }
+  .lock-title { font-size: 20px; font-weight: 700; color: var(--text); text-align: center; }
+  .lock-subtitle { font-size: 13px; color: var(--muted); text-align: center; margin-top: -12px; }
+  .pin-dots { display: flex; gap: 14px; margin: 4px 0; }
+  .pin-dot {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    transition: all 0.2s;
+  }
+  .pin-dot.filled { background: var(--gold); border-color: var(--gold); }
+  .pin-dot.error { background: var(--danger); border-color: var(--danger); }
+  .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
+  .pin-key {
+    height: 58px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card2);
+    color: var(--text);
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-body);
+  }
+  .pin-key:hover { background: var(--border); }
+  .pin-key:active { transform: scale(0.94); }
+  .pin-key.del { font-size: 16px; color: var(--muted); }
+  .pin-key.empty { background: transparent; border-color: transparent; cursor: default; }
+  .biometric-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card2);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+    font-family: var(--font-body);
+  }
+  .biometric-btn:hover { background: var(--border); }
+  .lock-error { font-size: 12px; color: var(--danger); text-align: center; min-height: 18px; }
+
   @media (max-width: 1400px) {
     .main-grid { grid-template-columns: 300px 1fr 1fr; }
   }
@@ -1149,6 +1243,7 @@
       <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
         <div class="theme-toggle-slider">🌙</div>
       </div>
+      <button class="lock-btn" onclick="lockApp()" title="Lock app">🔒</button>
       <button id="notifBellBtn" class="notif-bell-btn" onclick="openNotifPanel()">
         🔔
         <div id="notifBadge" class="notif-badge">0</div>
@@ -1216,9 +1311,11 @@
         <div class="form-group">
           <label class="form-label">Payment Mode</label>
           <div class="payment-mode-grid" id="subPaymentMode">
-            <button type="button" class="payment-mode-btn active" data-mode="card" onclick="selectPaymentMode('sub','card')">Card</button>
+            <button type="button" class="payment-mode-btn active" data-mode="debit" onclick="selectPaymentMode('sub','debit')">Debit</button>
+            <button type="button" class="payment-mode-btn" data-mode="credit" onclick="selectPaymentMode('sub','credit')">Credit</button>
             <button type="button" class="payment-mode-btn" data-mode="upi" onclick="selectPaymentMode('sub','upi')">UPI</button>
-            <button type="button" class="payment-mode-btn" data-mode="other" onclick="selectPaymentMode('sub','other')">Other</button>
+            <button type="button" class="payment-mode-btn" data-mode="wallet" onclick="selectPaymentMode('sub','wallet')">Wallet</button>
+            <button type="button" class="payment-mode-btn" data-mode="points" onclick="selectPaymentMode('sub','points')">Points</button>
           </div>
         </div>
 
@@ -1229,11 +1326,11 @@
     <div class="center-col">
       <div class="summary-grid">
         <div class="summary-card" onclick="toggleChart()">
-          <div class="label">This Month</div>
+          <div class="label">MONTHLY</div>
           <div class="amount" id="monthlyTotal">₹0<span>/mo</span></div>
         </div>
         <div class="summary-card" onclick="toggleChart()">
-          <div class="label">This Year</div>
+          <div class="label">ANNUAL</div>
           <div class="amount" id="annualTotal">₹0<span>/yr</span></div>
         </div>
       </div>
@@ -1346,9 +1443,11 @@
     <div class="form-group">
       <label class="form-label">Payment Mode</label>
       <div class="payment-mode-grid" id="editPaymentMode">
-        <button type="button" class="payment-mode-btn" data-mode="card" onclick="selectPaymentMode('edit','card')">Card</button>
+        <button type="button" class="payment-mode-btn" data-mode="debit" onclick="selectPaymentMode('edit','debit')">Debit</button>
+        <button type="button" class="payment-mode-btn" data-mode="credit" onclick="selectPaymentMode('edit','credit')">Credit</button>
         <button type="button" class="payment-mode-btn" data-mode="upi" onclick="selectPaymentMode('edit','upi')">UPI</button>
-        <button type="button" class="payment-mode-btn" data-mode="other" onclick="selectPaymentMode('edit','other')">Other</button>
+        <button type="button" class="payment-mode-btn" data-mode="wallet" onclick="selectPaymentMode('edit','wallet')">Wallet</button>
+        <button type="button" class="payment-mode-btn" data-mode="points" onclick="selectPaymentMode('edit','points')">Points</button>
       </div>
     </div>
 
@@ -1537,12 +1636,21 @@ function renderSummary() {
   const active = subs.filter(s => !s.ended);
   let monthly = 0, annual = 0;
   active.forEach(s => {
-    if (s.billing === 'monthly') monthly += s.price;
-    else if (s.billing === 'annual') annual += s.price;
-    else if (s.billing === 'weekly') monthly += s.price * 4;
-    else if (s.billing === 'days') monthly += (s.price / (s.billingDays || 30)) * 30;
+    if (s.billing === 'monthly') {
+      monthly += s.price;
+      annual += s.price * 12;
+    } else if (s.billing === 'annual') {
+      monthly += s.price / 12;
+      annual += s.price;
+    } else if (s.billing === 'weekly') {
+      monthly += s.price * 4;
+      annual += s.price * 52;
+    } else if (s.billing === 'days') {
+      const perDay = s.price / (s.billingDays || 30);
+      monthly += perDay * 30;
+      annual += perDay * 365;
+    }
   });
-  annual += monthly * 12;
 
   document.getElementById('monthlyTotal').innerHTML = `₹${monthly.toFixed(0)}<span>/mo</span>`;
   document.getElementById('annualTotal').innerHTML = `₹${annual.toFixed(0)}<span>/yr</span>`;
@@ -1731,7 +1839,7 @@ function addSub() {
   handleBillingChange('sub');
   document.getElementById('subStartDate').value = new Date().toISOString().split('T')[0];
   autoCalcEndDateByCycle('sub', 'monthly');
-  selectPaymentMode('sub', 'card');
+  selectPaymentMode('sub', 'debit');
   showToast(`${name} added ✓`);
 }
 
@@ -1747,7 +1855,7 @@ function openEdit(id) {
   document.getElementById('editEndDate').value = s.endDate || '';
   document.getElementById('editDays').value = s.billingDays || 30;
   handleBillingChange('edit');
-  selectPaymentMode('edit', s.paymentMode || 'card');
+  selectPaymentMode('edit', s.paymentMode || 'debit');
   document.getElementById('editIconInput')._pendingLogo = null;
   document.getElementById('editIconInput')._removeLogo = false;
   document.getElementById('editModal').classList.add('open');
@@ -2038,11 +2146,12 @@ function selectPaymentMode(prefix, mode) {
 
 function getPaymentMode(prefix) {
   const active = document.getElementById(prefix + 'PaymentMode').querySelector('.payment-mode-btn.active');
-  return active ? active.dataset.mode : 'card';
+  return active ? active.dataset.mode : 'debit';
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
 (function init() {
+  initLock();
   initFirebase();
 
   if (!isFirebaseEnabled) {
@@ -2057,5 +2166,236 @@ function getPaymentMode(prefix) {
   setTimeout(() => { render(); }, 500);
 })();
 </script>
+<!-- LOCK SCREEN -->
+<div id="lockScreen" class="lock-screen hidden">
+  <div class="lock-box">
+    <div class="lock-logo">S$</div>
+    <div class="lock-title" id="lockTitle">Welcome back</div>
+    <div class="lock-subtitle" id="lockSubtitle">Enter your PIN to continue</div>
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot" id="dot0"></div>
+      <div class="pin-dot" id="dot1"></div>
+      <div class="pin-dot" id="dot2"></div>
+      <div class="pin-dot" id="dot3"></div>
+    </div>
+    <div class="lock-error" id="lockError"></div>
+    <div class="pin-keypad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key empty"></button>
+      <button class="pin-key" onclick="pinKey('0')">0</button>
+      <button class="pin-key del" onclick="pinBackspace()">⌫</button>
+    </div>
+    <button class="biometric-btn" id="biometricBtn" onclick="triggerBiometric()" style="display:none">
+      <span id="biometricIcon">👆</span>
+      <span id="biometricLabel">Use Face ID / Fingerprint</span>
+    </button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// LOCK / AUTH SYSTEM
+// ═══════════════════════════════════════════════════════════════════════════
+const LOCK_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days in ms
+const PIN_KEY = 'subsukesh_pin';
+const UNLOCK_KEY = 'subsukesh_unlocked_until';
+const SETTING_KEY = 'subsukesh_pin_set';
+
+let pinBuffer = '';
+let isSettingPin = false;
+let pinConfirmBuffer = '';
+let awaitingConfirm = false;
+
+function initLock() {
+  const pinSet = localStorage.getItem(SETTING_KEY);
+  const unlockedUntil = parseInt(localStorage.getItem(UNLOCK_KEY) || '0');
+  const now = Date.now();
+
+  if (!pinSet) {
+    // First time — set up PIN
+    showLockScreen(true);
+  } else if (now < unlockedUntil) {
+    // Still within trusted window — let them in
+    hideLockScreen();
+  } else {
+    // PIN set but session expired — show unlock screen
+    showLockScreen(false);
+    setTimeout(() => triggerBiometric(), 400);
+  }
+}
+
+function showLockScreen(setup) {
+  isSettingPin = setup;
+  awaitingConfirm = false;
+  pinBuffer = '';
+  pinConfirmBuffer = '';
+  document.getElementById('lockScreen').classList.remove('hidden');
+  document.getElementById('lockError').textContent = '';
+  updateDots();
+
+  if (setup) {
+    document.getElementById('lockTitle').textContent = 'Set your PIN';
+    document.getElementById('lockSubtitle').textContent = 'Choose a 4-digit PIN to protect your app';
+    document.getElementById('biometricBtn').style.display = 'none';
+  } else {
+    document.getElementById('lockTitle').textContent = 'Welcome back';
+    document.getElementById('lockSubtitle').textContent = 'Enter your PIN to continue';
+    checkBiometricSupport();
+  }
+}
+
+function hideLockScreen() {
+  document.getElementById('lockScreen').classList.add('hidden');
+}
+
+function lockApp() {
+  localStorage.removeItem(UNLOCK_KEY);
+  pinBuffer = '';
+  showLockScreen(false);
+  setTimeout(() => triggerBiometric(), 400);
+}
+
+function pinKey(digit) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += digit;
+  updateDots();
+  document.getElementById('lockError').textContent = '';
+
+  if (pinBuffer.length === 4) {
+    setTimeout(() => handlePinComplete(), 150);
+  }
+}
+
+function pinBackspace() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  updateDots();
+}
+
+function updateDots() {
+  const len = isSettingPin && awaitingConfirm ? pinConfirmBuffer.length : pinBuffer.length;
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('dot' + i);
+    dot.classList.toggle('filled', i < len);
+    dot.classList.remove('error');
+  }
+}
+
+function handlePinComplete() {
+  if (isSettingPin) {
+    if (!awaitingConfirm) {
+      // First entry — ask to confirm
+      pinConfirmBuffer = pinBuffer;
+      pinBuffer = '';
+      awaitingConfirm = true;
+      document.getElementById('lockSubtitle').textContent = 'Confirm your PIN';
+      updateDots();
+    } else {
+      // Confirmation entry
+      const confirm = pinBuffer;
+      if (confirm === pinConfirmBuffer) {
+        // Save PIN hash and unlock
+        localStorage.setItem(PIN_KEY, hashPin(pinConfirmBuffer));
+        localStorage.setItem(SETTING_KEY, '1');
+        unlockSuccess();
+      } else {
+        // Mismatch
+        showPinError('PINs do not match. Try again.');
+        pinBuffer = '';
+        pinConfirmBuffer = '';
+        awaitingConfirm = false;
+        document.getElementById('lockSubtitle').textContent = 'Choose a 4-digit PIN to protect your app';
+      }
+    }
+  } else {
+    // Verify PIN
+    const stored = localStorage.getItem(PIN_KEY);
+    if (hashPin(pinBuffer) === stored) {
+      unlockSuccess();
+    } else {
+      showPinError('Incorrect PIN. Try again.');
+      pinBuffer = '';
+    }
+  }
+}
+
+function unlockSuccess() {
+  localStorage.setItem(UNLOCK_KEY, Date.now() + LOCK_DURATION);
+  hideLockScreen();
+}
+
+function showPinError(msg) {
+  document.getElementById('lockError').textContent = msg;
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('dot' + i).classList.add('error');
+  }
+  setTimeout(() => {
+    for (let i = 0; i < 4; i++) {
+      document.getElementById('dot' + i).classList.remove('error', 'filled');
+    }
+  }, 600);
+}
+
+function hashPin(pin) {
+  // Simple hash — good enough for local PIN protection
+  let hash = 0;
+  const str = pin + 'subsukesh_salt_2024';
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash.toString(36);
+}
+
+async function checkBiometricSupport() {
+  const btn = document.getElementById('biometricBtn');
+  if (window.PublicKeyCredential) {
+    try {
+      const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+      if (available) {
+        btn.style.display = 'flex';
+        // Detect if iOS (Face ID) or Android (Fingerprint)
+        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+        document.getElementById('biometricIcon').textContent = isIOS ? '🔐' : '👆';
+        document.getElementById('biometricLabel').textContent = isIOS ? 'Use Face ID' : 'Use Fingerprint';
+      }
+    } catch(e) {}
+  }
+}
+
+async function triggerBiometric() {
+  const pinSet = localStorage.getItem(SETTING_KEY);
+  if (!pinSet) return;
+
+  try {
+    // Use WebAuthn to trigger biometric
+    const challenge = new Uint8Array(32);
+    crypto.getRandomValues(challenge);
+
+    const credential = await navigator.credentials.get({
+      publicKey: {
+        challenge,
+        timeout: 30000,
+        userVerification: 'required',
+        rpId: window.location.hostname || 'localhost'
+      }
+    });
+
+    if (credential) {
+      unlockSuccess();
+    }
+  } catch(e) {
+    // User cancelled or not available — just show PIN pad silently
+  }
+}
+</script>
+
 </body>
 </html>

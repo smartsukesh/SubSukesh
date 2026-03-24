@@ -1545,7 +1545,8 @@ function setupAuthListener() {
     if (user) {
       currentUser = user;
       if (authBtn) {
-        authBtn.textContent = '🚪'; 
+        // Use the custom image instead of the door emoji
+        authBtn.innerHTML = '<img src="pngegg (2).png" alt="Sign Out" style="width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0 0 2px rgba(255,255,255,0.2));">'; 
         authBtn.title = `Sign Out (${user.displayName ? user.displayName.split(' ')[0] : 'User'})`;
       }
       showToast(`Welcome, ${user.displayName ? user.displayName.split(' ')[0] : 'User'}!`);
@@ -1555,7 +1556,8 @@ function setupAuthListener() {
     } else {
       currentUser = null;
       if (authBtn) {
-        authBtn.textContent = '👤'; 
+        // Revert back to the default profile emoji when signed out
+        authBtn.innerHTML = '👤'; 
         authBtn.title = 'Sign In with Google';
       }
       

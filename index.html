@@ -1242,6 +1242,8 @@
       </div>
     </div>
     <div class="header-actions">
+      <button class="notif-bell-btn" onclick="exportToCSV()" title="Export to Spreadsheet">📊</button>
+      
       <button id="authBtn" class="notif-bell-btn" onclick="toggleAuth()" title="Sign In">👤</button>
       <button class="lock-btn" onclick="lockApp()" title="Lock app">🔒</button>
       <button id="notifBellBtn" class="notif-bell-btn" onclick="openNotifPanel()">
@@ -2210,7 +2212,53 @@ function getPaymentMode(prefix) {
   const active = document.getElementById(prefix + 'PaymentMode').querySelector('.payment-mode-btn.active');
   return active ? active.dataset.mode : 'debit';
 }
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA EXPORT (CSV)
+// ═══════════════════════════════════════════════════════════════════════════
+function exportToCSV() {
+  if (!subs || subs.length === 0) {
+    showToast('No subscriptions to export!', true);
+    return;
+  }
 
+  // 1. Set up the column headers for the spreadsheet
+  let csvContent = "Name,Price (₹),Billing Cycle,Category,Start Date,End Date,Payment Mode,Status\n";
+
+  // 2. Loop through all subscriptions and format them as rows
+  subs.forEach(s => {
+    // Escape quotes in names (e.g., if a sub is named "My Sub") to prevent CSV breaking
+    const name = `"${s.name.replace(/"/g, '""')}"`; 
+    const price = s.price.toFixed(2);
+    const cycle = s.billing === 'days' ? `Every ${s.billingDays} days` : s.billing;
+    const category = s.category;
+    const start = s.startDate;
+    const end = s.endDate || "N/A";
+    const payMode = (s.paymentMode || "N/A").toUpperCase();
+    const status = s.ended ? "Ended" : "Active";
+
+    // Add the row to our CSV string
+    csvContent += `${name},${price},${cycle},${category},${start},${end},${payMode},${status}\n`;
+  });
+
+  // 3. Create a Blob (a file-like object) containing the CSV data
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  
+  // 4. Create a temporary invisible link to trigger the download
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  
+  // Generate a filename with today's date
+  const dateStr = new Date().toISOString().split('T')[0];
+  link.setAttribute("download", `SubSukesh_Export_${dateStr}.csv`);
+  
+  // Click the link and clean up
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  showToast('Spreadsheet downloaded! 📊');
+}
 // ─── INIT ────────────────────────────────────────────────────────────────────
 
 // ═══════════════════════════════════════════════════════════════════════════

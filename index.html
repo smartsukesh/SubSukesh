@@ -956,4 +956,1528 @@
     margin-bottom: 10px;
   }
   .notif-item.urgent { border-color: var(--danger); background: rgba(255,94,114,0.05); }
-  .not
+  .notif-item.warning { border-color: var(--gold); background: rgba(245,197,66,0.05); }
+
+  .notif-emoji {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .notif-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .notif-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .notif-desc {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .notif-time {
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .notif-time.red { color: var(--danger); }
+  .notif-time.orange { color: var(--gold); }
+
+  .notif-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .notif-empty .big-emoji {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 2000;
+    opacity: 0;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.error {
+    background: rgba(255,94,114,0.15);
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
+  /* LOCK BUTTON */
+  .lock-btn {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lock-btn:hover { background: var(--card2); border-color: rgba(255,255,255,0.12); }
+
+  /* LOCK SCREEN */
+  .lock-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lock-screen.hidden { display: none; }
+  .lock-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    width: 90%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .lock-logo {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--gold), var(--purple));
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700;
+    color: #0b0b12;
+  }
+  .lock-title { font-size: 20px; font-weight: 700; color: var(--text); text-align: center; }
+  .lock-subtitle { font-size: 13px; color: var(--muted); text-align: center; margin-top: -12px; }
+  .pin-dots { display: flex; gap: 14px; margin: 4px 0; }
+  .pin-dot {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    transition: all 0.2s;
+  }
+  .pin-dot.filled { background: var(--gold); border-color: var(--gold); }
+  .pin-dot.error { background: var(--danger); border-color: var(--danger); }
+  .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
+  .pin-key {
+    height: 58px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card2);
+    color: var(--text);
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-body);
+  }
+  .pin-key:hover { background: var(--border); }
+  .pin-key:active { transform: scale(0.94); }
+  .pin-key.del { font-size: 16px; color: var(--muted); }
+  .pin-key.empty { background: transparent; border-color: transparent; cursor: default; }
+  .biometric-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card2);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+    font-family: var(--font-body);
+  }
+  .biometric-btn:hover { background: var(--border); }
+  .lock-error { font-size: 12px; color: var(--danger); text-align: center; min-height: 18px; }
+
+  @media (max-width: 1400px) {
+    .main-grid { grid-template-columns: 300px 1fr 1fr; }
+  }
+  @media (max-width: 1200px) {
+    .main-grid { grid-template-columns: 280px 1fr; }
+    .right-col { display: none; }
+  }
+  @media (max-width: 1000px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .left-col { position: static; }
+  }
+
+  @media (max-width: 768px) {
+    body { font-size: 14px; }
+    .app-wrapper { padding: 12px 12px 40px; }
+    header { padding: 12px 0 16px; }
+    .logo-icon { width: 28px; height: 28px; font-size: 13px; }
+    header h1 { font-size: 18px; }
+    header p { font-size: 11px; }
+    .notif-bell-btn { width: 36px; height: 36px; font-size: 16px; }
+    .theme-toggle { width: 50px; height: 26px; }
+    .theme-toggle-slider { width: 18px; height: 18px; font-size: 10px; }
+    body.light-mode .theme-toggle-slider { left: 28px; }
+
+    /* MOBILE LAYOUT: summary → subs → add form */
+    .main-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    /* Order: center-col (summary+subs) first, then left-col (add form) */
+    .center-col { order: 1; min-height: auto; }
+    .left-col   { order: 2; position: static; }
+    /* Hide right col on mobile — subs shown in center-col only */
+    .right-col  { display: none !important; }
+
+    /* Summary cards side by side on mobile */
+    .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px; min-height: auto; }
+    .summary-card { padding: 14px 12px; min-height: auto; }
+    .summary-card .amount { font-size: 18px; }
+    .summary-card .label { font-size: 11px; }
+    .summary-card .sub-note { font-size: 10px; }
+    .summary-card .count-badge { font-size: 9px; padding: 2px 6px; }
+
+    /* Add form */
+    .add-card { padding: 16px; }
+    .section-title { font-size: 12px; margin-bottom: 12px; }
+    .form-label { font-size: 10px; margin-bottom: 5px; }
+    .form-input, .form-select { padding: 9px 10px; font-size: 12px; }
+    .form-group { margin-bottom: 12px; }
+    .payment-mode-btn { font-size: 10px; padding: 7px; }
+    .add-btn { padding: 11px; font-size: 13px; }
+
+    /* Subscription cards */
+    .sub-card { padding: 12px; margin-bottom: 8px; }
+    .sub-logo { width: 38px; height: 38px; font-size: 18px; }
+    .sub-name { font-size: 13px; }
+    .sub-cycle { font-size: 10px; }
+    .sub-row-price { font-size: 14px; min-width: 45px; }
+    .sub-row-enddate { font-size: 11px; min-width: 55px; }
+    .pay-badge { font-size: 9px; padding: 2px 5px; min-width: 40px; }
+    .days-left-badge { font-size: 9px; padding: 2px 5px; min-width: 50px; }
+    .status-dot { width: 8px; height: 8px; }
+    .sub-details { margin-top: 10px; padding-top: 10px; gap: 8px; }
+    .detail-label { font-size: 9px; }
+    .detail-value { font-size: 12px; }
+    .sub-btn { padding: 8px; font-size: 11px; }
+
+    /* Chart modal */
+    .chart-card { max-width: 95%; padding: 20px 16px; }
+    .chart-canvas-wrap { width: 160px; height: 160px; }
+    #pieChart { width: 160px !important; height: 160px !important; }
+    .chart-legend { grid-template-columns: 1fr; }
+
+    /* Edit modal */
+    .modal-content { max-width: 95%; padding: 20px 16px; }
+    .modal-title { font-size: 16px; }
+    .icon-upload-area { padding: 12px; }
+    .icon-preview { width: 50px; height: 50px; }
+    .icon-fallback { font-size: 20px; }
+
+    /* Notification panel */
+    .notif-panel { width: 100%; }
+    .notif-header { padding: 20px 16px; }
+    .notif-header h3 { font-size: 16px; }
+    .notif-item { padding: 12px; }
+    .notif-emoji { width: 36px; height: 36px; font-size: 18px; }
+    .notif-name { font-size: 12px; }
+    .notif-desc { font-size: 10px; }
+
+    .subs-scroll { padding-right: 4px; overflow-y: visible; }
+    .subs-scroll::-webkit-scrollbar { width: 4px; }
+    .toggle-btn { font-size: 11px; padding: 7px 0; }
+    .empty-emoji { font-size: 40px; }
+    .empty-state { font-size: 12px; padding: 30px 16px; }
+  }
+
+  @media (max-width: 375px) {
+    .app-wrapper { padding: 10px 10px 40px; }
+    .sub-meta { gap: 6px; }
+    .sub-row-price { font-size: 13px; min-width: 40px; }
+    .sub-row-enddate { font-size: 10px; min-width: 50px; }
+    .pay-badge, .days-left-badge { font-size: 8px; padding: 2px 4px; min-width: 35px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-wrapper">
+  <header>
+    <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" style="position:absolute; left:0;">
+      <div class="theme-toggle-slider">🌙</div>
+    </div>
+    <div class="logo-mark">
+      <div class="logo-icon">S$</div>
+      <div>
+        <h1>SubSukesh</h1>
+        <p>Track your subscriptions</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="authBtn" class="notif-bell-btn" onclick="toggleAuth()" title="Sign In">👤</button>
+      <button class="lock-btn" onclick="lockApp()" title="Lock app">🔒</button>
+      <button id="notifBellBtn" class="notif-bell-btn" onclick="openNotifPanel()">
+        🔔
+        <div id="notifBadge" class="notif-badge">0</div>
+      </button>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <div class="left-col">
+      <div class="add-card">
+        <div class="section-title">
+          <span class="dot"></span>
+          Add Subscription
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Name</label>
+          <input type="text" id="subName" class="form-input" placeholder="Netflix, Spotify, etc.">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Price (₹)</label>
+            <input type="number" id="subPrice" class="form-input" placeholder="499" step="0.01">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select id="subCategory" class="form-select">
+              <option value="Entertainment">Entertainment</option>
+              <option value="Productivity">Productivity</option>
+              <option value="Cloud">Cloud</option>
+              <option value="Education">Education</option>
+              <option value="Fitness">Fitness</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Billing Cycle</label>
+          <select id="subBilling" class="form-select" onchange="handleBillingChange('sub')">
+            <option value="monthly">Monthly</option>
+            <option value="annual">Annual</option>
+            <option value="weekly">Weekly</option>
+            <option value="days">Custom Days</option>
+          </select>
+        </div>
+
+        <div id="subDaysWrapper" class="days-input-wrapper form-group">
+          <label class="form-label">Every N Days</label>
+          <input type="number" id="subDays" class="form-input" placeholder="30" min="1" value="30">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Start Date</label>
+            <input type="date" id="subStartDate" class="form-input" onchange="autoCalcEndDateByCycle('sub')">
+          </div>
+          <div class="form-group">
+            <label class="form-label">End Date</label>
+            <input type="date" id="subEndDate" class="form-input">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Payment Mode</label>
+          <div class="payment-mode-grid" id="subPaymentMode">
+            <button type="button" class="payment-mode-btn active" data-mode="debit" onclick="selectPaymentMode('sub','debit')">Debit</button>
+            <button type="button" class="payment-mode-btn" data-mode="credit" onclick="selectPaymentMode('sub','credit')">Credit</button>
+            <button type="button" class="payment-mode-btn" data-mode="upi" onclick="selectPaymentMode('sub','upi')">UPI</button>
+            <button type="button" class="payment-mode-btn" data-mode="wallet" onclick="selectPaymentMode('sub','wallet')">Wallet</button>
+            <button type="button" class="payment-mode-btn" data-mode="points" onclick="selectPaymentMode('sub','points')">Points</button>
+          </div>
+        </div>
+
+        <button class="add-btn" onclick="addSub()">Add Subscription</button>
+      </div>
+    </div>
+
+    <div class="center-col">
+      <div class="summary-grid">
+        <div class="summary-card" onclick="toggleChart()">
+          <div class="label">MONTHLY</div>
+          <div class="amount" id="monthlyTotal">₹0<span>/mo</span></div>
+        </div>
+        <div class="summary-card" onclick="toggleChart()">
+          <div class="label">ANNUAL</div>
+          <div class="amount" id="annualTotal">₹0<span>/yr</span></div>
+        </div>
+      </div>
+
+      <div class="subs-scroll" id="subsContainer1">
+        <div class="empty-state">
+          <div class="empty-emoji">📦</div>
+          <p>No subscriptions yet.<br>Add one to get started!</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-col">
+      <div class="summary-card full">
+        <div class="label">Total Active</div>
+        <div class="amount" id="subsCount">0</div>
+        <div class="sub-note">Next renewal: <b id="nextRenewal">—</b></div>
+        <div class="count-badge" id="activeCountBadge">0 active</div>
+      </div>
+
+      <div class="subs-scroll" id="subsContainer2"></div>
+    </div>
+  </div>
+</div>
+
+<div id="chartModal" class="chart-modal" onclick="handleChartModalClick(event)">
+  <div class="chart-card">
+    <div class="section-title">
+      <span class="dot"></span>
+      Spending by Category
+    </div>
+    <div class="chart-inner" id="chartContainer">
+      <div class="no-data-msg">Add subscriptions to see breakdown</div>
+    </div>
+  </div>
+</div>
+
+<div id="editModal" class="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">Edit Subscription</div>
+      <button class="modal-close" onclick="closeEdit()">×</button>
+    </div>
+
+    <div class="icon-upload-area">
+      <div id="editIconPreview" class="icon-preview">
+        <div id="editIconFallback" class="icon-fallback">📦</div>
+        <div class="icon-preview-overlay"></div>
+      </div>
+      <div style="flex: 1;">
+        <input type="file" id="editIconInput" accept="image/*" style="display:none;" onchange="handleEditIconUpload(event)">
+        <button class="icon-upload-btn" onclick="document.getElementById('editIconInput').click()">Upload Icon</button>
+        <button id="editIconRemoveBtn" class="icon-remove-btn" onclick="removeEditIcon()">Remove</button>
+      </div>
+    </div>
+
+    <input type="hidden" id="editId">
+    
+    <div class="form-group">
+      <label class="form-label">Name</label>
+      <input type="text" id="editName" class="form-input">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Price (₹)</label>
+        <input type="number" id="editPrice" class="form-input" step="0.01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select id="editCategory" class="form-select">
+          <option value="Entertainment">Entertainment</option>
+          <option value="Productivity">Productivity</option>
+          <option value="Cloud">Cloud</option>
+          <option value="Education">Education</option>
+          <option value="Fitness">Fitness</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Billing Cycle</label>
+      <select id="editBilling" class="form-select" onchange="handleBillingChange('edit')">
+        <option value="monthly">Monthly</option>
+        <option value="annual">Annual</option>
+        <option value="weekly">Weekly</option>
+        <option value="days">Custom Days</option>
+      </select>
+    </div>
+
+    <div id="editDaysWrapper" class="days-input-wrapper form-group">
+      <label class="form-label">Every N Days</label>
+      <input type="number" id="editDays" class="form-input" min="1" value="30">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Start Date</label>
+        <input type="date" id="editStartDate" class="form-input" onchange="autoCalcEndDateByCycle('edit')">
+      </div>
+      <div class="form-group">
+        <label class="form-label">End Date</label>
+        <input type="date" id="editEndDate" class="form-input">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Payment Mode</label>
+      <div class="payment-mode-grid" id="editPaymentMode">
+        <button type="button" class="payment-mode-btn" data-mode="debit" onclick="selectPaymentMode('edit','debit')">Debit</button>
+        <button type="button" class="payment-mode-btn" data-mode="credit" onclick="selectPaymentMode('edit','credit')">Credit</button>
+        <button type="button" class="payment-mode-btn" data-mode="upi" onclick="selectPaymentMode('edit','upi')">UPI</button>
+        <button type="button" class="payment-mode-btn" data-mode="wallet" onclick="selectPaymentMode('edit','wallet')">Wallet</button>
+        <button type="button" class="payment-mode-btn" data-mode="points" onclick="selectPaymentMode('edit','points')">Points</button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeEdit()">Cancel</button>
+      <button class="modal-btn primary" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div id="notifPanel" class="notif-panel" onclick="handleNotifOverlayClick(event)">
+  <div class="notif-header">
+    <h3>Alerts <span id="notifPanelCount" class="notif-count"></span></h3>
+  </div>
+  <div id="notifList" class="notif-list"></div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<div id="lockScreen" class="lock-screen hidden">
+  <div class="lock-box">
+    <div class="lock-logo">S$</div>
+    <div class="lock-title" id="lockTitle">Welcome back</div>
+    <div class="lock-subtitle" id="lockSubtitle">Enter your PIN to continue</div>
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot" id="dot0"></div>
+      <div class="pin-dot" id="dot1"></div>
+      <div class="pin-dot" id="dot2"></div>
+      <div class="pin-dot" id="dot3"></div>
+    </div>
+    <div class="lock-error" id="lockError"></div>
+    <div class="pin-keypad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key empty"></button>
+      <button class="pin-key" onclick="pinKey('0')">0</button>
+      <button class="pin-key del" onclick="pinBackspace()">⌫</button>
+    </div>
+    <button class="biometric-btn" id="biometricBtn" onclick="triggerBiometric()" style="display:none">
+      <span id="biometricIcon">👆</span>
+      <span id="biometricLabel">Use Face ID / Fingerprint</span>
+    </button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// FIREBASE CONFIGURATION & AUTH
+// ═══════════════════════════════════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyA-t7NepAe9mwKuiao04TmYhGucKZTJufo",
+  authDomain: "subsukesh.firebaseapp.com",
+  databaseURL: "https://subsukesh-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "subsukesh",
+  storageBucket: "subsukesh.firebasestorage.app",
+  messagingSenderId: "291568174592",
+  appId: "1:291568174592:web:74aff29d12bc6bf8dfbae5"
+};
+
+let firebaseApp = null;
+let database = null;
+let isFirebaseEnabled = false;
+let currentUser = null;
+let dbListenerRef = null;
+
+function initFirebase() {
+  try {
+    firebaseApp = firebase.initializeApp(firebaseConfig);
+    database = firebase.database();
+    isFirebaseEnabled = true;
+    console.log("✅ Firebase initialized!");
+    
+    // Start listening for logins ONLY after Firebase is ready
+    setupAuthListener();
+    
+    return true;
+  } catch (error) {
+    console.error("❌ Firebase initialization error:", error);
+    isFirebaseEnabled = false;
+    return false;
+  }
+}
+
+function setupAuthListener() {
+  firebase.auth().onAuthStateChanged((user) => {
+    const authBtn = document.getElementById('authBtn');
+    
+    if (user) {
+      currentUser = user;
+      if (authBtn) {
+        authBtn.textContent = '🚪'; 
+        authBtn.title = `Sign Out (${user.displayName ? user.displayName.split(' ')[0] : 'User'})`;
+      }
+      showToast(`Welcome, ${user.displayName ? user.displayName.split(' ')[0] : 'User'}!`);
+      
+      loadFromFirebase();
+      setupFirebaseListener();
+    } else {
+      currentUser = null;
+      if (authBtn) {
+        authBtn.textContent = '👤'; 
+        authBtn.title = 'Sign In with Google';
+      }
+      
+      if (dbListenerRef) dbListenerRef.off(); // Stop listening to old data
+      
+      // Load local storage fallback when logged out
+      subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+      render();
+    }
+  });
+}
+
+function toggleAuth() {
+  if (currentUser) {
+    firebase.auth().signOut().then(() => showToast('Signed out successfully'));
+  } else {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider).catch(error => {
+      showToast('Sign in failed: ' + error.message, true);
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FIREBASE SYNC — USER SCOPED
+// ═══════════════════════════════════════════════════════════════════════════
+
+function loadFromFirebase() {
+  if (!isFirebaseEnabled || !currentUser) return;
+
+  const userRef = database.ref(`users/${currentUser.uid}/subscriptions`);
+  userRef.once('value')
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        subs = snapshot.val() || [];
+        console.log("📥 Loaded", subs.length, "subscriptions from Cloud");
+        render();
+      } else {
+        // If cloud is empty, migrate local data up to the cloud
+        const localData = localStorage.getItem('subsukesh_subs');
+        if (localData) {
+          subs = JSON.parse(localData);
+          saveToFirebase();
+          console.log("📤 Migrated local subscriptions to Cloud");
+        }
+      }
+    })
+    .catch((error) => console.error("❌ Error loading from Firebase:", error));
+}
+
+function saveToFirebase() {
+  // Always save locally as a backup
+  localStorage.setItem('subsukesh_subs', JSON.stringify(subs));
+  
+  if (!isFirebaseEnabled || !currentUser) return;
+
+  const userRef = database.ref(`users/${currentUser.uid}/subscriptions`);
+  userRef.set(subs)
+    .then(() => console.log("💾 Saved to Firebase Cloud"))
+    .catch((error) => console.error("❌ Error saving to Firebase:", error));
+}
+
+function setupFirebaseListener() {
+  if (!isFirebaseEnabled || !currentUser) return;
+
+  if (dbListenerRef) dbListenerRef.off();
+  
+  dbListenerRef = database.ref(`users/${currentUser.uid}/subscriptions`);
+  dbListenerRef.on('value', (snapshot) => {
+    if (snapshot.exists()) {
+      const newSubs = snapshot.val() || [];
+      if (JSON.stringify(newSubs) !== JSON.stringify(subs)) {
+        subs = newSubs;
+        console.log("🔄 Real-time update received!");
+        render();
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA & STATE
+// ═══════════════════════════════════════════════════════════════════════════
+let subs = [];
+let pieChartInstance = null;
+
+function toggleTheme() {
+  const body = document.body;
+  const slider = document.querySelector('.theme-toggle-slider');
+  if (body.classList.contains('light-mode')) {
+    body.classList.remove('light-mode');
+    slider.textContent = '🌙';
+    localStorage.setItem('subsukesh_theme', 'dark');
+  } else {
+    body.classList.add('light-mode');
+    slider.textContent = '☀️';
+    localStorage.setItem('subsukesh_theme', 'light');
+  }
+}
+
+function loadTheme() {
+  const savedTheme = localStorage.getItem('subsukesh_theme');
+  const slider = document.querySelector('.theme-toggle-slider');
+  if (savedTheme === 'light') {
+    document.body.classList.add('light-mode');
+    slider.textContent = '☀️';
+  } else {
+    slider.textContent = '🌙';
+  }
+}
+
+const knownSubs = [
+  { name: 'Netflix', emoji: '🎬' },
+  { name: 'Spotify', emoji: '🎵' },
+  { name: 'YouTube', emoji: '▶️' },
+  { name: 'YouTube Premium', emoji: '▶️' },
+  { name: 'Prime Video', emoji: '📺' },
+  { name: 'Disney+', emoji: '🏰' },
+  { name: 'Hotstar', emoji: '⭐' },
+  { name: 'Apple Music', emoji: '🍎' },
+  { name: 'iCloud', emoji: '☁️' },
+  { name: 'Google One', emoji: '📦' },
+  { name: 'Dropbox', emoji: '📁' },
+  { name: 'ChatGPT', emoji: '🤖' },
+  { name: 'GitHub', emoji: '🐙' },
+  { name: 'Adobe', emoji: '🎨' },
+  { name: 'Figma', emoji: '🎨' },
+  { name: 'Notion', emoji: '📝' },
+  { name: 'Canva', emoji: '🎨' }
+];
+
+function matchKnown(name) {
+  return knownSubs.find(k => k.name.toLowerCase() === name.toLowerCase());
+}
+
+function save() { saveToFirebase(); }
+
+function render() {
+  renderSummary();
+  renderChart();
+  renderSubs();
+  updateNotifBell();
+}
+
+function renderSummary() {
+  const active = subs.filter(s => !s.ended);
+  let monthly = 0, annual = 0;
+  active.forEach(s => {
+    if (s.billing === 'monthly') {
+      monthly += s.price;
+      annual += s.price * 12;
+    } else if (s.billing === 'annual') {
+      monthly += s.price / 12;
+      annual += s.price;
+    } else if (s.billing === 'weekly') {
+      monthly += s.price * 4;
+      annual += s.price * 52;
+    } else if (s.billing === 'days') {
+      const perDay = s.price / (s.billingDays || 30);
+      monthly += perDay * 30;
+      annual += perDay * 365;
+    }
+  });
+
+  document.getElementById('monthlyTotal').innerHTML = `₹${monthly.toFixed(0)}<span>/mo</span>`;
+  document.getElementById('annualTotal').innerHTML = `₹${annual.toFixed(0)}<span>/yr</span>`;
+  document.getElementById('subsCount').textContent = active.length;
+  document.getElementById('activeCountBadge').textContent = `${active.length} active`;
+
+  const upcoming = active.filter(s => s.endDate).sort((a,b) => new Date(a.endDate) - new Date(b.endDate));
+  document.getElementById('nextRenewal').textContent = upcoming.length > 0 ? fmtDate(upcoming[0].endDate) : '—';
+}
+
+function renderChart() {
+  const active = subs.filter(s => !s.ended);
+  if (active.length === 0) {
+    document.getElementById('chartContainer').innerHTML = `<div class="no-data-msg">Add subscriptions to see breakdown</div>`;
+    if (pieChartInstance) { pieChartInstance.destroy(); pieChartInstance = null; }
+    return;
+  }
+
+  const byCategory = {};
+  active.forEach(s => {
+    byCategory[s.category] = (byCategory[s.category] || 0) + toMonthly(s);
+  });
+
+  const labels = Object.keys(byCategory);
+  const data = Object.values(byCategory);
+  const total = data.reduce((a,b) => a+b, 0);
+  const colors = ['#f5c542','#9b7fe8','#4cd9a0','#ff5e72','#f09d51','#5eb3f6'];
+
+  document.getElementById('chartContainer').innerHTML = `
+    <div class="chart-canvas-wrap"><canvas id="pieChart"></canvas></div>
+    <div class="chart-legend">
+      ${labels.map((label, i) => `
+        <div class="legend-item">
+          <div class="legend-dot" style="background:${colors[i % colors.length]}"></div>
+          <div class="legend-name">${label}</div>
+          <div class="legend-pct">${((data[i]/total)*100).toFixed(0)}%</div>
+        </div>`).join('')}
+    </div>`;
+
+  if (pieChartInstance) pieChartInstance.destroy();
+  pieChartInstance = new Chart(document.getElementById('pieChart').getContext('2d'), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+    options: {
+      responsive: false, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: (ctx) => `₹${ctx.parsed.toFixed(0)} (${((ctx.parsed/total)*100).toFixed(0)}%)` } }
+      },
+      cutout: '65%'
+    }
+  });
+}
+
+function toMonthly(s) {
+  if (s.billing === 'monthly') return s.price;
+  if (s.billing === 'annual') return s.price / 12;
+  if (s.billing === 'weekly') return s.price * 4;
+  if (s.billing === 'days') return (s.price / (s.billingDays || 30)) * 30;
+  return s.price;
+}
+
+function getSubStatus(s) {
+  if (s.ended) return 'red';
+  if (!s.endDate) return 'green';
+  const h = hoursLeft(s.endDate);
+  if (h === null) return 'green';
+  if (h <= 168) return 'yellow';
+  return 'green';
+}
+
+function sortByStatus(arr) {
+  return arr.sort((a, b) => {
+    const order = { yellow: 0, green: 1, red: 2 };
+    const diff = order[getSubStatus(a)] - order[getSubStatus(b)];
+    if (diff !== 0) return diff;
+    if (a.endDate && b.endDate) return new Date(a.endDate) - new Date(b.endDate);
+    return 0;
+  });
+}
+
+function renderSubs() {
+  const filtered = subs.filter(s => !s.ended);
+  const container1 = document.getElementById('subsContainer1');
+  const container2 = document.getElementById('subsContainer2');
+
+  if (filtered.length === 0) {
+    container1.innerHTML = `<div class="empty-state"><div class="empty-emoji">📦</div><p>No subscriptions yet.<br>Add one to get started!</p></div>`;
+    container2.innerHTML = '';
+    return;
+  }
+
+  const sorted = sortByStatus([...filtered]);
+  const isMobile = window.innerWidth <= 768;
+
+  if (isMobile) {
+    container1.innerHTML = sorted.map(renderSubCard).join('');
+    container2.innerHTML = '';
+  } else {
+    const col1 = [], col2 = [];
+    sorted.forEach((sub, i) => i % 2 === 0 ? col1.push(sub) : col2.push(sub));
+    container1.innerHTML = col1.map(renderSubCard).join('');
+    container2.innerHTML = col2.map(renderSubCard).join('');
+  }
+}
+
+function renderSubCard(s) {
+  const known = matchKnown(s.name);
+  const emoji = s.customLogo ? '' : ((known && known.emoji) || '📦');
+  const logo = s.customLogo || null;
+  const logoHTML = logo ? `<img src="${logo}" alt="${s.name}">` : emoji;
+  const cycle = s.billing === 'days' ? `Every ${s.billingDays} days` : s.billing.charAt(0).toUpperCase() + s.billing.slice(1);
+  const endDateHTML = s.endDate ? fmtDate(s.endDate) : '—';
+  const payBadge = s.paymentMode ? `<div class="pay-badge">${s.paymentMode.toUpperCase()}</div>` : '';
+  const daysText = formatDaysLeft(getDaysLeft(s));
+  const status = getSubStatus(s);
+  const daysLeftBadge = daysText ? `<div class="days-left-badge ${status}">${daysText}</div>` : '';
+
+  return `
+    <div class="sub-card" id="sub-${s.id}" onclick="toggleCard('${s.id}')">
+      <div class="sub-row">
+        <div class="sub-logo">${logoHTML}</div>
+        <div class="sub-info">
+          <div class="sub-name">${escHtml(s.name)}</div>
+          <div class="sub-cycle">${cycle}</div>
+        </div>
+        <div class="sub-meta">
+          <div class="sub-row-price">₹${s.price.toFixed(0)}</div>
+          <div class="sub-row-enddate">${endDateHTML}</div>
+          ${payBadge}
+          ${daysLeftBadge}
+          <div class="status-dot ${status}"></div>
+        </div>
+      </div>
+      <div class="sub-details">
+        <div class="detail-item"><div class="detail-label">Category</div><div class="detail-value">${s.category}</div></div>
+        <div class="detail-item"><div class="detail-label">Start</div><div class="detail-value">${fmtDate(s.startDate)}</div></div>
+        <div class="detail-item"><div class="detail-label">End</div><div class="detail-value">${endDateHTML}</div></div>
+        <div class="detail-item"><div class="detail-label">Payment</div><div class="detail-value">${s.paymentMode ? s.paymentMode.toUpperCase() : '—'}</div></div>
+      </div>
+      <div class="sub-actions">
+        <button class="sub-btn edit" onclick="event.stopPropagation(); openEdit('${s.id}')">Edit</button>
+        ${!s.ended ? `<button class="sub-btn renew" onclick="event.stopPropagation(); renewSub('${s.id}')">Renew</button>` : ''}
+        ${!s.ended ? `<button class="sub-btn end" onclick="event.stopPropagation(); endSub('${s.id}')">End</button>` : ''}
+      </div>
+    </div>`;
+}
+
+function toggleCard(id) {
+  const clicked = document.getElementById('sub-' + id);
+  const wasExpanded = clicked.classList.contains('expanded');
+
+  document.querySelectorAll('.sub-card.expanded').forEach(card => {
+    card.classList.remove('expanded');
+  });
+
+  if (!wasExpanded) {
+    clicked.classList.add('expanded');
+  }
+}
+
+function addSub() {
+  const name = document.getElementById('subName').value.trim();
+  const price = parseFloat(document.getElementById('subPrice').value);
+  const billing = document.getElementById('subBilling').value;
+  const category = document.getElementById('subCategory').value;
+  const startDate = document.getElementById('subStartDate').value;
+  const endDate = document.getElementById('subEndDate').value;
+  const billingDays = billing === 'days' ? parseInt(document.getElementById('subDays').value) || 30 : null;
+  const paymentMode = getPaymentMode('sub');
+
+  if (!name || isNaN(price) || price <= 0) { showToast('Please enter a valid name and price', true); return; }
+
+  subs.push({ id: Date.now().toString(), name, price, billing, billingDays, category, startDate, endDate, paymentMode, ended: false, autoRenewed: false, customLogo: null });
+  save();
+  render();
+
+  document.getElementById('subName').value = '';
+  document.getElementById('subPrice').value = '';
+  document.getElementById('subBilling').value = 'monthly';
+  document.getElementById('subCategory').value = 'Entertainment';
+  handleBillingChange('sub');
+  document.getElementById('subStartDate').value = new Date().toISOString().split('T')[0];
+  autoCalcEndDateByCycle('sub', 'monthly');
+  selectPaymentMode('sub', 'debit');
+  showToast(`${name} added ✓`);
+}
+
+function openEdit(id) {
+  const s = subs.find(sub => sub.id === id);
+  if (!s) return;
+  document.getElementById('editId').value = s.id;
+  document.getElementById('editName').value = s.name;
+  document.getElementById('editPrice').value = s.price;
+  document.getElementById('editBilling').value = s.billing;
+  document.getElementById('editCategory').value = s.category;
+  document.getElementById('editStartDate').value = s.startDate;
+  document.getElementById('editEndDate').value = s.endDate || '';
+  document.getElementById('editDays').value = s.billingDays || 30;
+  handleBillingChange('edit');
+  selectPaymentMode('edit', s.paymentMode || 'debit');
+  document.getElementById('editIconInput')._pendingLogo = null;
+  document.getElementById('editIconInput')._removeLogo = false;
+  document.getElementById('editModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  updateEditIconPreview(s.customLogo || null, s.name);
+  document.addEventListener('keydown', handleEditEscKey);
+}
+
+function closeEdit() {
+  document.getElementById('editModal').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('editIconInput')._pendingLogo = null;
+  document.getElementById('editIconInput')._removeLogo = false;
+  document.removeEventListener('keydown', handleEditEscKey);
+}
+
+function handleEditEscKey(e) { if (e.key === 'Escape') closeEdit(); }
+function handleOverlayClick(e) { if (e.target === document.getElementById('editModal')) closeEdit(); }
+
+function saveEdit() {
+  const id = document.getElementById('editId').value;
+  const name = document.getElementById('editName').value.trim();
+  const price = parseFloat(document.getElementById('editPrice').value);
+  const billing = document.getElementById('editBilling').value;
+  const category = document.getElementById('editCategory').value;
+  const startDate = document.getElementById('editStartDate').value;
+  const endDate = document.getElementById('editEndDate').value;
+  const billingDays = billing === 'days' ? parseInt(document.getElementById('editDays').value) || 30 : null;
+  const paymentMode = getPaymentMode('edit');
+
+  if (!name || isNaN(price) || price <= 0) { showToast('Please enter a valid name and price', true); return; }
+
+  const idx = subs.findIndex(s => s.id === id);
+  if (idx === -1) return;
+
+  const pendingLogo = document.getElementById('editIconInput')._pendingLogo;
+  const removeLogo = document.getElementById('editIconInput')._removeLogo;
+  let customLogo = subs[idx].customLogo || null;
+  if (removeLogo) customLogo = null;
+  if (pendingLogo) customLogo = pendingLogo;
+
+  subs[idx] = { ...subs[idx], name, price, billing, billingDays, category, startDate, endDate, paymentMode, customLogo };
+  save(); render(); closeEdit();
+  showToast(`${name} updated ✓`);
+}
+
+function renewSub(id) {
+  const idx = subs.findIndex(s => s.id === id);
+  if (idx === -1) return;
+  const s = subs[idx];
+  const newStart = s.endDate || new Date().toISOString().split('T')[0];
+  const newEnd = computeEndDateFrom(newStart, s);
+  subs[idx] = { ...s, startDate: newStart, endDate: newEnd, ended: false, autoRenewed: false };
+  save(); render();
+  setTimeout(() => { const card = document.getElementById('sub-' + id); if (card) card.classList.add('just-renewed'); }, 50);
+  showToast(`${s.name} renewed until ${fmtDate(newEnd)} 🎉`);
+}
+
+function endSub(id) {
+  const idx = subs.findIndex(s => s.id === id);
+  if (idx === -1) return;
+  subs[idx] = { ...subs[idx], ended: true };
+  save(); render();
+  showToast(`${subs[idx].name} marked as ended.`);
+}
+
+function computeEndDateFrom(startStr, s) {
+  const d = new Date(startStr);
+  if (s.billing === 'monthly') d.setDate(d.getDate() + 30);
+  else if (s.billing === 'annual') { d.setFullYear(d.getFullYear() + 1); d.setDate(d.getDate() - 1); }
+  else if (s.billing === 'weekly') d.setDate(d.getDate() + 7);
+  else if (s.billing === 'days') d.setDate(d.getDate() + (s.billingDays || 30));
+  else d.setDate(d.getDate() + 30);
+  return d.toISOString().split('T')[0];
+}
+
+function autoRenewExpired() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  let renewed = [];
+  subs = subs.map(s => {
+    if (s.ended || !s.endDate) return s;
+    const end = new Date(s.endDate); end.setHours(23,59,59,0);
+    if (end < today) {
+      renewed.push(s.name);
+      return { ...s, startDate: s.endDate, endDate: computeEndDateFrom(s.endDate, s), autoRenewed: true };
+    }
+    return s;
+  });
+  if (renewed.length > 0) {
+    save();
+    showToast(renewed.length === 1 ? `Auto-renewed: ${renewed[0]} 🔄` : `Auto-renewed ${renewed.length} subscriptions 🔄`);
+  }
+}
+
+function handleEditIconUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('editIconInput')._pendingLogo = e.target.result;
+    document.getElementById('editIconInput')._removeLogo = false;
+    updateEditIconPreview(e.target.result, document.getElementById('editName').value || '?');
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function removeEditIcon() {
+  document.getElementById('editIconInput')._pendingLogo = null;
+  document.getElementById('editIconInput')._removeLogo = true;
+  updateEditIconPreview(null, document.getElementById('editName').value || '?');
+}
+
+function updateEditIconPreview(logoUri, name) {
+  const preview = document.getElementById('editIconPreview');
+  const fallback = document.getElementById('editIconFallback');
+  const removeBtn = document.getElementById('editIconRemoveBtn');
+  const existing = preview.querySelector('img.icon-preview-img');
+  if (existing) existing.remove();
+  if (logoUri) {
+    fallback.style.display = 'none';
+    const img = document.createElement('img');
+    img.className = 'icon-preview-img';
+    img.src = logoUri;
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:10px;position:absolute;inset:0;';
+    preview.insertBefore(img, preview.querySelector('.icon-preview-overlay'));
+    removeBtn.classList.add('visible');
+  } else {
+    fallback.style.display = '';
+    const known = matchKnown(name);
+    fallback.textContent = (known && known.emoji) || name.slice(0,2).toUpperCase() || '📦';
+    removeBtn.classList.remove('visible');
+  }
+}
+
+function getExpiringSoon() {
+  return subs.filter(s => {
+    if (!s.endDate) return false;
+    const h = hoursLeft(s.endDate);
+    return h !== null && h <= 72 && h >= -24;
+  }).sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+}
+
+function hoursLeft(dateStr) {
+  if (!dateStr) return null;
+  const end = new Date(dateStr); end.setHours(23,59,59,0);
+  return (end - new Date()) / 3600000;
+}
+
+function getDaysLeft(s) {
+  if (!s.endDate) return null;
+  const h = hoursLeft(s.endDate);
+  return h === null ? null : Math.ceil(h / 24);
+}
+
+function formatDaysLeft(days) {
+  if (days === null) return null;
+  if (days < 0) return 'Expired';
+  if (days === 0) return 'Today';
+  if (days === 1) return '1 day';
+  if (days <= 7) return `${days} days`;
+  const weeks = Math.floor(days / 7);
+  if (weeks === 1) return '1 week';
+  if (days <= 30) return `${weeks} weeks`;
+  const months = Math.floor(days / 30);
+  return months === 1 ? '1 month' : `${months} months`;
+}
+
+function updateNotifBell() {
+  const expiring = getExpiringSoon();
+  const btn = document.getElementById('notifBellBtn');
+  const badge = document.getElementById('notifBadge');
+  if (expiring.length > 0) {
+    btn.classList.add('has-alerts');
+    badge.style.display = 'flex';
+    badge.textContent = expiring.length;
+  } else {
+    btn.classList.remove('has-alerts');
+    badge.style.display = 'none';
+  }
+}
+
+function openNotifPanel() {
+  const expiring = getExpiringSoon();
+  const list = document.getElementById('notifList');
+  const countEl = document.getElementById('notifPanelCount');
+
+  if (expiring.length === 0) {
+    countEl.textContent = '';
+    list.innerHTML = `<div class="notif-empty"><div class="big-emoji">✅</div><p>No subscriptions expiring<br>within the next 72 hours!</p></div>`;
+  } else {
+    countEl.textContent = `· ${expiring.length} alert${expiring.length !== 1 ? 's' : ''}`;
+    list.innerHTML = expiring.map(s => {
+      const known = matchKnown(s.name);
+      const emoji = known ? known.emoji : '📦';
+      const h = hoursLeft(s.endDate);
+      let timeLabel, timeClass, itemClass;
+      if (h < 0) { timeLabel = 'Expired'; timeClass = 'red'; itemClass = 'urgent'; }
+      else if (h <= 1) { timeLabel = '< 1 hr left'; timeClass = 'red'; itemClass = 'urgent'; }
+      else if (h <= 24) { timeLabel = `${Math.ceil(h)}h left`; timeClass = 'red'; itemClass = 'urgent'; }
+      else { const hrs = Math.round(h); timeLabel = `~${Math.floor(hrs/24)}d ${hrs%24}h left`; timeClass = 'orange'; itemClass = 'warning'; }
+      return `
+        <div class="notif-item ${itemClass}">
+          <div class="notif-emoji">${emoji}</div>
+          <div class="notif-info">
+            <div class="notif-name">${escHtml(s.name)}</div>
+            <div class="notif-desc">${s.category} · ends ${fmtDate(s.endDate)}</div>
+          </div>
+          <div class="notif-time ${timeClass}">${timeLabel}</div>
+        </div>`;
+    }).join('');
+  }
+
+  document.getElementById('notifPanel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.addEventListener('keydown', handleNotifEscKey);
+}
+
+function closeNotifPanel() {
+  document.getElementById('notifPanel').classList.remove('open');
+  document.body.style.overflow = '';
+  document.removeEventListener('keydown', handleNotifEscKey);
+}
+
+function handleNotifEscKey(e) { if (e.key === 'Escape') closeNotifPanel(); }
+function handleNotifOverlayClick(e) { if (e.target === document.getElementById('notifPanel')) closeNotifPanel(); }
+
+function toggleChart() {
+  const chartModal = document.getElementById('chartModal');
+  const isOpen = chartModal.classList.contains('open');
+  if (isOpen) {
+    chartModal.classList.remove('open');
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', handleChartEscKey);
+  } else {
+    chartModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleChartEscKey);
+  }
+}
+
+function handleChartEscKey(e) { if (e.key === 'Escape') toggleChart(); }
+function handleChartModalClick(e) { if (e.target === document.getElementById('chartModal')) toggleChart(); }
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}/${y.slice(2)}`;
+}
+
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast' + (isError ? ' error' : '');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function handleBillingChange(prefix) {
+  const val = document.getElementById(prefix + 'Billing').value;
+  document.getElementById(prefix + 'DaysWrapper').classList.toggle('active', val === 'days');
+  autoCalcEndDateByCycle(prefix);
+}
+
+function autoCalcEndDateByCycle(prefix, overrideBilling) {
+  const startVal = document.getElementById(prefix + 'StartDate').value;
+  if (!startVal) return;
+  const billing = overrideBilling || document.getElementById(prefix + 'Billing').value;
+  const d = new Date(startVal);
+  if (billing === 'monthly') d.setDate(d.getDate() + 30);
+  else if (billing === 'annual') { d.setFullYear(d.getFullYear() + 1); d.setDate(d.getDate() - 1); }
+  else if (billing === 'weekly') d.setDate(d.getDate() + 7);
+  else if (billing === 'days') d.setDate(d.getDate() + (parseInt(document.getElementById(prefix + 'Days').value) || 30));
+  document.getElementById(prefix + 'EndDate').value = d.toISOString().split('T')[0];
+}
+
+function selectPaymentMode(prefix, mode) {
+  document.getElementById(prefix + 'PaymentMode').querySelectorAll('.payment-mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+}
+
+function getPaymentMode(prefix) {
+  const active = document.getElementById(prefix + 'PaymentMode').querySelector('.payment-mode-btn.active');
+  return active ? active.dataset.mode : 'debit';
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LOCK / AUTH SYSTEM
+// ═══════════════════════════════════════════════════════════════════════════
+const LOCK_DURATION = 30 * 24 * 60 * 60 * 1000;
+const PIN_KEY = 'subsukesh_pin';
+const UNLOCK_KEY = 'subsukesh_unlocked_until';
+const SETTING_KEY = 'subsukesh_pin_set';
+
+let pinBuffer = '';
+let isSettingPin = false;
+let pinConfirmBuffer = '';
+let awaitingConfirm = false;
+
+function initLock() {
+  const pinSet = localStorage.getItem(SETTING_KEY);
+  const unlockedUntil = parseInt(localStorage.getItem(UNLOCK_KEY) || '0');
+  const now = Date.now();
+  if (!pinSet) {
+    showLockScreen(true);
+  } else if (now < unlockedUntil) {
+    hideLockScreen();
+  } else {
+    showLockScreen(false);
+  }
+}
+
+function showLockScreen(setup) {
+  isSettingPin = setup;
+  awaitingConfirm = false;
+  pinBuffer = '';
+  pinConfirmBuffer = '';
+  document.getElementById('lockScreen').classList.remove('hidden');
+  document.getElementById('lockError').textContent = '';
+  updateDots();
+  if (setup) {
+    document.getElementById('lockTitle').textContent = 'Set your PIN';
+    document.getElementById('lockSubtitle').textContent = 'Choose a 4-digit PIN to protect your app';
+    document.getElementById('biometricBtn').style.display = 'none';
+  } else {
+    document.getElementById('lockTitle').textContent = 'Welcome back';
+    document.getElementById('lockSubtitle').textContent = 'Enter your PIN to continue';
+    checkBiometricSupport().then(() => {
+      triggerBiometric();
+    });
+  }
+}
+
+function hideLockScreen() {
+  document.getElementById('lockScreen').classList.add('hidden');
+}
+
+function lockApp() {
+  localStorage.removeItem(UNLOCK_KEY);
+  pinBuffer = '';
+  showLockScreen(false);
+}
+
+function pinKey(digit) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += digit;
+  updateDots();
+  document.getElementById('lockError').textContent = '';
+  if (pinBuffer.length === 4) setTimeout(() => handlePinComplete(), 150);
+}
+
+function pinBackspace() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  updateDots();
+}
+
+function updateDots() {
+  const len = isSettingPin && awaitingConfirm ? pinConfirmBuffer.length : pinBuffer.length;
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('dot' + i);
+    dot.classList.toggle('filled', i < len);
+    dot.classList.remove('error');
+  }
+}
+
+function handlePinComplete() {
+  if (isSettingPin) {
+    localStorage.setItem(PIN_KEY, hashPin(pinBuffer));
+    localStorage.setItem(SETTING_KEY, '1');
+    unlockSuccess();
+  } else {
+    const stored = localStorage.getItem(PIN_KEY);
+    if (hashPin(pinBuffer) === stored) {
+      unlockSuccess();
+    } else {
+      showPinError('Incorrect PIN. Try again.');
+      pinBuffer = '';
+    }
+  }
+}
+
+async function unlockSuccess() {
+  localStorage.setItem(UNLOCK_KEY, Date.now() + LOCK_DURATION);
+  hideLockScreen();
+
+  const hasRegistered = localStorage.getItem(WEBAUTHN_KEY);
+  if (!hasRegistered && localStorage.getItem(SETTING_KEY)) {
+    const available = await isBiometricAvailable();
+    if (available) {
+      setTimeout(async () => {
+        const registered = await registerBiometric();
+        if (registered) showToast('Face ID / Fingerprint enabled for next time! 🔐');
+      }, 800);
+    }
+  }
+}
+
+function showPinError(msg) {
+  document.getElementById('lockError').textContent = msg;
+  for (let i = 0; i < 4; i++) document.getElementById('dot' + i).classList.add('error');
+  setTimeout(() => {
+    for (let i = 0; i < 4; i++) document.getElementById('dot' + i).classList.remove('error', 'filled');
+  }, 600);
+}
+
+function hashPin(pin) {
+  let hash = 0;
+  const str = pin + 'subsukesh_salt_2024';
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash.toString(36);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WEBAUTHN — FULL BIOMETRIC REGISTRATION & AUTHENTICATION
+// ═══════════════════════════════════════════════════════════════════════════
+const WEBAUTHN_KEY = 'subsukesh_webauthn_id';
+
+function getRpId() {
+  const host = window.location.hostname;
+  return host === '' || host === 'localhost' ? 'localhost' : host;
+}
+
+async function isBiometricAvailable() {
+  if (!window.PublicKeyCredential) return false;
+  try {
+    return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+  } catch(e) { return false; }
+}
+
+async function registerBiometric() {
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const userId = crypto.getRandomValues(new Uint8Array(16));
+
+    const credential = await navigator.credentials.create({
+      publicKey: {
+        challenge,
+        rp: { name: 'SubSukesh', id: getRpId() },
+        user: {
+          id: userId,
+          name: 'subsukesh_user',
+          displayName: 'SubSukesh User'
+        },
+        pubKeyCredParams: [
+          { type: 'public-key', alg: -7 },
+          { type: 'public-key', alg: -257 }
+        ],
+        authenticatorSelection: {
+          authenticatorAttachment: 'platform',
+          userVerification: 'required',
+          requireResidentKey: false
+        },
+        timeout: 60000,
+        attestation: 'none'
+      }
+    });
+
+    if (credential) {
+      const credId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+      localStorage.setItem(WEBAUTHN_KEY, credId);
+      console.log('✅ Biometric registered!');
+      return true;
+    }
+  } catch(e) {
+    console.log('Biometric registration skipped:', e.message);
+  }
+  return false;
+}
+
+async function authenticateBiometric() {
+  const storedCredId = localStorage.getItem(WEBAUTHN_KEY);
+  if (!storedCredId) return false;
+
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const credIdBytes = Uint8Array.from(atob(storedCredId), c => c.charCodeAt(0));
+
+    const assertion = await navigator.credentials.get({
+      publicKey: {
+        challenge,
+        rpId: getRpId(),
+        allowCredentials: [{
+          type: 'public-key',
+          id: credIdBytes,
+          transports: ['internal']
+        }],
+        userVerification: 'required',
+        timeout: 60000
+      }
+    });
+
+    return !!assertion;
+  } catch(e) {
+    console.log('Biometric auth failed:', e.message);
+    return false;
+  }
+}
+
+async function checkBiometricSupport() {
+  const btn = document.getElementById('biometricBtn');
+  const available = await isBiometricAvailable();
+  if (available) {
+    btn.style.display = 'flex';
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    document.getElementById('biometricIcon').textContent = isIOS ? '🔐' : '👆';
+    document.getElementById('biometricLabel').textContent = isIOS ? 'Use Face ID' : 'Use Fingerprint';
+  }
+  return available;
+}
+
+async function triggerBiometric() {
+  if (!localStorage.getItem(SETTING_KEY)) return;
+  const available = await isBiometricAvailable();
+  if (!available) return;
+
+  const hasRegistered = localStorage.getItem(WEBAUTHN_KEY);
+
+  if (!hasRegistered) {
+    document.getElementById('lockSubtitle').textContent = 'Setting up biometric for this device...';
+    const registered = await registerBiometric();
+    if (registered) {
+      unlockSuccess();
+      showToast('Face ID / Fingerprint set up! 🎉');
+    }
+  } else {
+    const success = await authenticateBiometric();
+    if (success) unlockSuccess();
+  }
+}
+
+// ─── MAIN INIT ───────────────────────────────────────────────────────────────
+(function init() {
+  initLock();
+  initFirebase();
+
+  // Load fallback if Firebase fails to init
+  if (!isFirebaseEnabled) {
+    subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+  }
+
+  loadTheme();
+  document.getElementById('subStartDate').value = new Date().toISOString().split('T')[0];
+  autoCalcEndDateByCycle('sub', 'monthly');
+  autoRenewExpired();
+
+  setTimeout(() => { render(); }, 500);
+})();
+</script>
+
+</body>
+</html>

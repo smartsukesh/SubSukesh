@@ -1,6 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>SubSukesh – Subscription Tracker</title>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0b0b12;
+    --card: #13131f;
+    --card2: #1a1a2a;
+    --border: rgba(255,255,255,0.07);
+    --gold: #f5c542;
+    --gold2: #e6a817;
+    --purple: #9b7fe8;
+    --purple2: #7c5cbf;
+    --text: #e8e8f0;
+    --muted: #7a7a9a;
+    --danger: #ff5e72;
+    --success: #4cd9a0;
+    --font-head: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  /* Light mode - Professional palette */
+  body.light-mode {
+    --bg: #d9934a;
+    --card: #4a5f7a;
+    --card2: #3d5066;
+    --border: rgba(255,255,255,0.2);
+    --text: #ffffff;
+    --muted: #f5f0e8;
+  }
+
+  body.light-mode::before {
+    background: radial-gradient(circle, rgba(74,95,122,0.15) 0%, transparent 70%);
+  }
+  body.light-mode::after {
+    background: radial-gradient(circle, rgba(217,147,74,0.2) 0%, transparent 70%);
+  }
+  
+  body.light-mode .summary-card .label,
+  body.light-mode .sub-cycle,
+  body.light-mode .sub-row-enddate,
+  body.light-mode .detail-label,
+  body.light-mode .form-label,
+  body.light-mode .notif-desc,
+  body.light-mode .cat-label,
+  body.light-mode .app-suggestion-category {
+    color: #f5f0e8;
+  }
+  
+  body.light-mode .summary-card .amount,
+  body.light-mode .sub-name,
+  body.light-mode .detail-value,
+  body.light-mode .section-title,
+  body.light-mode .modal-title,
+  body.light-mode .notif-name,
+  body.light-mode header h1,
+  body.light-mode .app-suggestion-name {
+    color: #ffffff;
+  }
+  
+  body.light-mode header p {
+    color: #f5f0e8;
+  }
+  
+  body.light-mode .form-input,
+  body.light-mode .form-select {
+    color: #ffffff;
+    background: rgba(0,0,0,0.1);
+    border-color: rgba(255,255,255,0.2);
+  }
+  
+  body.light-mode .form-input::placeholder {
+    color: #d0c8bc;
+  }
+  
+  body.light-mode .pay-badge {
+    color: #f5f0e8;
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.25);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before, body::after {
+    content: ''; position: fixed; pointer-events: none; border-radius: 50%; filter: blur(100px); opacity: 0.3;
+  }
+  body::before {
+    width: 600px; height: 600px; top: -200px; right: -100px;
+    background: radial-gradient(circle, rgba(155,127,232,0.25) 0%, transparent 70%);
+  }
+  body::after {
+    width: 500px; height: 500px; bottom: -150px; left: -100px;
+    background: radial-gradient(circle, rgba(245,197,66,0.2) 0%, transparent 70%);
+  }
+
+  header {
+    text-align: center;
+    padding: 3rem 1.5rem 2.5rem;
+    position: relative;
+    z-index: 1;
+  }
+  header h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+  }
+  header p {
+    color: var(--muted);
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  .theme-toggle {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 1000;
+  }
+  .theme-toggle-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 0;
+    width: 52px;
+    height: 28px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  .theme-toggle-btn:hover {
+    transform: scale(1.05);
+    border-color: var(--purple);
+  }
+  .theme-toggle-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, var(--gold), var(--purple));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+  }
+  body.light-mode .theme-toggle-slider {
+    transform: translateX(24px);
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem 3rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  .summary-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--purple);
+    box-shadow: 0 12px 40px rgba(155,127,232,0.15);
+  }
+  .summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--purple));
+  }
+
+  .summary-card .label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+  }
+  .summary-card .amount {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+    line-height: 1;
+  }
+  .summary-card .amount span {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin-left: 0.25rem;
+  }
+  .summary-card .detail {
+    font-size: 0.875rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .chart-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+  }
+  .chart-section h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+  #pieChart {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .section-title .badge {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--muted);
+    background: var(--card2);
+    padding: 0.375rem 0.75rem;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+  }
+
+  .add-sub-card {
+    background: var(--card);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+  }
+  .add-sub-card:hover {
+    border-color: var(--purple);
+    background: var(--card2);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .form-input, .form-select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    font-family: var(--font-body);
+    transition: all 0.3s ease;
+  }
+  .form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px rgba(155,127,232,0.1);
+  }
+  .form-input::placeholder {
+    color: var(--muted);
+  }
+
+  .days-input-wrapper {
+    display: none;
+    margin-top: 0.5rem;
+  }
+  .days-input-wrapper.active {
+    display: block;
+  }
+
+  .payment-modes {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .pay-badge {
+    padding: 0.625rem 1rem;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  .pay-badge:hover {
+    border-color: var(--purple);
+    transform: scale(1.05);
+  }
+  .pay-badge.selected {
+    background: linear-gradient(135deg, var(--gold), var(--purple));
+    color: white;
+    border-color: transparent;
+  }
+
+  .btn {
+    padding: 0.875rem 2rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--font-body);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--gold), var(--purple));
+    color: white;
+    box-shadow: 0 4px 20px rgba(155,127,232,0.3);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(155,127,232,0.4);
+  }
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .subs-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .sub-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 1.25rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .sub-card:hover {
+    border-color: var(--purple);
+    transform: translateX(4px);
+    box-shadow: 0 8px 30px rgba(155,127,232,0.12);
+  }
+  .sub-card.just-renewed {
+    animation: renewGlow 1s ease;
+  }
+  @keyframes renewGlow {
+    0%, 100% { box-shadow: 0 0 0 rgba(76,217,160,0); }
+    50% { box-shadow: 0 0 30px rgba(76,217,160,0.5); }
+  }
+
+  .sub-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--gold2), var(--purple2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    flex-shrink: 0;
+  }
+  .sub-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  .sub-info {
+    min-width: 0;
+  }
+  .sub-name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.375rem;
+  }
+  .sub-meta {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+  .sub-cycle, .sub-category {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .sub-price {
+    text-align: right;
+  }
+  .sub-price-amount {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+  }
+  .sub-price-cycle {
+    font-size: 0.875rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .sub-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    transition: all 0.2s ease;
+  }
+  .action-btn:hover {
+    background: var(--card2);
+    border-color: var(--purple);
+    transform: scale(1.1);
+  }
+
+  .sub-row-enddate {
+    grid-column: 1 / -1;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.875rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .modal.open {
+    display: flex;
+    opacity: 1;
+  }
+
+  .modal-content {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2rem;
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+  }
+  .modal.open .modal-content {
+    transform: scale(1);
+  }
+
+  .modal-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    transition: all 0.2s ease;
+  }
+  .modal-close:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: white;
+    transform: rotate(90deg);
+  }
+
+  .icon-upload-section {
+    margin-bottom: 1.5rem;
+  }
+  .icon-preview-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .icon-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--gold2), var(--purple2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .icon-preview-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    cursor: pointer;
+    border-radius: 12px;
+  }
+  .icon-preview:hover .icon-preview-overlay {
+    opacity: 1;
+  }
+  .icon-preview-overlay span {
+    font-size: 1.5rem;
+  }
+  .icon-upload-btn {
+    padding: 0.75rem 1.5rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .icon-upload-btn:hover {
+    border-color: var(--purple);
+    background: var(--card2);
+  }
+  .icon-remove-btn {
+    padding: 0.75rem 1.5rem;
+    background: var(--danger);
+    border: 1px solid var(--danger);
+    border-radius: var(--radius-sm);
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .icon-remove-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .icon-remove-btn:hover {
+    background: #ff3d52;
+  }
+
+  .notif-bell {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+  }
+  .notif-bell-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--purple));
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 8px 30px rgba(155,127,232,0.4);
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  .notif-bell-btn:hover {
+    transform: translateY(-4px) scale(1.1);
+    box-shadow: 0 12px 40px rgba(155,127,232,0.5);
+  }
+  .notif-bell-btn.has-alerts {
+    animation: bellPulse 2s infinite;
+  }
+  @keyframes bellPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  .notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--danger);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 12px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    border: 2px solid var(--bg);
+  }
+
+  .notif-panel {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 400px;
+    max-width: calc(100vw - 4rem);
+    max-height: 500px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    display: none;
+    flex-direction: column;
+    z-index: 999;
+  }
+  .notif-panel.open {
+    display: flex;
+  }
+  .notif-panel-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .notif-panel-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .notif-panel-count {
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+  .notif-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+  .notif-close:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: white;
+  }
+  .notif-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+  .notif-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease;
+  }
+  .notif-item:hover {
+    border-color: var(--purple);
+    transform: translateX(4px);
+  }
+  .notif-item.urgent {
+    border-left: 3px solid var(--danger);
+  }
+  .notif-item.warning {
+    border-left: 3px solid var(--gold);
+  }
+  .notif-emoji {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+  .notif-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .notif-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+  }
+  .notif-desc {
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+  .notif-time {
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-align: right;
+  }
+  .notif-time.red { color: var(--danger); }
+  .notif-time.orange { color: var(--gold); }
+  .notif-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+  .notif-empty .big-emoji {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+  .notif-empty p {
+    color: var(--muted);
+    font-size: 1rem;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 6rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    font-weight: 600;
+    z-index: 3000;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+  .toast.error {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: white;
+  }
+
+  /* App Suggestions Section */
+  .app-suggestions-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .app-suggestions-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .app-suggestions-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .app-suggestions-controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .category-filter-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .category-filter-btn:hover {
+    border-color: var(--purple);
+  }
+
+  .category-filter-btn.active {
+    background: linear-gradient(135deg, var(--gold), var(--purple));
+    color: white;
+    border-color: transparent;
+  }
+
+  .app-suggestions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+
+  .app-suggestion-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+
+  .app-suggestion-card:hover {
+    border-color: var(--purple);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(155,127,232,0.15);
+  }
+
+  .app-suggestion-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .app-suggestion-name {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+  }
+
+  .app-suggestion-category {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .app-suggestions-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--muted);
+  }
+
+  .app-suggestions-empty .big-emoji {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .sub-card {
+      grid-template-columns: auto 1fr;
+    }
+    .sub-price, .sub-actions {
+      grid-column: 1 / -1;
+      justify-self: start;
+      margin-top: 0.75rem;
+    }
+    .sub-price {
+      text-align: left;
+    }
+    .app-suggestions-grid {
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="theme-toggle">
+  <button class="theme-toggle-btn" onclick="toggleTheme()">
+    <div class="theme-toggle-slider">🌙</div>
+  </button>
+</div>
+
+<header>
+  <h1>SubSukesh</h1>
+  <p>Track your subscriptions, master your spending</p>
+</header>
+
+<div class="container">
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="label">Monthly Spend</div>
+      <div class="amount" id="monthlyTotal">₹0<span>/mo</span></div>
+      <div class="detail" id="activeCountBadge">0 active</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Annual Spend</div>
+      <div class="amount" id="annualTotal">₹0<span>/yr</span></div>
+      <div class="detail">Projected yearly cost</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Active Plans</div>
+      <div class="amount" id="subsCount">0</div>
+      <div class="detail">Currently subscribed</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Next Renewal</div>
+      <div class="amount" style="font-size:1.5rem" id="nextRenewal">—</div>
+      <div class="detail">Upcoming payment</div>
+    </div>
+  </div>
+
+  <!-- App Suggestions Section -->
+  <div class="app-suggestions-section" id="appSuggestionsSection" style="display:none;">
+    <div class="app-suggestions-header">
+      <div class="app-suggestions-title">✨ Popular Apps</div>
+      <div class="app-suggestions-controls">
+        <button class="category-filter-btn active" onclick="filterAppSuggestions('All')">All</button>
+        <button class="category-filter-btn" onclick="filterAppSuggestions('Streaming')">Streaming</button>
+        <button class="category-filter-btn" onclick="filterAppSuggestions('Music')">Music</button>
+        <button class="category-filter-btn" onclick="filterAppSuggestions('Productivity')">Productivity</button>
+        <button class="category-filter-btn" onclick="filterAppSuggestions('Cloud')">Cloud</button>
+      </div>
+    </div>
+    <div class="app-suggestions-grid" id="appSuggestionsGrid"></div>
+  </div>
+
+  <div class="chart-section">
+    <h2>Spending by Category</h2>
+    <canvas id="pieChart"></canvas>
+  </div>
+
+  <div class="add-sub-card">
+    <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:1.5rem;color:var(--text)">➕ Add New Subscription</h2>
+    <div class="form-grid">
+      <div>
+        <label class="form-label">Name</label>
+        <input type="text" id="subName" class="form-input" placeholder="Netflix, Spotify..." oninput="handleSubNameInput()">
+      </div>
+      <div>
+        <label class="form-label">Price (₹)</label>
+        <input type="number" id="subPrice" class="form-input" placeholder="199">
+      </div>
+      <div>
+        <label class="form-label">Billing Cycle</label>
+        <select id="subBilling" class="form-select" onchange="handleBillingChange('sub')">
+          <option value="monthly">Monthly</option>
+          <option value="annual">Annual</option>
+          <option value="weekly">Weekly</option>
+          <option value="days">Custom Days</option>
+        </select>
+        <div id="subDaysWrapper" class="days-input-wrapper">
+          <input type="number" id="subDays" class="form-input" placeholder="e.g. 90" value="30" style="margin-top:0.5rem">
+        </div>
+      </div>
+      <div>
+        <label class="form-label">Category</label>
+        <select id="subCategory" class="form-select">
+          <option>Entertainment</option>
+          <option>Music</option>
+          <option>Productivity</option>
+          <option>Cloud Storage</option>
+          <option>Gaming</option>
+          <option>Health & Fitness</option>
+          <option>News</option>
+          <option>Education</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Start Date</label>
+        <input type="date" id="subStartDate" class="form-input" onchange="autoCalcEndDateByCycle('sub')">
+      </div>
+      <div>
+        <label class="form-label">End Date</label>
+        <input type="date" id="subEndDate" class="form-input">
+      </div>
+    </div>
+    <div style="margin-bottom:1.5rem">
+      <label class="form-label">Payment Method</label>
+      <div class="payment-modes" id="subPaymentModes">
+        <div class="pay-badge selected" onclick="selectPaymentMode('sub','debit')">💳 Debit</div>
+        <div class="pay-badge" onclick="selectPaymentMode('sub','credit')">💳 Credit</div>
+        <div class="pay-badge" onclick="selectPaymentMode('sub','upi')">📱 UPI</div>
+        <div class="pay-badge" onclick="selectPaymentMode('sub','wallet')">👛 Wallet</div>
+        <div class="pay-badge" onclick="selectPaymentMode('sub','netbanking')">🏦 Net Banking</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="addSub()">Add Subscription</button>
+  </div>
+
+  <div class="section-title">
+    Your Subscriptions
+    <span class="badge" id="activeCountBadge2">0 active</span>
+  </div>
+  <div class="subs-list" id="subsList"></div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal" id="editModal" onclick="handleOverlayClick(event)">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeEdit()">×</button>
+    <h2 class="modal-title">Edit Subscription</h2>
+    <input type="hidden" id="editId">
+    
+    <div class="icon-upload-section">
+      <label class="form-label">Custom Icon</label>
+      <div class="icon-preview-wrapper">
+        <div class="icon-preview" id="editIconPreview" onclick="document.getElementById('editIconInput').click()">
+          <div id="editIconFallback">📦</div>
+          <div class="icon-preview-overlay"><span>📷</span></div>
+        </div>
+        <input type="file" id="editIconInput" accept="image/*" onchange="handleEditIconUpload(event)" style="display:none">
+        <button class="icon-upload-btn" onclick="document.getElementById('editIconInput').click()">Upload Icon</button>
+        <button class="icon-remove-btn" id="editIconRemoveBtn" onclick="removeEditIcon()">Remove</button>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div>
+        <label class="form-label">Name</label>
+        <input type="text" id="editName" class="form-input" placeholder="Subscription name">
+      </div>
+      <div>
+        <label class="form-label">Price (₹)</label>
+        <input type="number" id="editPrice" class="form-input" placeholder="199">
+      </div>
+      <div>
+        <label class="form-label">Billing Cycle</label>
+        <select id="editBilling" class="form-select" onchange="handleBillingChange('edit')">
+          <option value="monthly">Monthly</option>
+          <option value="annual">Annual</option>
+          <option value="weekly">Weekly</option>
+          <option value="days">Custom Days</option>
+        </select>
+        <div id="editDaysWrapper" class="days-input-wrapper">
+          <input type="number" id="editDays" class="form-input" placeholder="e.g. 90" value="30" style="margin-top:0.5rem">
+        </div>
+      </div>
+      <div>
+        <label class="form-label">Category</label>
+        <select id="editCategory" class="form-select">
+          <option>Entertainment</option>
+          <option>Music</option>
+          <option>Productivity</option>
+          <option>Cloud Storage</option>
+          <option>Gaming</option>
+          <option>Health & Fitness</option>
+          <option>News</option>
+          <option>Education</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Start Date</label>
+        <input type="date" id="editStartDate" class="form-input">
+      </div>
+      <div>
+        <label class="form-label">End Date</label>
+        <input type="date" id="editEndDate" class="form-input">
+      </div>
+    </div>
+    <div style="margin-bottom:1.5rem">
+      <label class="form-label">Payment Method</label>
+      <div class="payment-modes" id="editPaymentModes">
+        <div class="pay-badge" onclick="selectPaymentMode('edit','debit')">💳 Debit</div>
+        <div class="pay-badge" onclick="selectPaymentMode('edit','credit')">💳 Credit</div>
+        <div class="pay-badge" onclick="selectPaymentMode('edit','upi')">📱 UPI</div>
+        <div class="pay-badge" onclick="selectPaymentMode('edit','wallet')">👛 Wallet</div>
+        <div class="pay-badge" onclick="selectPaymentMode('edit','netbanking')">🏦 Net Banking</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:1rem">
+      <button class="btn btn-primary" onclick="saveEdit()" style="flex:1">Save Changes</button>
+      <button class="btn" onclick="closeEdit()" style="background:var(--card2);color:var(--text);border:1px solid var(--border)">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notification Bell -->
+<div class="notif-bell">
+  <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifPanel()">
+    🔔
+    <div class="notif-badge" id="notifBadge">0</div>
+  </button>
+</div>
+
+<!-- Notification Panel -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-header">
+    <div class="notif-panel-title">
+      ⏰ Expiring Soon
+      <span class="notif-panel-count" id="notifPanelCount"></span>
+    </div>
+    <button class="notif-close" onclick="closeNotifPanel()">×</button>
+  </div>
+  <div class="notif-list" id="notifList"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
-// FIREBASE CONFIGURATION & AUTH
+// FIREBASE CONFIGURATION
 // ═══════════════════════════════════════════════════════════════════════════
 const firebaseConfig = {
   apiKey: "AIzaSyA-t7NepAe9mwKuiao04TmYhGucKZTJufo",
@@ -15,8 +1199,6 @@ const firebaseConfig = {
 let firebaseApp = null;
 let database = null;
 let isFirebaseEnabled = false;
-let currentUser = null;
-let dbListenerRef = null;
 
 function initFirebase() {
   try {
@@ -24,7 +1206,9 @@ function initFirebase() {
     database = firebase.database();
     isFirebaseEnabled = true;
     console.log("✅ Firebase initialized!");
-    setupAuthListener();
+    loadFromFirebase();
+    setupFirebaseListener();
+    loadAppCatalogFromFirebase();
     return true;
   } catch (error) {
     console.error("❌ Firebase initialization error:", error);
@@ -33,84 +1217,264 @@ function initFirebase() {
   }
 }
 
-function setupAuthListener() {
-  firebase.auth().onAuthStateChanged((user) => {
-    const menuAuthBtn = document.getElementById('menuAuthBtn');
-    if (user) {
-      currentUser = user;
-      if (menuAuthBtn) {
-        menuAuthBtn.innerHTML = '<img src="logout.png" alt="Sign Out" style="width: 16px; height: 16px; object-fit: contain;"> Sign Out';
-        menuAuthBtn.title = `Sign Out (${user.displayName ? user.displayName.split(' ')[0] : 'User'})`;
+// ═══════════════════════════════════════════════════════════════════════════
+// COMPREHENSIVE APP CATALOG - 100+ POPULAR APPS
+// ═══════════════════════════════════════════════════════════════════════════
+const APP_CATALOG = [
+  // Streaming & Entertainment
+  { id: 'netflix', name: 'Netflix', icon: '🎬', category: 'Streaming' },
+  { id: 'prime-video', name: 'Prime Video', icon: '📺', category: 'Streaming' },
+  { id: 'disney-plus', name: 'Disney+', icon: '🏰', category: 'Streaming' },
+  { id: 'hotstar', name: 'Hotstar', icon: '⭐', category: 'Streaming' },
+  { id: 'hulu', name: 'Hulu', icon: '📺', category: 'Streaming' },
+  { id: 'hbo-max', name: 'HBO Max', icon: '🎭', category: 'Streaming' },
+  { id: 'apple-tv', name: 'Apple TV+', icon: '📺', category: 'Streaming' },
+  { id: 'paramount', name: 'Paramount+', icon: '⛰️', category: 'Streaming' },
+  { id: 'peacock', name: 'Peacock', icon: '🦚', category: 'Streaming' },
+  { id: 'discovery', name: 'Discovery+', icon: '🔍', category: 'Streaming' },
+  { id: 'crunchyroll', name: 'Crunchyroll', icon: '🍜', category: 'Streaming' },
+  { id: 'voot', name: 'Voot', icon: '📱', category: 'Streaming' },
+  { id: 'zee5', name: 'Zee5', icon: '📺', category: 'Streaming' },
+  { id: 'sonyliv', name: 'SonyLIV', icon: '📺', category: 'Streaming' },
+  { id: 'mubi', name: 'MUBI', icon: '🎬', category: 'Streaming' },
+  { id: 'criterion', name: 'Criterion Channel', icon: '🎥', category: 'Streaming' },
+  { id: 'shudder', name: 'Shudder', icon: '👻', category: 'Streaming' },
+  { id: 'funimation', name: 'Funimation', icon: '🎌', category: 'Streaming' },
+
+  // Music
+  { id: 'spotify', name: 'Spotify', icon: '🎵', category: 'Music' },
+  { id: 'apple-music', name: 'Apple Music', icon: '🍎', category: 'Music' },
+  { id: 'youtube-music', name: 'YouTube Music', icon: '▶️', category: 'Music' },
+  { id: 'amazon-music', name: 'Amazon Music', icon: '🎶', category: 'Music' },
+  { id: 'tidal', name: 'Tidal', icon: '🌊', category: 'Music' },
+  { id: 'deezer', name: 'Deezer', icon: '🎵', category: 'Music' },
+  { id: 'soundcloud', name: 'SoundCloud', icon: '☁️', category: 'Music' },
+  { id: 'pandora', name: 'Pandora', icon: '📻', category: 'Music' },
+  { id: 'gaana', name: 'Gaana', icon: '🎵', category: 'Music' },
+  { id: 'jiosaavn', name: 'JioSaavn', icon: '🎶', category: 'Music' },
+  { id: 'wynk', name: 'Wynk Music', icon: '🎵', category: 'Music' },
+
+  // Productivity & Work
+  { id: 'notion', name: 'Notion', icon: '📝', category: 'Productivity' },
+  { id: 'evernote', name: 'Evernote', icon: '🐘', category: 'Productivity' },
+  { id: 'todoist', name: 'Todoist', icon: '✅', category: 'Productivity' },
+  { id: 'asana', name: 'Asana', icon: '📋', category: 'Productivity' },
+  { id: 'trello', name: 'Trello', icon: '📊', category: 'Productivity' },
+  { id: 'monday', name: 'Monday.com', icon: '📅', category: 'Productivity' },
+  { id: 'clickup', name: 'ClickUp', icon: '🎯', category: 'Productivity' },
+  { id: 'airtable', name: 'Airtable', icon: '📊', category: 'Productivity' },
+  { id: 'coda', name: 'Coda', icon: '📄', category: 'Productivity' },
+  { id: 'roam', name: 'Roam Research', icon: '🔗', category: 'Productivity' },
+  { id: 'obsidian', name: 'Obsidian', icon: '💎', category: 'Productivity' },
+  { id: 'bear', name: 'Bear', icon: '🐻', category: 'Productivity' },
+  { id: 'onenote', name: 'OneNote', icon: '📓', category: 'Productivity' },
+
+  // Design & Creative
+  { id: 'adobe-cc', name: 'Adobe Creative Cloud', icon: '🎨', category: 'Productivity' },
+  { id: 'figma', name: 'Figma', icon: '🎨', category: 'Productivity' },
+  { id: 'canva', name: 'Canva', icon: '🎨', category: 'Productivity' },
+  { id: 'sketch', name: 'Sketch', icon: '✏️', category: 'Productivity' },
+  { id: 'framer', name: 'Framer', icon: '🖼️', category: 'Productivity' },
+  { id: 'invision', name: 'InVision', icon: '👁️', category: 'Productivity' },
+  { id: 'miro', name: 'Miro', icon: '🎨', category: 'Productivity' },
+  { id: 'procreate', name: 'Procreate', icon: '🖌️', category: 'Productivity' },
+
+  // Cloud Storage
+  { id: 'icloud', name: 'iCloud+', icon: '☁️', category: 'Cloud' },
+  { id: 'google-one', name: 'Google One', icon: '📦', category: 'Cloud' },
+  { id: 'dropbox', name: 'Dropbox', icon: '📁', category: 'Cloud' },
+  { id: 'onedrive', name: 'OneDrive', icon: '☁️', category: 'Cloud' },
+  { id: 'box', name: 'Box', icon: '📦', category: 'Cloud' },
+  { id: 'sync', name: 'Sync.com', icon: '🔄', category: 'Cloud' },
+  { id: 'pcloud', name: 'pCloud', icon: '☁️', category: 'Cloud' },
+  { id: 'mega', name: 'MEGA', icon: '💾', category: 'Cloud' },
+
+  // AI & ChatBots
+  { id: 'chatgpt', name: 'ChatGPT Plus', icon: '🤖', category: 'Productivity' },
+  { id: 'claude', name: 'Claude Pro', icon: '🤖', category: 'Productivity' },
+  { id: 'copilot', name: 'GitHub Copilot', icon: '🤖', category: 'Productivity' },
+  { id: 'midjourney', name: 'Midjourney', icon: '🎨', category: 'Productivity' },
+  { id: 'jasper', name: 'Jasper AI', icon: '✍️', category: 'Productivity' },
+
+  // Developer Tools
+  { id: 'github', name: 'GitHub', icon: '🐙', category: 'Productivity' },
+  { id: 'gitlab', name: 'GitLab', icon: '🦊', category: 'Productivity' },
+  { id: 'vercel', name: 'Vercel', icon: '▲', category: 'Productivity' },
+  { id: 'netlify', name: 'Netlify', icon: '🌐', category: 'Productivity' },
+  { id: 'heroku', name: 'Heroku', icon: '☁️', category: 'Productivity' },
+  { id: 'aws', name: 'AWS', icon: '☁️', category: 'Productivity' },
+  { id: 'digitalocean', name: 'DigitalOcean', icon: '🌊', category: 'Productivity' },
+  { id: 'supabase', name: 'Supabase', icon: '⚡', category: 'Productivity' },
+  { id: 'firebase', name: 'Firebase', icon: '🔥', category: 'Productivity' },
+
+  // YouTube & Video
+  { id: 'youtube', name: 'YouTube Premium', icon: '▶️', category: 'Streaming' },
+  { id: 'vimeo', name: 'Vimeo', icon: '🎥', category: 'Streaming' },
+  { id: 'twitch', name: 'Twitch', icon: '🎮', category: 'Streaming' },
+
+  // Gaming
+  { id: 'xbox-game-pass', name: 'Xbox Game Pass', icon: '🎮', category: 'Gaming' },
+  { id: 'playstation-plus', name: 'PlayStation Plus', icon: '🎮', category: 'Gaming' },
+  { id: 'nintendo-online', name: 'Nintendo Online', icon: '🎮', category: 'Gaming' },
+  { id: 'ea-play', name: 'EA Play', icon: '🎮', category: 'Gaming' },
+  { id: 'ubisoft', name: 'Ubisoft+', icon: '🎮', category: 'Gaming' },
+  { id: 'epic-games', name: 'Epic Games', icon: '🎮', category: 'Gaming' },
+  { id: 'geforce-now', name: 'GeForce NOW', icon: '🎮', category: 'Gaming' },
+
+  // Health & Fitness
+  { id: 'strava', name: 'Strava', icon: '🏃', category: 'Health & Fitness' },
+  { id: 'peloton', name: 'Peloton', icon: '🚴', category: 'Health & Fitness' },
+  { id: 'calm', name: 'Calm', icon: '🧘', category: 'Health & Fitness' },
+  { id: 'headspace', name: 'Headspace', icon: '🧠', category: 'Health & Fitness' },
+  { id: 'myfitnesspal', name: 'MyFitnessPal', icon: '💪', category: 'Health & Fitness' },
+  { id: 'fitbit', name: 'Fitbit Premium', icon: '⌚', category: 'Health & Fitness' },
+  { id: 'apple-fitness', name: 'Apple Fitness+', icon: '🍎', category: 'Health & Fitness' },
+
+  // News & Reading
+  { id: 'nyt', name: 'NY Times', icon: '📰', category: 'News' },
+  { id: 'wsj', name: 'Wall Street Journal', icon: '📰', category: 'News' },
+  { id: 'medium', name: 'Medium', icon: '✍️', category: 'News' },
+  { id: 'kindle-unlimited', name: 'Kindle Unlimited', icon: '📚', category: 'News' },
+  { id: 'audible', name: 'Audible', icon: '🎧', category: 'News' },
+  { id: 'scribd', name: 'Scribd', icon: '📖', category: 'News' },
+  { id: 'blinkist', name: 'Blinkist', icon: '⚡', category: 'News' },
+
+  // Education
+  { id: 'coursera', name: 'Coursera', icon: '🎓', category: 'Education' },
+  { id: 'udemy', name: 'Udemy', icon: '📚', category: 'Education' },
+  { id: 'skillshare', name: 'Skillshare', icon: '🎨', category: 'Education' },
+  { id: 'masterclass', name: 'MasterClass', icon: '🎓', category: 'Education' },
+  { id: 'linkedin-learning', name: 'LinkedIn Learning', icon: '💼', category: 'Education' },
+  { id: 'duolingo', name: 'Duolingo Plus', icon: '🦉', category: 'Education' },
+  { id: 'babbel', name: 'Babbel', icon: '🗣️', category: 'Education' },
+
+  // Communication
+  { id: 'zoom', name: 'Zoom', icon: '📹', category: 'Productivity' },
+  { id: 'slack', name: 'Slack', icon: '💬', category: 'Productivity' },
+  { id: 'discord-nitro', name: 'Discord Nitro', icon: '💬', category: 'Productivity' },
+  { id: 'telegram', name: 'Telegram Premium', icon: '✈️', category: 'Productivity' },
+  { id: 'whatsapp', name: 'WhatsApp Business', icon: '📱', category: 'Productivity' },
+
+  // Password & Security
+  { id: '1password', name: '1Password', icon: '🔐', category: 'Productivity' },
+  { id: 'lastpass', name: 'LastPass', icon: '🔑', category: 'Productivity' },
+  { id: 'dashlane', name: 'Dashlane', icon: '🔒', category: 'Productivity' },
+  { id: 'bitwarden', name: 'Bitwarden', icon: '🔐', category: 'Productivity' },
+  { id: 'nordvpn', name: 'NordVPN', icon: '🛡️', category: 'Productivity' },
+  { id: 'expressvpn', name: 'ExpressVPN', icon: '🔒', category: 'Productivity' },
+
+  // Email & Marketing
+  { id: 'mailchimp', name: 'Mailchimp', icon: '📧', category: 'Productivity' },
+  { id: 'convertkit', name: 'ConvertKit', icon: '📬', category: 'Productivity' },
+  { id: 'superhuman', name: 'Superhuman', icon: '⚡', category: 'Productivity' },
+  { id: 'hey', name: 'HEY Email', icon: '👋', category: 'Productivity' },
+
+  // Other
+  { id: 'grammarly', name: 'Grammarly', icon: '✍️', category: 'Productivity' },
+  { id: 'notion-calendar', name: 'Notion Calendar', icon: '📅', category: 'Productivity' },
+  { id: 'calendly', name: 'Calendly', icon: '📅', category: 'Productivity' },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FIREBASE SYNC — APP CATALOG (SHARED ACROSS ALL USERS)
+// ═══════════════════════════════════════════════════════════════════════════
+
+function loadAppCatalogFromFirebase() {
+  if (!isFirebaseEnabled) return;
+  
+  const catalogRef = database.ref('subsukesh/appCatalog');
+  catalogRef.once('value')
+    .then((snapshot) => {
+      if (!snapshot.exists()) {
+        // First time - save default catalog
+        catalogRef.set(APP_CATALOG);
+        console.log("📤 Initialized app catalog in Firebase");
+      } else {
+        // Merge with existing catalog (keeps user-added apps)
+        const firebaseCatalog = snapshot.val();
+        const mergedCatalog = [...APP_CATALOG];
+        
+        // Add any custom apps from Firebase that aren't in default catalog
+        firebaseCatalog.forEach(app => {
+          if (!mergedCatalog.find(a => a.id === app.id)) {
+            mergedCatalog.push(app);
+          }
+        });
+        
+        APP_CATALOG.length = 0;
+        APP_CATALOG.push(...mergedCatalog);
+        console.log("📥 Loaded", APP_CATALOG.length, "apps from catalog");
       }
-      showToast(`Welcome, ${user.displayName ? user.displayName.split(' ')[0] : 'User'}!`);
-      loadFromFirebase();
-      setupFirebaseListener();
-    } else {
-      currentUser = null;
-      if (menuAuthBtn) {
-        menuAuthBtn.innerHTML = '👤 Sign In';
-        menuAuthBtn.title = 'Sign In with Google';
-      }
-      if (dbListenerRef) dbListenerRef.off();
-      subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
-      render();
-    }
-  });
+      renderAppSuggestions();
+    })
+    .catch((error) => {
+      console.error("❌ Error loading app catalog:", error);
+    });
 }
 
-function toggleAuth() {
-  if (currentUser) {
-    firebase.auth().signOut().then(() => showToast('Signed out successfully'));
-  } else {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider).catch(error => {
-      showToast('Sign in failed: ' + error.message, true);
-    });
-  }
+function saveAppCatalogToFirebase() {
+  if (!isFirebaseEnabled) return;
+  
+  const catalogRef = database.ref('subsukesh/appCatalog');
+  catalogRef.set(APP_CATALOG)
+    .then(() => console.log("💾 Saved app catalog to Firebase"))
+    .catch((error) => console.error("❌ Error saving catalog:", error));
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FIREBASE SYNC — USER SCOPED
+// FIREBASE SYNC — SUBSCRIPTIONS (SHARED PATH)
 // ═══════════════════════════════════════════════════════════════════════════
 
 function loadFromFirebase() {
-  if (!isFirebaseEnabled || !currentUser) return;
+  if (!isFirebaseEnabled) return;
 
-  const userRef = database.ref(`users/${currentUser.uid}/subscriptions`);
-  userRef.once('value')
+  const sharedRef = database.ref('subsukesh/subscriptions');
+  sharedRef.once('value')
     .then((snapshot) => {
       if (snapshot.exists()) {
         subs = snapshot.val() || [];
-        console.log("📥 Loaded", subs.length, "subscriptions from Cloud");
+        console.log("📥 Loaded", subs.length, "subscriptions from Firebase");
         render();
       } else {
+        // No data in Firebase yet — migrate from localStorage if any
         const localData = localStorage.getItem('subsukesh_subs');
         if (localData) {
           subs = JSON.parse(localData);
           saveToFirebase();
-          console.log("📤 Migrated local subscriptions to Cloud");
+          console.log("📤 Migrated", subs.length, "subscriptions to Firebase");
         }
       }
     })
-    .catch((error) => console.error("❌ Error loading from Firebase:", error));
+    .catch((error) => {
+      console.error("❌ Error loading from Firebase:", error);
+      subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+      render();
+    });
 }
 
 function saveToFirebase() {
-  localStorage.setItem('subsukesh_subs', JSON.stringify(subs));
-  if (!isFirebaseEnabled || !currentUser) return;
+  if (!isFirebaseEnabled) {
+    localStorage.setItem('subsukesh_subs', JSON.stringify(subs));
+    return;
+  }
 
-  const userRef = database.ref(`users/${currentUser.uid}/subscriptions`);
-  userRef.set(subs)
-    .then(() => console.log("💾 Saved to Firebase Cloud"))
-    .catch((error) => console.error("❌ Error saving to Firebase:", error));
+  const sharedRef = database.ref('subsukesh/subscriptions');
+  sharedRef.set(subs)
+    .then(() => {
+      console.log("💾 Saved to Firebase");
+      localStorage.setItem('subsukesh_subs', JSON.stringify(subs));
+    })
+    .catch((error) => {
+      console.error("❌ Error saving to Firebase:", error);
+      localStorage.setItem('subsukesh_subs', JSON.stringify(subs));
+    });
 }
 
 function setupFirebaseListener() {
-  if (!isFirebaseEnabled || !currentUser) return;
-  if (dbListenerRef) dbListenerRef.off();
+  if (!isFirebaseEnabled) return;
 
-  dbListenerRef = database.ref(`users/${currentUser.uid}/subscriptions`);
-  dbListenerRef.on('value', (snapshot) => {
+  const sharedRef = database.ref('subsukesh/subscriptions');
+  sharedRef.on('value', (snapshot) => {
     if (snapshot.exists()) {
       const newSubs = snapshot.val() || [];
       if (JSON.stringify(newSubs) !== JSON.stringify(subs)) {
@@ -123,63 +1487,11 @@ function setupFirebaseListener() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// DATA EXPORT (CSV)
-// ═══════════════════════════════════════════════════════════════════════════
-function exportToCSV() {
-  if (!subs || subs.length === 0) {
-    showToast('No subscriptions to export!', true);
-    return;
-  }
-
-  let csvContent = "Name,Price (₹),Billing Cycle,Category,Start Date,End Date,Payment Mode,Status\n";
-  subs.forEach(s => {
-    const name = `"${s.name.replace(/"/g, '""')}"`;
-    const price = s.price.toFixed(2);
-    const cycle = s.billing === 'days' ? `Every ${s.billingDays} days` : s.billing;
-    const category = s.category;
-    const start = s.startDate;
-    const end = s.endDate || "N/A";
-    const payMode = (s.paymentMode || "N/A").toUpperCase();
-    const status = s.ended ? "Ended" : "Active";
-    csvContent += `${name},${price},${cycle},${category},${start},${end},${payMode},${status}\n`;
-  });
-
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.setAttribute("href", url);
-  const dateStr = new Date().toISOString().split('T')[0];
-  link.setAttribute("download", `SubSukesh_Export_${dateStr}.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  showToast('Spreadsheet downloaded! 📊');
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// DROPDOWN MENU & CONTACT
-// ═══════════════════════════════════════════════════════════════════════════
-function toggleMenu() {
-  document.getElementById('dropdownMenu').classList.toggle('open');
-}
-
-document.addEventListener('click', (e) => {
-  const menu = document.getElementById('dropdownMenu');
-  const menuBtnContainer = document.querySelector('.menu-container');
-  if (menu && menu.classList.contains('open') && !menuBtnContainer.contains(e.target)) {
-    menu.classList.remove('open');
-  }
-});
-
-function contactUs() {
-  window.location.href = "mailto:sukeshgautams@gmail.com?subject=SubSukesh Support Request";
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
 // DATA & STATE
 // ═══════════════════════════════════════════════════════════════════════════
 let subs = [];
 let pieChartInstance = null;
+let currentCategoryFilter = 'All';
 
 function toggleTheme() {
   const body = document.body;
@@ -206,28 +1518,34 @@ function loadTheme() {
   }
 }
 
-const knownSubs = [
-  { name: 'Netflix', emoji: '🎬' },
-  { name: 'Spotify', emoji: '🎵' },
-  { name: 'YouTube', emoji: '▶️' },
-  { name: 'YouTube Premium', emoji: '▶️' },
-  { name: 'Prime Video', emoji: '📺' },
-  { name: 'Disney+', emoji: '🏰' },
-  { name: 'Hotstar', emoji: '⭐' },
-  { name: 'Apple Music', emoji: '🍎' },
-  { name: 'iCloud', emoji: '☁️' },
-  { name: 'Google One', emoji: '📦' },
-  { name: 'Dropbox', emoji: '📁' },
-  { name: 'ChatGPT', emoji: '🤖' },
-  { name: 'GitHub', emoji: '🐙' },
-  { name: 'Adobe', emoji: '🎨' },
-  { name: 'Figma', emoji: '🎨' },
-  { name: 'Notion', emoji: '📝' },
-  { name: 'Canva', emoji: '🎨' }
-];
+// ═══════════════════════════════════════════════════════════════════════════
+// AUTO-MATCH ICON FROM CATALOG
+// ═══════════════════════════════════════════════════════════════════════════
 
-function matchKnown(name) {
-  return knownSubs.find(k => k.name.toLowerCase() === name.toLowerCase());
+function matchAppFromCatalog(name) {
+  const normalized = name.toLowerCase().trim();
+  return APP_CATALOG.find(app => 
+    app.name.toLowerCase() === normalized || 
+    app.id.toLowerCase() === normalized
+  );
+}
+
+function handleSubNameInput() {
+  const name = document.getElementById('subName').value.trim();
+  const match = matchAppFromCatalog(name);
+  
+  if (match) {
+    // Auto-fill category if it matches
+    const categorySelect = document.getElementById('subCategory');
+    if (match.category === 'Streaming') categorySelect.value = 'Entertainment';
+    else if (match.category === 'Music') categorySelect.value = 'Music';
+    else if (match.category === 'Cloud') categorySelect.value = 'Cloud Storage';
+    else if (match.category === 'Gaming') categorySelect.value = 'Gaming';
+    else if (match.category === 'News') categorySelect.value = 'News';
+    else if (match.category === 'Education') categorySelect.value = 'Education';
+    else if (match.category === 'Health & Fitness') categorySelect.value = 'Health & Fitness';
+    else categorySelect.value = 'Productivity';
+  }
 }
 
 function save() { saveToFirebase(); }
@@ -237,6 +1555,7 @@ function render() {
   renderChart();
   renderSubs();
   updateNotifBell();
+  renderAppSuggestions();
 }
 
 function renderSummary() {
@@ -263,6 +1582,7 @@ function renderSummary() {
   document.getElementById('annualTotal').innerHTML = `₹${annual.toFixed(0)}<span>/yr</span>`;
   document.getElementById('subsCount').textContent = active.length;
   document.getElementById('activeCountBadge').textContent = `${active.length} active`;
+  document.getElementById('activeCountBadge2').textContent = `${active.length} active`;
 
   const upcoming = active.filter(s => s.endDate).sort((a,b) => new Date(a.endDate) - new Date(b.endDate));
   document.getElementById('nextRenewal').textContent = upcoming.length > 0 ? fmtDate(upcoming[0].endDate) : '—';
@@ -271,156 +1591,184 @@ function renderSummary() {
 function renderChart() {
   const active = subs.filter(s => !s.ended);
   if (active.length === 0) {
-    document.getElementById('chartContainer').innerHTML = `<div class="no-data-msg">Add subscriptions to see breakdown</div>`;
     if (pieChartInstance) { pieChartInstance.destroy(); pieChartInstance = null; }
+    document.getElementById('pieChart').getContext('2d').clearRect(0,0,400,400);
     return;
   }
-  const byCategory = {};
+
+  const catMap = {};
   active.forEach(s => {
-    byCategory[s.category] = (byCategory[s.category] || 0) + toMonthly(s);
+    const c = s.category || 'Other';
+    let amt = 0;
+    if (s.billing === 'monthly') amt = s.price;
+    else if (s.billing === 'annual') amt = s.price / 12;
+    else if (s.billing === 'weekly') amt = s.price * 4;
+    else if (s.billing === 'days') amt = (s.price / (s.billingDays || 30)) * 30;
+    catMap[c] = (catMap[c] || 0) + amt;
   });
 
-  const labels = Object.keys(byCategory);
-  const data = Object.values(byCategory);
-  const total = data.reduce((a,b) => a+b, 0);
-  const colors = ['#f5c542','#9b7fe8','#4cd9a0','#ff5e72','#f09d51','#5eb3f6'];
+  const labels = Object.keys(catMap);
+  const data = Object.values(catMap);
+  const colors = ['#f5c542','#9b7fe8','#4cd9a0','#ff5e72','#5eb3ff','#ffa94d','#a78bfa','#fb923c'];
 
-  document.getElementById('chartContainer').innerHTML = `
-    <div class="chart-canvas-wrap"><canvas id="pieChart"></canvas></div>
-    <div class="chart-legend">
-      ${labels.map((label, i) => `
-        <div class="legend-item">
-          <div class="legend-dot" style="background:${colors[i % colors.length]}"></div>
-          <div class="legend-name">${label}</div>
-          <div class="legend-pct">${((data[i]/total)*100).toFixed(0)}%</div>
-        </div>`).join('')}
-    </div>`;
-
+  const ctx = document.getElementById('pieChart').getContext('2d');
   if (pieChartInstance) pieChartInstance.destroy();
-  pieChartInstance = new Chart(document.getElementById('pieChart').getContext('2d'), {
+  pieChartInstance = new Chart(ctx, {
     type: 'doughnut',
-    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: colors.slice(0, labels.length),
+        borderWidth: 0
+      }]
+    },
     options: {
-      responsive: false,
-      maintainAspectRatio: false,
+      responsive: true,
+      maintainAspectRatio: true,
       plugins: {
-        legend: { display: false },
+        legend: { display: true, position: 'bottom', labels: { color: getComputedStyle(document.body).getPropertyValue('--text'), font: { size: 12, weight: 600 } } },
         tooltip: {
           callbacks: {
-            label: (ctx) => `₹${ctx.parsed.toFixed(0)} (${((ctx.parsed/total)*100).toFixed(0)}%)`
+            label: (ctx) => `${ctx.label}: ₹${ctx.parsed.toFixed(0)}/mo`
           }
         }
-      },
-      cutout: '65%'
+      }
     }
   });
 }
 
-function toMonthly(s) {
-  if (s.billing === 'monthly') return s.price;
-  if (s.billing === 'annual') return s.price / 12;
-  if (s.billing === 'weekly') return s.price * 4;
-  if (s.billing === 'days') return (s.price / (s.billingDays || 30)) * 30;
-  if (s.billing === 'one-time') return 0;
-  return s.price;
-}
-
-function getSubStatus(s) {
-  if (s.ended) return 'red';
-  if (!s.endDate) return 'green';
-  const h = hoursLeft(s.endDate);
-  if (h === null) return 'green';
-  if (h <= 168) return 'yellow';
-  return 'green';
-}
-
-function sortByStatus(arr) {
-  return arr.sort((a, b) => {
-    const order = { yellow: 0, green: 1, red: 2 };
-    const diff = order[getSubStatus(a)] - order[getSubStatus(b)];
-    if (diff !== 0) return diff;
-    if (a.endDate && b.endDate) return new Date(a.endDate) - new Date(b.endDate);
-    return 0;
-  });
-}
-
 function renderSubs() {
-  const filtered = subs.filter(s => !s.ended);
-  const container1 = document.getElementById('subsContainer1');
-  const container2 = document.getElementById('subsContainer2');
-
-  if (filtered.length === 0) {
-    container1.innerHTML = `<div class="empty-state"><div class="empty-emoji">📦</div><p>No subscriptions yet.<br>Add one to get started!</p></div>`;
-    container2.innerHTML = '';
+  const active = subs.filter(s => !s.ended);
+  const list = document.getElementById('subsList');
+  if (active.length === 0) {
+    list.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--muted)">
+      <div style="font-size:3rem;margin-bottom:1rem">📭</div>
+      <p>No subscriptions yet. Add your first one above!</p>
+    </div>`;
     return;
   }
 
-  const sorted = sortByStatus([...filtered]);
-  const isMobile = window.innerWidth <= 768;
-  if (isMobile) {
-    container1.innerHTML = sorted.map(renderSubCard).join('');
-    container2.innerHTML = '';
-  } else {
-    const col1 = [], col2 = [];
-    sorted.forEach((sub, i) => i % 2 === 0 ? col1.push(sub) : col2.push(sub));
-    container1.innerHTML = col1.map(renderSubCard).join('');
-    container2.innerHTML = col2.map(renderSubCard).join('');
-  }
-}
+  list.innerHTML = active.map(s => {
+    const match = matchAppFromCatalog(s.name);
+    const icon = s.customLogo ? `<img src="${s.customLogo}">` : (match ? match.icon : s.name.slice(0,2).toUpperCase());
+    
+    const cycleText = s.billing === 'monthly' ? 'Monthly' : s.billing === 'annual' ? 'Annual' : s.billing === 'weekly' ? 'Weekly' : `${s.billingDays || 30} days`;
+    const pricePerCycle = s.billing === 'monthly' ? '/mo' : s.billing === 'annual' ? '/yr' : s.billing === 'weekly' ? '/wk' : `/${s.billingDays || 30}d`;
 
-function renderSubCard(s) {
-  const known = matchKnown(s.name);
-  const emoji = s.customLogo ? '' : ((known && known.emoji) || '📦');
-  const logo = s.customLogo || null;
-  const logoHTML = logo ? `<img src="${logo}" alt="${s.name}">` : emoji;
-  const cycle = s.billing === 'days'
-    ? `Every ${s.billingDays} days`
-    : (s.billing === 'one-time'
-        ? 'One-time'
-        : s.billing.charAt(0).toUpperCase() + s.billing.slice(1));
-  const endDateHTML = s.endDate ? fmtDate(s.endDate) : '—';
-  const payBadge = s.paymentMode ? `<div class="pay-badge">${s.paymentMode.toUpperCase()}</div>` : '';
-  const daysText = formatDaysLeft(getDaysLeft(s));
-  const status = getSubStatus(s);
-  const daysLeftBadge = daysText ? `<div class="days-left-badge ${status}">${daysText}</div>` : '';
+    let endDateRow = '';
+    if (s.endDate) {
+      const daysLeft = getDaysLeft(s);
+      const daysText = formatDaysLeft(daysLeft);
+      endDateRow = `<div class="sub-row-enddate">📅 Ends: ${fmtDate(s.endDate)} ${daysText ? `(${daysText})` : ''}</div>`;
+    }
 
-  return `
-    <div class="sub-card" id="sub-${s.id}" onclick="toggleCard('${s.id}')">
-      <div class="sub-row">
-        <div class="sub-logo">${logoHTML}</div>
+    const payIcon = s.paymentMode === 'credit' ? '💳' : s.paymentMode === 'upi' ? '📱' : s.paymentMode === 'wallet' ? '👛' : s.paymentMode === 'netbanking' ? '🏦' : '💳';
+
+    return `
+      <div class="sub-card" id="sub-${s.id}">
+        <div class="sub-icon">${icon}</div>
         <div class="sub-info">
           <div class="sub-name">${escHtml(s.name)}</div>
-          <div class="sub-cycle">${cycle}</div>
+          <div class="sub-meta">
+            <span class="sub-cycle">🔄 ${cycleText}</span>
+            <span class="sub-category">📂 ${s.category || 'Other'}</span>
+            <span class="sub-category">${payIcon} ${capitalize(s.paymentMode || 'debit')}</span>
+          </div>
         </div>
-        <div class="sub-meta">
-          <div class="sub-row-price">₹${s.price.toFixed(0)}</div>
-          <div class="sub-row-enddate">${endDateHTML}</div>
-          ${payBadge}
-          ${daysLeftBadge}
-          <div class="status-dot ${status}"></div>
+        <div class="sub-price">
+          <div class="sub-price-amount">₹${s.price}</div>
+          <div class="sub-price-cycle">${pricePerCycle}</div>
         </div>
+        <div class="sub-actions">
+          <button class="action-btn" onclick="openEdit('${s.id}')" title="Edit">✏️</button>
+          <button class="action-btn" onclick="confirmEnd('${s.id}')" title="End subscription">🗑️</button>
+          ${s.endDate ? `<button class="action-btn" onclick="renewSub('${s.id}')" title="Renew">🔄</button>` : ''}
+        </div>
+        ${endDateRow}
       </div>
-      <div class="sub-details">
-        <div class="detail-item"><div class="detail-label">Category</div><div class="detail-value">${s.category}</div></div>
-        <div class="detail-item"><div class="detail-label">Start</div><div class="detail-value">${fmtDate(s.startDate)}</div></div>
-        <div class="detail-item"><div class="detail-label">End</div><div class="detail-value">${endDateHTML}</div></div>
-        <div class="detail-item"><div class="detail-label">Payment</div><div class="detail-value">${s.paymentMode ? s.paymentMode.toUpperCase() : '—'}</div></div>
-      </div>
-      <div class="sub-actions">
-        <button class="sub-btn edit" onclick="event.stopPropagation(); openEdit('${s.id}')">Edit</button>
-        ${!s.ended ? `<button class="sub-btn renew" onclick="event.stopPropagation(); renewSub('${s.id}')">Renew</button>` : ''}
-        ${!s.ended ? `<button class="sub-btn end" onclick="event.stopPropagation(); endSub('${s.id}')">End</button>` : ''}
-      </div>
-    </div>`;
+    `;
+  }).join('');
 }
 
-function toggleCard(id) {
-  const clicked = document.getElementById('sub-' + id);
-  const wasExpanded = clicked.classList.contains('expanded');
-  document.querySelectorAll('.sub-card.expanded').forEach(card => {
-    card.classList.remove('expanded');
+// ═══════════════════════════════════════════════════════════════════════════
+// APP SUGGESTIONS RENDERING
+// ═══════════════════════════════════════════════════════════════════════════
+
+function renderAppSuggestions() {
+  const userAppNames = subs.map(s => s.name.toLowerCase());
+  
+  // Filter out apps user already has
+  let available = APP_CATALOG.filter(app => 
+    !userAppNames.includes(app.name.toLowerCase())
+  );
+
+  // Apply category filter
+  if (currentCategoryFilter !== 'All') {
+    available = available.filter(app => app.category === currentCategoryFilter);
+  }
+
+  const grid = document.getElementById('appSuggestionsGrid');
+  const section = document.getElementById('appSuggestionsSection');
+
+  if (available.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+
+  // Show top 20 suggestions
+  const suggestions = available.slice(0, 20);
+
+  grid.innerHTML = suggestions.map(app => `
+    <div class="app-suggestion-card" onclick="quickAddApp('${app.id}')">
+      <div class="app-suggestion-icon">${app.icon}</div>
+      <div class="app-suggestion-name">${escHtml(app.name)}</div>
+      <div class="app-suggestion-category">${app.category}</div>
+    </div>
+  `).join('');
+}
+
+function filterAppSuggestions(category) {
+  currentCategoryFilter = category;
+  
+  // Update active button
+  document.querySelectorAll('.category-filter-btn').forEach(btn => {
+    btn.classList.remove('active');
   });
-  if (!wasExpanded) clicked.classList.add('expanded');
+  event.target.classList.add('active');
+  
+  renderAppSuggestions();
+}
+
+function quickAddApp(appId) {
+  const app = APP_CATALOG.find(a => a.id === appId);
+  if (!app) return;
+
+  // Pre-fill the form
+  document.getElementById('subName').value = app.name;
+  
+  // Set category
+  const categorySelect = document.getElementById('subCategory');
+  if (app.category === 'Streaming') categorySelect.value = 'Entertainment';
+  else if (app.category === 'Music') categorySelect.value = 'Music';
+  else if (app.category === 'Cloud') categorySelect.value = 'Cloud Storage';
+  else if (app.category === 'Gaming') categorySelect.value = 'Gaming';
+  else if (app.category === 'News') categorySelect.value = 'News';
+  else if (app.category === 'Education') categorySelect.value = 'Education';
+  else if (app.category === 'Health & Fitness') categorySelect.value = 'Health & Fitness';
+  else categorySelect.value = 'Productivity';
+
+  // Scroll to add form
+  document.querySelector('.add-sub-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  
+  // Focus on price field
+  setTimeout(() => {
+    document.getElementById('subPrice').focus();
+  }, 500);
+
+  showToast(`💡 Fill in the price for ${app.name}`);
 }
 
 function addSub() {
@@ -430,33 +1778,50 @@ function addSub() {
   const category = document.getElementById('subCategory').value;
   const startDate = document.getElementById('subStartDate').value;
   const endDate = document.getElementById('subEndDate').value;
-  const billingDays = billing === 'days'
-    ? parseInt(document.getElementById('subDays').value) || 30
-    : null;
+  const billingDays = billing === 'days' ? parseInt(document.getElementById('subDays').value) || 30 : null;
   const paymentMode = getPaymentMode('sub');
 
-  if (!name || isNaN(price) || price <= 0) {
-    showToast('Please enter a valid name and price', true);
-    return;
+  if (!name || isNaN(price) || price <= 0) { 
+    showToast('Please enter a valid name and price', true); 
+    return; 
   }
 
-  subs.push({
-    id: Date.now().toString(),
-    name,
-    price,
-    billing,
-    billingDays,
-    category,
-    startDate,
-    endDate,
-    paymentMode,
-    ended: false,
-    autoRenewed: false,
-    customLogo: null
+  // Check if this app is from catalog and add it if it's not already there
+  const match = matchAppFromCatalog(name);
+  if (!match) {
+    // User is adding a custom app - add it to catalog
+    const newApp = {
+      id: name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+      name: name,
+      icon: name.slice(0, 2).toUpperCase(),
+      category: category === 'Entertainment' ? 'Streaming' : 
+                category === 'Cloud Storage' ? 'Cloud' :
+                category === 'Health & Fitness' ? 'Health & Fitness' :
+                category
+    };
+    APP_CATALOG.push(newApp);
+    saveAppCatalogToFirebase();
+  }
+
+  subs.push({ 
+    id: Date.now().toString(), 
+    name, 
+    price, 
+    billing, 
+    billingDays, 
+    category, 
+    startDate, 
+    endDate, 
+    paymentMode, 
+    ended: false, 
+    autoRenewed: false, 
+    customLogo: null 
   });
+  
   save();
   render();
 
+  // Reset form
   document.getElementById('subName').value = '';
   document.getElementById('subPrice').value = '';
   document.getElementById('subBilling').value = 'monthly';
@@ -498,9 +1863,7 @@ function closeEdit() {
 }
 
 function handleEditEscKey(e) { if (e.key === 'Escape') closeEdit(); }
-function handleOverlayClick(e) {
-  if (e.target === document.getElementById('editModal')) closeEdit();
-}
+function handleOverlayClick(e) { if (e.target === document.getElementById('editModal')) closeEdit(); }
 
 function saveEdit() {
   const id = document.getElementById('editId').value;
@@ -510,15 +1873,10 @@ function saveEdit() {
   const category = document.getElementById('editCategory').value;
   const startDate = document.getElementById('editStartDate').value;
   const endDate = document.getElementById('editEndDate').value;
-  const billingDays = billing === 'days'
-    ? parseInt(document.getElementById('editDays').value) || 30
-    : null;
+  const billingDays = billing === 'days' ? parseInt(document.getElementById('editDays').value) || 30 : null;
   const paymentMode = getPaymentMode('edit');
 
-  if (!name || isNaN(price) || price <= 0) {
-    showToast('Please enter a valid name and price', true);
-    return;
-  }
+  if (!name || isNaN(price) || price <= 0) { showToast('Please enter a valid name and price', true); return; }
 
   const idx = subs.findIndex(s => s.id === id);
   if (idx === -1) return;
@@ -529,21 +1887,8 @@ function saveEdit() {
   if (removeLogo) customLogo = null;
   if (pendingLogo) customLogo = pendingLogo;
 
-  subs[idx] = {
-    ...subs[idx],
-    name,
-    price,
-    billing,
-    billingDays,
-    category,
-    startDate,
-    endDate,
-    paymentMode,
-    customLogo
-  };
-  save();
-  render();
-  closeEdit();
+  subs[idx] = { ...subs[idx], name, price, billing, billingDays, category, startDate, endDate, paymentMode, customLogo };
+  save(); render(); closeEdit();
   showToast(`${name} updated ✓`);
 }
 
@@ -553,28 +1898,25 @@ function renewSub(id) {
   const s = subs[idx];
   const newStart = s.endDate || new Date().toISOString().split('T')[0];
   const newEnd = computeEndDateFrom(newStart, s);
-  subs[idx] = {
-    ...s,
-    startDate: newStart,
-    endDate: newEnd,
-    ended: false,
-    autoRenewed: false
-  };
-  save();
-  render();
-  setTimeout(() => {
-    const card = document.getElementById('sub-' + id);
-    if (card) card.classList.add('just-renewed');
-  }, 50);
+  subs[idx] = { ...s, startDate: newStart, endDate: newEnd, ended: false, autoRenewed: false };
+  save(); render();
+  setTimeout(() => { const card = document.getElementById('sub-' + id); if (card) card.classList.add('just-renewed'); }, 50);
   showToast(`${s.name} renewed until ${fmtDate(newEnd)} 🎉`);
+}
+
+function confirmEnd(id) {
+  const s = subs.find(sub => sub.id === id);
+  if (!s) return;
+  if (confirm(`Are you sure you want to end "${s.name}"?`)) {
+    endSub(id);
+  }
 }
 
 function endSub(id) {
   const idx = subs.findIndex(s => s.id === id);
   if (idx === -1) return;
   subs[idx] = { ...subs[idx], ended: true };
-  save();
-  render();
+  save(); render();
   showToast(`${subs[idx].name} marked as ended.`);
 }
 
@@ -584,7 +1926,6 @@ function computeEndDateFrom(startStr, s) {
   else if (s.billing === 'annual') { d.setFullYear(d.getFullYear() + 1); d.setDate(d.getDate() - 1); }
   else if (s.billing === 'weekly') d.setDate(d.getDate() + 7);
   else if (s.billing === 'days') d.setDate(d.getDate() + (s.billingDays || 30));
-  else if (s.billing === 'one-time') return;
   else d.setDate(d.getDate() + 30);
   return d.toISOString().split('T')[0];
 }
@@ -592,37 +1933,18 @@ function computeEndDateFrom(startStr, s) {
 function autoRenewExpired() {
   const today = new Date(); today.setHours(0,0,0,0);
   let renewed = [];
-  let updated = false;
-
   subs = subs.map(s => {
     if (s.ended || !s.endDate) return s;
     const end = new Date(s.endDate); end.setHours(23,59,59,0);
     if (end < today) {
-      if (s.billing === 'one-time') {
-        updated = true;
-        return { ...s, ended: true };
-      }
       renewed.push(s.name);
-      updated = true;
-      return {
-        ...s,
-        startDate: s.endDate,
-        endDate: computeEndDateFrom(s.endDate, s),
-        autoRenewed: true
-      };
+      return { ...s, startDate: s.endDate, endDate: computeEndDateFrom(s.endDate, s), autoRenewed: true };
     }
     return s;
   });
-
-  if (updated) {
+  if (renewed.length > 0) {
     save();
-    if (renewed.length > 0) {
-      showToast(
-        renewed.length === 1
-          ? `Auto-renewed: ${renewed[0]} 🔄`
-          : `Auto-renewed ${renewed.length} subscriptions 🔄`
-      );
-    }
+    showToast(renewed.length === 1 ? `Auto-renewed: ${renewed[0]} 🔄` : `Auto-renewed ${renewed.length} subscriptions 🔄`);
   }
 }
 
@@ -633,10 +1955,7 @@ function handleEditIconUpload(event) {
   reader.onload = e => {
     document.getElementById('editIconInput')._pendingLogo = e.target.result;
     document.getElementById('editIconInput')._removeLogo = false;
-    updateEditIconPreview(
-      e.target.result,
-      document.getElementById('editName').value || '?'
-    );
+    updateEditIconPreview(e.target.result, document.getElementById('editName').value || '?');
   };
   reader.readAsDataURL(file);
   event.target.value = '';
@@ -659,27 +1978,23 @@ function updateEditIconPreview(logoUri, name) {
     const img = document.createElement('img');
     img.className = 'icon-preview-img';
     img.src = logoUri;
-    img.style.cssText =
-      'width:100%;height:100%;object-fit:cover;border-radius:10px;position:absolute;inset:0;';
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:10px;position:absolute;inset:0;';
     preview.insertBefore(img, preview.querySelector('.icon-preview-overlay'));
     removeBtn.classList.add('visible');
   } else {
     fallback.style.display = '';
-    const known = matchKnown(name);
-    fallback.textContent =
-      (known && known.emoji) || name.slice(0,2).toUpperCase() || '📦';
+    const match = matchAppFromCatalog(name);
+    fallback.textContent = (match && match.icon) || name.slice(0,2).toUpperCase() || '📦';
     removeBtn.classList.remove('visible');
   }
 }
 
 function getExpiringSoon() {
-  return subs
-    .filter(s => {
-      if (!s.endDate) return false;
-      const h = hoursLeft(s.endDate);
-      return h !== null && h <= 72 && h >= -24;
-    })
-    .sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+  return subs.filter(s => {
+    if (!s.endDate) return false;
+    const h = hoursLeft(s.endDate);
+    return h !== null && h <= 72 && h >= -24;
+  }).sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
 }
 
 function hoursLeft(dateStr) {
@@ -728,24 +2043,18 @@ function openNotifPanel() {
 
   if (expiring.length === 0) {
     countEl.textContent = '';
-    list.innerHTML =
-      `<div class="notif-empty"><div class="big-emoji">✅</div><p>No subscriptions expiring<br>within the next 72 hours!</p></div>`;
+    list.innerHTML = `<div class="notif-empty"><div class="big-emoji">✅</div><p>No subscriptions expiring<br>within the next 72 hours!</p></div>`;
   } else {
     countEl.textContent = `· ${expiring.length} alert${expiring.length !== 1 ? 's' : ''}`;
     list.innerHTML = expiring.map(s => {
-      const known = matchKnown(s.name);
-      const emoji = known ? known.emoji : '📦';
+      const match = matchAppFromCatalog(s.name);
+      const emoji = match ? match.icon : '📦';
       const h = hoursLeft(s.endDate);
       let timeLabel, timeClass, itemClass;
       if (h < 0) { timeLabel = 'Expired'; timeClass = 'red'; itemClass = 'urgent'; }
       else if (h <= 1) { timeLabel = '< 1 hr left'; timeClass = 'red'; itemClass = 'urgent'; }
       else if (h <= 24) { timeLabel = `${Math.ceil(h)}h left`; timeClass = 'red'; itemClass = 'urgent'; }
-      else {
-        const hrs = Math.round(h);
-        timeLabel = `~${Math.floor(hrs/24)}d ${hrs%24}h left`;
-        timeClass = 'orange';
-        itemClass = 'warning';
-      }
+      else { const hrs = Math.round(h); timeLabel = `~${Math.floor(hrs/24)}d ${hrs%24}h left`; timeClass = 'orange'; itemClass = 'warning'; }
       return `
         <div class="notif-item ${itemClass}">
           <div class="notif-emoji">${emoji}</div>
@@ -754,49 +2063,86 @@ function openNotifPanel() {
             <div class="notif-desc">${s.category} · ends ${fmtDate(s.endDate)}</div>
           </div>
           <div class="notif-time ${timeClass}">${timeLabel}</div>
-        </div>`;
+        </div>
+      `;
     }).join('');
   }
-
   document.getElementById('notifPanel').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  document.addEventListener('keydown', handleNotifEscKey);
 }
 
 function closeNotifPanel() {
   document.getElementById('notifPanel').classList.remove('open');
-  document.body.style.overflow = '';
-  document.removeEventListener('keydown', handleNotifEscKey);
 }
 
-function handleNotifEscKey(e) { if (e.key === 'Escape') closeNotifPanel(); }
-function handleNotifOverlayClick(e) {
-  if (e.target === document.getElementById('notifPanel')) closeNotifPanel();
-}
-
-function toggleChart() {
-  const chartModal = document.getElementById('chartModal');
-  const isOpen = chartModal.classList.contains('open');
-  if (isOpen) {
-    chartModal.classList.remove('open');
-    document.body.style.overflow = '';
-    document.removeEventListener('keydown', handleChartEscKey);
+function toggleNotifPanel() {
+  const panel = document.getElementById('notifPanel');
+  if (panel.classList.contains('open')) {
+    closeNotifPanel();
   } else {
-    chartModal.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    document.addEventListener('keydown', handleChartEscKey);
+    openNotifPanel();
   }
 }
 
-function handleChartEscKey(e) { if (e.key === 'Escape') toggleChart(); }
-function handleChartModalClick(e) {
-  if (e.target === document.getElementById('chartModal')) toggleChart();
+function handleBillingChange(prefix) {
+  const billing = document.getElementById(prefix + 'Billing').value;
+  const daysWrapper = document.getElementById(prefix + 'DaysWrapper');
+  if (billing === 'days') {
+    daysWrapper.classList.add('active');
+  } else {
+    daysWrapper.classList.remove('active');
+  }
+  autoCalcEndDateByCycle(prefix);
+}
+
+function autoCalcEndDateByCycle(prefix, overrideBilling) {
+  const startStr = document.getElementById(prefix + 'StartDate').value;
+  if (!startStr) return;
+  const billing = overrideBilling || document.getElementById(prefix + 'Billing').value;
+  const billingDays = billing === 'days' ? parseInt(document.getElementById(prefix + 'Days').value) || 30 : null;
+  const s = { billing, billingDays };
+  const endDate = computeEndDateFrom(startStr, s);
+  document.getElementById(prefix + 'EndDate').value = endDate;
+}
+
+function getPaymentMode(prefix) {
+  const selected = document.querySelector(`#${prefix}PaymentModes .pay-badge.selected`);
+  if (!selected) return 'debit';
+  const text = selected.textContent.toLowerCase();
+  if (text.includes('credit')) return 'credit';
+  if (text.includes('upi')) return 'upi';
+  if (text.includes('wallet')) return 'wallet';
+  if (text.includes('net banking')) return 'netbanking';
+  return 'debit';
+}
+
+function selectPaymentMode(prefix, mode) {
+  document.querySelectorAll(`#${prefix}PaymentModes .pay-badge`).forEach(b => b.classList.remove('selected'));
+  const badges = document.querySelectorAll(`#${prefix}PaymentModes .pay-badge`);
+  badges.forEach(b => {
+    const txt = b.textContent.toLowerCase();
+    if ((mode === 'debit' && txt.includes('debit')) ||
+        (mode === 'credit' && txt.includes('credit')) ||
+        (mode === 'upi' && txt.includes('upi')) ||
+        (mode === 'wallet' && txt.includes('wallet')) ||
+        (mode === 'netbanking' && txt.includes('net banking'))) {
+      b.classList.add('selected');
+    }
+  });
+}
+
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.toggle('error', isError);
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
 function fmtDate(d) {
-  if (!d) return '—';
-  const [y,m,day] = d.split('-');
-  return `${day}/${m}/${y.slice(2)}`;
+  if (!d) return '';
+  const date = new Date(d);
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
 
 function escHtml(str) {
@@ -805,419 +2151,39 @@ function escHtml(str) {
   return div.innerHTML;
 }
 
-function showToast(msg, isError = false) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.className = 'toast' + (isError ? ' error' : '');
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-function handleBillingChange(prefix) {
-  const val = document.getElementById(prefix + 'Billing').value;
-  document.getElementById(prefix + 'DaysWrapper')
-          .classList.toggle('active', val === 'days');
-  autoCalcEndDateByCycle(prefix);
-}
-
-function autoCalcEndDateByCycle(prefix, overrideBilling) {
-  const startVal = document.getElementById(prefix + 'StartDate').value;
-  if (!startVal) return;
-  const billing = overrideBilling || document.getElementById(prefix + 'Billing').value;
-  const d = new Date(startVal);
-  if (billing === 'monthly') d.setDate(d.getDate() + 30);
-  else if (billing === 'annual') { d.setFullYear(d.getFullYear() + 1); d.setDate(d.getDate() - 1); }
-  else if (billing === 'weekly') d.setDate(d.getDate() + 7);
-  else if (billing === 'days') {
-    d.setDate(
-      d.getDate() +
-      (parseInt(document.getElementById(prefix + 'Days').value) || 30)
-    );
-  } else if (billing === 'one-time') return;
-  else d.setDate(d.getDate() + 30);
-  document.getElementById(prefix + 'EndDate').value =
-    d.toISOString().split('T')[0];
-}
-
-function selectPaymentMode(prefix, mode) {
-  document.getElementById(prefix + 'PaymentMode')
-    .querySelectorAll('.payment-mode-btn')
-    .forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.mode === mode);
-    });
-}
-
-function getPaymentMode(prefix) {
-  const active = document
-    .getElementById(prefix + 'PaymentMode')
-    .querySelector('.payment-mode-btn.active');
-  return active ? active.dataset.mode : 'debit';
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// LOCK / AUTH SYSTEM (PIN + WEB AUTHN + RESET)
+// INITIALIZATION
 // ═══════════════════════════════════════════════════════════════════════════
-const LOCK_DURATION = 30 * 24 * 60 * 60 * 1000;
-const PIN_KEY = 'subsukesh_pin';
-const UNLOCK_KEY = 'subsukesh_unlocked_until';
-const SETTING_KEY = 'subsukesh_pin_set';
-const WEBAUTHN_KEY = 'subsukesh_webauthn_id';
 
-let pinBuffer = '';
-let isSettingPin = false;
-let pinConfirmBuffer = '';
-let awaitingConfirm = false;
-let failedPinAttempts = 0;
-
-function initLock() {
-  const pinSet = localStorage.getItem(SETTING_KEY);
-  const unlockedUntil = parseInt(localStorage.getItem(UNLOCK_KEY) || '0');
-  const now = Date.now();
-  if (!pinSet) {
-    showLockScreen(true);
-  } else if (now < unlockedUntil) {
-    hideLockScreen();
-  } else {
-    showLockScreen(false);
-  }
-}
-
-function showLockScreen(setup) {
-  isSettingPin = setup;
-  awaitingConfirm = false;
-  pinBuffer = '';
-  pinConfirmBuffer = '';
-  failedPinAttempts = 0;
-  const forgotBtn = document.getElementById('forgotPinBtn');
-  if (forgotBtn) forgotBtn.style.display = 'none';
-
-  document.getElementById('lockScreen').classList.remove('hidden');
-  document.getElementById('lockError').textContent = '';
-  updateDots();
-
-  if (setup) {
-    document.getElementById('lockTitle').textContent = 'Set your PIN';
-    document.getElementById('lockSubtitle').textContent =
-      'Choose a 4-digit PIN to protect your app';
-    document.getElementById('biometricBtn').style.display = 'none';
-  } else {
-    document.getElementById('lockTitle').textContent = 'Welcome back';
-    document.getElementById('lockSubtitle').textContent =
-      'Enter your PIN to continue';
-    checkBiometricSupport().then(() => {
-      triggerBiometric();
-    });
-  }
-}
-
-function hideLockScreen() {
-  document.getElementById('lockScreen').classList.add('hidden');
-}
-
-function lockApp() {
-  localStorage.removeItem(UNLOCK_KEY);
-  pinBuffer = '';
-  showLockScreen(false);
-}
-
-function pinKey(digit) {
-  if (pinBuffer.length >= 4) return;
-  pinBuffer += digit;
-  updateDots();
-  document.getElementById('lockError').textContent = '';
-  if (pinBuffer.length === 4) {
-    setTimeout(() => handlePinComplete(), 150);
-  }
-}
-
-function pinBackspace() {
-  pinBuffer = pinBuffer.slice(0, -1);
-  updateDots();
-}
-
-function updateDots() {
-  const len =
-    isSettingPin && awaitingConfirm
-      ? pinConfirmBuffer.length
-      : pinBuffer.length;
-  for (let i = 0; i < 4; i++) {
-    const dot = document.getElementById('dot' + i);
-    dot.classList.toggle('filled', i < len);
-    dot.classList.remove('error');
-  }
-}
-
-function handlePinComplete() {
-  const forgotBtn = document.getElementById('forgotPinBtn');
-
-  if (isSettingPin) {
-    // 2-step PIN setup: enter + confirm
-    if (!awaitingConfirm) {
-      pinConfirmBuffer = pinBuffer;
-      awaitingConfirm = true;
-      pinBuffer = '';
-      updateDots();
-      document.getElementById('lockSubtitle').textContent =
-        'Re-enter your PIN to confirm';
-    } else {
-      if (pinBuffer === pinConfirmBuffer) {
-        localStorage.setItem(PIN_KEY, hashPin(pinBuffer));
-        localStorage.setItem(SETTING_KEY, '1');
-        unlockSuccess();
-      } else {
-        showPinError('PINs do not match. Try again.');
-        pinBuffer = '';
-        pinConfirmBuffer = '';
-        awaitingConfirm = false;
-        document.getElementById('lockSubtitle').textContent =
-          'Choose a 4-digit PIN to protect your app';
-      }
-    }
-  } else {
-    const stored = localStorage.getItem(PIN_KEY);
-    if (hashPin(pinBuffer) === stored) {
-      failedPinAttempts = 0;
-      if (forgotBtn) forgotBtn.style.display = 'none';
-      unlockSuccess();
-    } else {
-      failedPinAttempts++;
-      showPinError('Incorrect PIN. Try again.');
-      if (failedPinAttempts >= 3 && forgotBtn) {
-        forgotBtn.style.display = 'block';
-      }
-      pinBuffer = '';
-    }
-  }
-}
-
-async function unlockSuccess() {
-  localStorage.setItem(UNLOCK_KEY, Date.now() + LOCK_DURATION);
-  hideLockScreen();
-
-  const hasRegistered = localStorage.getItem(WEBAUTHN_KEY);
-  if (!hasRegistered && localStorage.getItem(SETTING_KEY)) {
-    const available = await isBiometricAvailable();
-    if (available) {
-      setTimeout(async () => {
-        const registered = await registerBiometric();
-        if (registered) {
-          showToast('Face ID / Fingerprint enabled for next time! 🔐');
-        }
-      }, 800);
-    }
-  }
-}
-
-function showPinError(msg) {
-  document.getElementById('lockError').textContent = msg;
-  for (let i = 0; i < 4; i++) {
-    document.getElementById('dot' + i).classList.add('error');
-  }
-  setTimeout(() => {
-    for (let i = 0; i < 4; i++) {
-      const dot = document.getElementById('dot' + i);
-      dot.classList.remove('error', 'filled');
-    }
-  }, 600);
-}
-
-function hashPin(pin) {
-  let hash = 0;
-  const str = pin + 'subsukesh_salt_2024';
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0;
-  }
-  return hash.toString(36);
-}
-
-// Forgot / reset PIN with Google-gated flow
-function showForgotPin() {
-  if (currentUser) {
-    if (confirm(
-      `Reset PIN? You'll be asked to set a new one.\nSigned in as: ${currentUser.email}`
-    )) {
-      resetPin();
-    }
-  } else {
-    // If not signed in, require Google sign-in to verify
-    const proceed = confirm(
-      'To reset your PIN, please sign in with Google so we can verify it is you.'
-    );
-    if (!proceed) return;
-
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider)
-      .then(result => {
-        if (confirm(
-          `Reset PIN for ${result.user.email}?\nYour subscription data will NOT be deleted.`
-        )) {
-          resetPin();
-        }
-      })
-      .catch(err => {
-        showToast('Google sign-in failed: ' + err.message, true);
-      });
-  }
-}
-
-function resetPin() {
-  localStorage.removeItem(PIN_KEY);
-  localStorage.removeItem(SETTING_KEY);
-  localStorage.removeItem(UNLOCK_KEY);
-  localStorage.removeItem(WEBAUTHN_KEY);
-  failedPinAttempts = 0;
-
-  showLockScreen(true);
-  showToast('PIN reset. Please set a new PIN.');
-}
-
-// Change PIN from inside the app (menu action)
-function changePinFlow() {
-  if (confirm('Change your PIN? You will be asked to set a new one now.')) {
-    resetPin();
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// WEBAUTHN — BIOMETRIC REGISTRATION & AUTHENTICATION
-// ═══════════════════════════════════════════════════════════════════════════
-function getRpId() {
-  const host = window.location.hostname;
-  return host === '' || host === 'localhost' ? 'localhost' : host;
-}
-
-async function isBiometricAvailable() {
-  if (!window.PublicKeyCredential) return false;
-  try {
-    return await PublicKeyCredential
-      .isUserVerifyingPlatformAuthenticatorAvailable();
-  } catch(e) {
-    return false;
-  }
-}
-
-async function registerBiometric() {
-  try {
-    const challenge = crypto.getRandomValues(new Uint8Array(32));
-    const userId = crypto.getRandomValues(new Uint8Array(16));
-
-    const credential = await navigator.credentials.create({
-      publicKey: {
-        challenge,
-        rp: { name: 'SubSukesh', id: getRpId() },
-        user: {
-          id: userId,
-          name: 'subsukesh_user',
-          displayName: 'SubSukesh User'
-        },
-        pubKeyCredParams: [
-          { type: 'public-key', alg: -7 },
-          { type: 'public-key', alg: -257 }
-        ],
-        authenticatorSelection: {
-          authenticatorAttachment: 'platform',
-          userVerification: 'required',
-          requireResidentKey: false
-        },
-        timeout: 60000,
-        attestation: 'none'
-      }
-    });
-
-    if (credential) {
-      const credId = btoa(
-        String.fromCharCode(...new Uint8Array(credential.rawId))
-      );
-      localStorage.setItem(WEBAUTHN_KEY, credId);
-      console.log('✅ Biometric registered!');
-      return true;
-    }
-  } catch(e) {
-    console.log('Biometric registration skipped:', e.message);
-  }
-  return false;
-}
-
-async function authenticateBiometric() {
-  const storedCredId = localStorage.getItem(WEBAUTHN_KEY);
-  if (!storedCredId) return false;
-
-  try {
-    const challenge = crypto.getRandomValues(new Uint8Array(32));
-    const credIdBytes = Uint8Array.from(
-      atob(storedCredId),
-      c => c.charCodeAt(0)
-    );
-
-    const assertion = await navigator.credentials.get({
-      publicKey: {
-        challenge,
-        rpId: getRpId(),
-        allowCredentials: [{
-          type: 'public-key',
-          id: credIdBytes,
-          transports: ['internal']
-        }],
-        userVerification: 'required',
-        timeout: 60000
-      }
-    });
-
-    return !!assertion;
-  } catch(e) {
-    console.log('Biometric auth failed:', e.message);
-    return false;
-  }
-}
-
-async function checkBiometricSupport() {
-  const btn = document.getElementById('biometricBtn');
-  const available = await isBiometricAvailable();
-  if (available) {
-    btn.style.display = 'flex';
-    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-    document.getElementById('biometricIcon').textContent = isIOS ? '🔐' : '👆';
-    document.getElementById('biometricLabel').textContent =
-      isIOS ? 'Use Face ID' : 'Use Fingerprint';
-  }
-  return available;
-}
-
-async function triggerBiometric() {
-  if (!localStorage.getItem(SETTING_KEY)) return;
-  const available = await isBiometricAvailable();
-  if (!available) return;
-
-  const hasRegistered = localStorage.getItem(WEBAUTHN_KEY);
-  if (!hasRegistered) {
-    document.getElementById('lockSubtitle').textContent =
-      'Setting up biometric for this device...';
-    const registered = await registerBiometric();
-    if (registered) {
-      unlockSuccess();
-      showToast('Face ID / Fingerprint set up! 🎉');
-    }
-  } else {
-    const success = await authenticateBiometric();
-    if (success) unlockSuccess();
-  }
-}
-
-// ─── MAIN INIT ───────────────────────────────────────────────────────────────
-(function init() {
-  initLock();
-  initFirebase();
-  if (!isFirebaseEnabled) {
-    subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
-  }
-
+window.addEventListener('load', () => {
   loadTheme();
-  document.getElementById('subStartDate').value =
-    new Date().toISOString().split('T')[0];
+  initFirebase();
+  
+  // Set today's date
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('subStartDate').value = today;
   autoCalcEndDateByCycle('sub', 'monthly');
+  
+  // Auto-renew expired subscriptions
   autoRenewExpired();
+  
+  // Set interval to check for renewals every hour
+  setInterval(autoRenewExpired, 3600000);
+});
 
-  setTimeout(() => { render(); }, 500);
-})();
+// Close notification panel when clicking outside
+document.addEventListener('click', (e) => {
+  const panel = document.getElementById('notifPanel');
+  const btn = document.getElementById('notifBellBtn');
+  if (panel.classList.contains('open') && !panel.contains(e.target) && !btn.contains(e.target)) {
+    closeNotifPanel();
+  }
+});
 </script>
+
+</body>
+</html>

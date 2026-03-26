@@ -1816,16 +1816,23 @@ function loadFromFirebase() {
   userRef.once('value')
     .then((snapshot) => {
       if (snapshot.exists()) {
-        subs = snapshot.val() || [];
+        const val = snapshot.val();
+        // Force data into an array (Prevents Firebase Object crash)
+        subs = Array.isArray(val) ? val : Object.values(val || {});
+        
         console.log("📥 Loaded", subs.length, "subscriptions from Cloud");
+        autoRenewExpired(); // Check auto-renews on fresh cloud data
         render();
       } else {
         const localData = localStorage.getItem('subsukesh_subs');
         if (localData) {
-          subs = JSON.parse(localData);
+          try { subs = JSON.parse(localData); } catch(e) { subs = []; }
           saveToFirebase();
           console.log("📤 Migrated local subscriptions to Cloud");
+        } else {
+          subs = [];
         }
+        render(); // Ensure UI updates if cloud is empty or migrating
       }
     })
     .catch((error) => console.error("❌ Error loading from Firebase:", error));
@@ -1850,10 +1857,19 @@ function setupFirebaseListener() {
   dbListenerRef = database.ref(`users/${currentUser.uid}/subscriptions`);
   dbListenerRef.on('value', (snapshot) => {
     if (snapshot.exists()) {
-      const newSubs = snapshot.val() || [];
+      const val = snapshot.val();
+      // Force data into an array
+      const newSubs = Array.isArray(val) ? val : Object.values(val || {});
+      
       if (JSON.stringify(newSubs) !== JSON.stringify(subs)) {
         subs = newSubs;
         console.log("🔄 Real-time update received!");
+        render();
+      }
+    } else {
+      // If user deletes their last subscription from another device, clear the screen
+      if (subs.length > 0) {
+        subs = [];
         render();
       }
     }
@@ -2880,19 +2896,23 @@ async function triggerBiometric() {
 // ─── MAIN INIT ───────────────────────────────────────────────────────────────
 (function init() {
   initLock();
-  initFirebase();
-
-  // Load fallback if Firebase fails to init
-  if (!isFirebaseEnabled) {
+  
+  // Load local cache IMMEDIATELY so the app never shows a blank screen
+  try {
     subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+  } catch(e) {
+    subs = [];
   }
+  
+  initFirebase();
 
   loadTheme();
   document.getElementById('subStartDate').value = new Date().toISOString().split('T')[0];
   autoCalcEndDateByCycle('sub', 'monthly');
+  
+  // Run auto-renew and initial render instantly using cached data
   autoRenewExpired();
-
-  setTimeout(() => { render(); }, 500);
+  render();
 })();
 </script>
 

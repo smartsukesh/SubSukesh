@@ -87,16 +87,6 @@
     background: rgba(255,255,255,0.15);
     border-color: rgba(255,255,255,0.25);
   }
-  
-  body.light-mode .show-more-btn {
-    background: rgba(0,0,0,0.1);
-    color: #ffffff;
-  }
-  body.light-mode .show-more-btn:hover {
-    background: rgba(0,0,0,0.2);
-    border-color: #ffffff;
-  }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -207,9 +197,64 @@
     background: var(--purple);
   }
 
+  /* DROPDOWN MENU STYLES */
+  .menu-container {
+    position: relative;
+  }
+  .dropdown-menu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    min-width: 160px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+  }
+  .dropdown-menu.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+  }
+  .dropdown-item {
+    padding: 12px 16px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.2s;
+  }
+  .dropdown-item:hover {
+    background: var(--card2);
+  }
+
+  /* FOOTER STYLES */
+  .app-footer {
+    text-align: center;
+    padding-top: 24px;
+    margin-top: 40px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
   .main-grid {
     display: grid;
     grid-template-columns: 320px 1fr 1fr;
+    grid-template-rows: auto auto;
     gap: 20px;
     align-items: start;
   }
@@ -220,11 +265,19 @@
     gap: 16px;
     position: sticky;
     top: 20px;
+    grid-row: 1 / 3;
+  }
+
+  .top-bar-span {
+    grid-column: 2 / 4;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 
   .summary-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 12px;
     min-height: 88px;
   }
@@ -252,7 +305,7 @@
     background: linear-gradient(90deg, var(--gold), var(--purple));
   }
   .summary-card.full {
-    grid-column: 1 / -1;
+    grid-column: auto;
     min-height: 88px;
   }
   .summary-card .label {
@@ -382,72 +435,24 @@
     padding: 20px 0;
   }
 
-  .center-col {
+  /* ── CARDS AREA ───────────────────────────────────── */
+  .cards-span {
+    grid-column: 2 / 4;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    min-height: 600px;
   }
 
-  .right-col {
-    display: flex;
-    flex-direction: column;
+  .subs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 16px;
-    max-height: calc(100vh - 40px);
-    position: sticky;
-    top: 20px;
-    align-self: start;
+    align-items: start;
+    align-content: start;
   }
-
-  /* Show More Button Wrapper */
-  .show-more-wrapper {
-    grid-column: 2 / -1;
-    display: flex;
-    justify-content: center;
-    padding: 10px 0 20px;
-  }
-  
-  .show-more-btn {
-    padding: 10px 24px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--card2);
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .show-more-btn:hover {
-    background: var(--card);
-    border-color: var(--gold);
-    color: var(--gold);
-  }
-
-  .view-toggle {
-    display: flex;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 4px;
-    gap: 4px;
-  }
-  .toggle-btn {
-    flex: 1;
-    padding: 8px 0;
-    border: none;
-    border-radius: 7px;
-    background: transparent;
-    color: var(--muted);
-    font-family: var(--font-body);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .toggle-btn.active {
-    background: linear-gradient(135deg, var(--gold2), var(--gold));
-    color: #0b0b12;
-    font-weight: 600;
+  .subs-grid .empty-state {
+    grid-column: 1 / -1; /* spans full width */
   }
 
   .subs-scroll {
@@ -460,18 +465,12 @@
   .subs-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   .subs-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.12); }
 
-  .category-block { margin-bottom:18px; }
-  .cat-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
-  .cat-label  { display:flex; align-items:center; gap:7px; font-size:11px; font-weight:600; color:var(--muted); }
-  .cat-icon   { font-size:13px; }
-  .cat-total  { font-size:11px; color:var(--gold); font-weight:600; }
-
   .sub-card {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 14px;
-    margin-bottom: 8px;
+    margin-bottom: 0px; /* grid handles gap */
     cursor: pointer;
     transition: all 0.2s;
   }
@@ -1056,22 +1055,6 @@
     color: var(--danger);
   }
 
-  /* LOCK BUTTON */
-  .lock-btn {
-    width: 40px; height: 40px;
-    border-radius: 10px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .lock-btn:hover { background: var(--card2); border-color: rgba(255,255,255,0.12); }
-
   /* LOCK SCREEN */
   .lock-screen {
     position: fixed;
@@ -1150,17 +1133,122 @@
   .biometric-btn:hover { background: var(--border); }
   .lock-error { font-size: 12px; color: var(--danger); text-align: center; min-height: 18px; }
 
+  /* ── SORT / FILTER BAR ───────────────────────────── */
+  .sort-filter-bar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+  }
+  .sort-filter-inner {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .sf-search {
+    flex: 1;
+    min-width: 120px;
+    padding: 8px 10px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 12px;
+  }
+  .sf-search:focus { outline: none; border-color: var(--gold); }
+  .sf-search::placeholder { color: var(--muted); }
+  .sf-select {
+    padding: 8px 10px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .sf-select:focus { outline: none; border-color: var(--gold); }
+
+  /* ── MORE TOGGLE ─────────────────────────────────── */
+  .more-toggle-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 7px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .more-toggle-btn:hover { background: var(--card2); color: var(--text); border-color: var(--gold); }
+
+  /* ── HISTORY TAB CARDS ───────────────────────────── */
+  .history-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    margin-bottom: 0px; /* Reset for grid */
+    opacity: 0.72;
+    transition: all 0.2s;
+  }
+  .history-card:hover { opacity: 1; background: var(--card2); border-color: rgba(255,255,255,0.12); }
+  .history-ended-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(255,94,114,0.12);
+    border: 1px solid rgba(255,94,114,0.25);
+    color: var(--danger);
+    white-space: nowrap;
+  }
+  .history-reactivate-btn {
+    padding: 7px 14px;
+    border: 1px solid rgba(76,217,160,0.3);
+    border-radius: 7px;
+    background: rgba(76,217,160,0.08);
+    color: var(--success);
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .history-reactivate-btn:hover { background: rgba(76,217,160,0.18); }
+  .history-delete-btn {
+    padding: 7px 14px;
+    border: 1px solid rgba(255,94,114,0.3);
+    border-radius: 7px;
+    background: rgba(255,94,114,0.08);
+    color: var(--danger);
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .history-delete-btn:hover { background: rgba(255,94,114,0.18); }
+
   @media (max-width: 1400px) {
     .main-grid { grid-template-columns: 300px 1fr 1fr; }
   }
   @media (max-width: 1200px) {
-    .main-grid { grid-template-columns: 280px 1fr; }
-    .right-col { display: none; }
+    .main-grid { grid-template-columns: 280px 1fr; grid-template-rows: auto; }
+    .left-col { grid-row: auto; }
+    .top-bar-span, .cards-span { grid-column: 2 / 3; }
+    .subs-grid { grid-template-columns: 1fr; }
   }
   @media (max-width: 1000px) {
     .main-grid { grid-template-columns: 1fr; }
-    .left-col { position: static; }
-    .show-more-wrapper { grid-column: 1 / -1; }
+    .left-col { position: static; grid-row: auto; }
+    .top-bar-span, .cards-span { grid-column: auto; }
   }
 
   @media (max-width: 768px) {
@@ -1180,13 +1268,12 @@
       flex-direction: column;
       gap: 16px;
     }
-    
-    .center-col { order: 1; min-height: auto; }
-    .show-more-wrapper { order: 2; padding: 0; }
-    .left-col   { order: 3; position: static; }
-    .right-col  { display: none !important; }
+    .top-bar-span { order: 1; }
+    .cards-span   { order: 2; min-height: auto; }
+    .left-col     { order: 3; position: static; }
 
     .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px; min-height: auto; }
+    .summary-card.full { grid-column: 1 / -1; }
     .summary-card { padding: 14px 12px; min-height: auto; }
     .summary-card .amount { font-size: 18px; }
     .summary-card .label { font-size: 11px; }
@@ -1201,7 +1288,8 @@
     .payment-mode-btn { font-size: 10px; padding: 7px; }
     .add-btn { padding: 11px; font-size: 13px; }
 
-    .sub-card { padding: 12px; margin-bottom: 8px; }
+    .subs-grid { grid-template-columns: 1fr; }
+    .sub-card { padding: 12px; margin-bottom: 0px; }
     .sub-logo { width: 38px; height: 38px; font-size: 18px; }
     .sub-name { font-size: 13px; }
     .sub-cycle { font-size: 10px; }
@@ -1236,9 +1324,10 @@
 
     .subs-scroll { padding-right: 4px; overflow-y: visible; }
     .subs-scroll::-webkit-scrollbar { width: 4px; }
-    .toggle-btn { font-size: 11px; padding: 7px 0; }
     .empty-emoji { font-size: 40px; }
     .empty-state { font-size: 12px; padding: 30px 16px; }
+    .sort-filter-inner { flex-direction: column; }
+    .sf-search, .sf-select { width: 100%; }
   }
 
   @media (max-width: 375px) {
@@ -1264,15 +1353,31 @@
         <p style="font-size: 11px;">Developed by Sukesh</p>
       </div>
     </div>
+    
     <div class="header-actions">
-      <button class="notif-bell-btn" onclick="exportToCSV()" title="Export to Spreadsheet">📊</button>
-      
-      <button id="authBtn" class="notif-bell-btn" onclick="toggleAuth()" title="Sign In">👤</button>
-      <button class="lock-btn" onclick="lockApp()" title="Lock app">🔒</button>
       <button id="notifBellBtn" class="notif-bell-btn" onclick="openNotifPanel()">
         🔔
         <div id="notifBadge" class="notif-badge">0</div>
       </button>
+
+      <div class="menu-container">
+        <button class="notif-bell-btn" onclick="toggleMenu()" title="Menu">⋮</button>
+        
+        <div id="dropdownMenu" class="dropdown-menu">
+          <div class="dropdown-item" id="menuAuthBtn" onclick="toggleAuth(); toggleMenu();">
+            👤 Sign In
+          </div>
+          <div class="dropdown-item" onclick="lockApp(); toggleMenu();">
+            🔒 Lock App
+          </div>
+          <div class="dropdown-item" onclick="exportToCSV(); toggleMenu();">
+            📊 Export Data
+          </div>
+          <div class="dropdown-item" onclick="contactUs(); toggleMenu();">
+            ✉️ Contact Us
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -1345,11 +1450,16 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label class="form-label">Notes (optional)</label>
+          <textarea id="subNotes" class="form-input" rows="2" placeholder="e.g. account email, login info, reminders…" style="resize:vertical; min-height:56px;"></textarea>
+        </div>
+
         <button class="add-btn" onclick="addSub()">Add Subscription</button>
       </div>
     </div>
 
-    <div class="center-col">
+    <div class="top-bar-span">
       <div class="summary-grid">
         <div class="summary-card" onclick="toggleChart()">
           <div class="label">MONTHLY</div>
@@ -1359,29 +1469,67 @@
           <div class="label">ANNUAL</div>
           <div class="amount" id="annualTotal">₹0<span>/yr</span></div>
         </div>
+        <div class="summary-card full">
+          <div class="label">Total Active</div>
+          <div class="amount" id="subsCount">0</div>
+          <div class="sub-note">Next renewal: <b id="nextRenewal">—</b></div>
+          <div class="count-badge" id="activeCountBadge">0 active</div>
+        </div>
       </div>
 
-      <div class="subs-scroll" id="subsContainer1">
-        <div class="empty-state">
-          <div class="empty-emoji">📦</div>
-          <p>No subscriptions yet.<br>Add one to get started!</p>
+      <div class="sort-filter-bar" id="sortFilterBar">
+        <div class="sort-filter-inner">
+          <select id="viewFilter" class="sf-select" onchange="switchTab(this.value)">
+            <option value="active">View: Active</option>
+            <option value="history">View: History</option>
+          </select>
+          <input type="text" id="searchInput" class="sf-search" placeholder="🔍  Search…" oninput="render()">
+          <select id="filterCategory" class="sf-select" onchange="render()">
+            <option value="">All Categories</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Productivity">Productivity</option>
+            <option value="Cloud">Cloud</option>
+            <option value="Education">Education</option>
+            <option value="Fitness">Fitness</option>
+            <option value="Other">Other</option>
+          </select>
+          <select id="sortBy" class="sf-select" onchange="render()">
+            <option value="status">Sort: Status</option>
+            <option value="name">Sort: Name A–Z</option>
+            <option value="name_desc">Sort: Name Z–A</option>
+            <option value="price_asc">Sort: Price ↑</option>
+            <option value="price_desc">Sort: Price ↓</option>
+            <option value="renewal">Sort: Renewal</option>
+          </select>
         </div>
       </div>
     </div>
 
-    <div class="right-col">
-      <div class="summary-card full">
-        <div class="label">Total Active</div>
-        <div class="amount" id="subsCount">0</div>
-        <div class="sub-note">Next renewal: <b id="nextRenewal">—</b></div>
-        <div class="count-badge" id="activeCountBadge">0 active</div>
+    <div class="cards-span">
+      <div id="activeView">
+        <div class="subs-scroll subs-grid" id="subsContainer">
+          <div class="empty-state">
+            <div class="empty-emoji">📦</div>
+            <p>No subscriptions yet.<br>Add one to get started!</p>
+          </div>
+        </div>
+      </div>
+      
+      <div id="historyView" style="display:none;">
+        <div class="subs-scroll subs-grid" id="historyContainer"></div>
       </div>
 
-      <div class="subs-scroll" id="subsContainer2"></div>
+      <div id="moreToggleWrap" style="display:none; text-align:center; padding-top: 10px;">
+        <button class="more-toggle-btn" id="moreToggleBtn" onclick="toggleMore()">▼ Show more</button>
+      </div>
     </div>
 
-    <div id="showMoreWrapper" class="show-more-wrapper"></div>
   </div>
+
+  <footer class="app-footer">
+    Created & Developed by Sukesh Gautam S
+  </footer>
+
 </div>
 
 <div id="chartModal" class="chart-modal" onclick="handleChartModalClick(event)">
@@ -1478,6 +1626,11 @@
       </div>
     </div>
 
+    <div class="form-group">
+      <label class="form-label">Notes (optional)</label>
+      <textarea id="editNotes" class="form-input" rows="2" placeholder="e.g. account email, login info, reminders…" style="resize:vertical; min-height:56px;"></textarea>
+    </div>
+
     <div class="modal-actions">
       <button class="modal-btn secondary" onclick="closeEdit()">Cancel</button>
       <button class="modal-btn primary" onclick="saveEdit()">Save Changes</button>
@@ -1555,6 +1708,7 @@ function initFirebase() {
     console.log("✅ Firebase initialized!");
     
     setupAuthListener();
+    
     return true;
   } catch (error) {
     console.error("❌ Firebase initialization error:", error);
@@ -1565,13 +1719,13 @@ function initFirebase() {
 
 function setupAuthListener() {
   firebase.auth().onAuthStateChanged((user) => {
-    const authBtn = document.getElementById('authBtn');
+    const menuAuthBtn = document.getElementById('menuAuthBtn');
     
     if (user) {
       currentUser = user;
-      if (authBtn) {
-        authBtn.innerHTML = '<img src="logout.png" alt="Sign Out" style="width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0 0 2px rgba(255,255,255,0.2));">'; 
-        authBtn.title = `Sign Out (${user.displayName ? user.displayName.split(' ')[0] : 'User'})`;
+      if (menuAuthBtn) {
+        menuAuthBtn.innerHTML = '<img src="logout.png" alt="Sign Out" style="width: 16px; height: 16px; object-fit: contain;"> Sign Out'; 
+        menuAuthBtn.title = `Sign Out (${user.displayName ? user.displayName.split(' ')[0] : 'User'})`;
       }
       showToast(`Welcome, ${user.displayName ? user.displayName.split(' ')[0] : 'User'}!`);
       
@@ -1579,28 +1733,21 @@ function setupAuthListener() {
       setupFirebaseListener();
     } else {
       currentUser = null;
-      if (authBtn) {
-        authBtn.innerHTML = '👤'; 
-        authBtn.title = 'Sign In with Google';
+      if (menuAuthBtn) {
+        menuAuthBtn.innerHTML = '👤 Sign In'; 
+        menuAuthBtn.title = 'Sign In with Google';
       }
       
       if (dbListenerRef) dbListenerRef.off(); 
       
-      subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+      try {
+        subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+      } catch(e) {
+        subs = [];
+      }
       render();
     }
   });
-}
-
-function toggleAuth() {
-  if (currentUser) {
-    firebase.auth().signOut().then(() => showToast('Signed out successfully'));
-  } else {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider).catch(error => {
-      showToast('Sign in failed: ' + error.message, true);
-    });
-  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1614,16 +1761,23 @@ function loadFromFirebase() {
   userRef.once('value')
     .then((snapshot) => {
       if (snapshot.exists()) {
-        subs = snapshot.val() || [];
+        const val = snapshot.val();
+        // FORCE FIREBASE OBJECT BACK INTO AN ARRAY TO PREVENT CRASH
+        subs = Array.isArray(val) ? val : Object.values(val || {});
+        
         console.log("📥 Loaded", subs.length, "subscriptions from Cloud");
+        autoRenewExpired();
         render();
       } else {
         const localData = localStorage.getItem('subsukesh_subs');
         if (localData) {
-          subs = JSON.parse(localData);
+          try { subs = JSON.parse(localData); } catch(e) { subs = []; }
           saveToFirebase();
           console.log("📤 Migrated local subscriptions to Cloud");
+        } else {
+          subs = [];
         }
+        render();
       }
     })
     .catch((error) => console.error("❌ Error loading from Firebase:", error));
@@ -1631,6 +1785,7 @@ function loadFromFirebase() {
 
 function saveToFirebase() {
   localStorage.setItem('subsukesh_subs', JSON.stringify(subs));
+  
   if (!isFirebaseEnabled || !currentUser) return;
 
   const userRef = database.ref(`users/${currentUser.uid}/subscriptions`);
@@ -1647,14 +1802,33 @@ function setupFirebaseListener() {
   dbListenerRef = database.ref(`users/${currentUser.uid}/subscriptions`);
   dbListenerRef.on('value', (snapshot) => {
     if (snapshot.exists()) {
-      const newSubs = snapshot.val() || [];
+      const val = snapshot.val();
+      // FORCE FIREBASE OBJECT BACK INTO AN ARRAY TO PREVENT CRASH
+      const newSubs = Array.isArray(val) ? val : Object.values(val || {});
+      
       if (JSON.stringify(newSubs) !== JSON.stringify(subs)) {
         subs = newSubs;
         console.log("🔄 Real-time update received!");
         render();
       }
+    } else {
+      if (subs.length > 0) {
+        subs = [];
+        render();
+      }
     }
   });
+}
+
+function toggleAuth() {
+  if (currentUser) {
+    firebase.auth().signOut().then(() => showToast('Signed out successfully'));
+  } else {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider).catch(error => {
+      showToast('Sign in failed: ' + error.message, true);
+    });
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1697,16 +1871,29 @@ function exportToCSV() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// DROPDOWN MENU & CONTACT
+// ═══════════════════════════════════════════════════════════════════════════
+function toggleMenu() {
+  document.getElementById('dropdownMenu').classList.toggle('open');
+}
+
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('dropdownMenu');
+  const menuBtnContainer = document.querySelector('.menu-container');
+  if (menu && menu.classList.contains('open') && !menuBtnContainer.contains(e.target)) {
+    menu.classList.remove('open');
+  }
+});
+
+function contactUs() {
+  window.location.href = "mailto:sukeshgautams@gmail.com?subject=SubSukesh Support Request";
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // DATA & STATE
 // ═══════════════════════════════════════════════════════════════════════════
 let subs = [];
 let pieChartInstance = null;
-let showAllSubs = false;
-
-function toggleShowMore() {
-  showAllSubs = !showAllSubs;
-  renderSubs();
-}
 
 function toggleTheme() {
   const body = document.body;
@@ -1844,7 +2031,7 @@ function toMonthly(s) {
   if (s.billing === 'annual') return s.price / 12;
   if (s.billing === 'weekly') return s.price * 4;
   if (s.billing === 'days') return (s.price / (s.billingDays || 30)) * 30;
-  if (s.billing === 'one-time') return 0; 
+  if (s.billing === 'one-time') return 0;
   return s.price;
 }
 
@@ -1867,43 +2054,157 @@ function sortByStatus(arr) {
   });
 }
 
+// ─── TAB STATE ────────────────────────────────────────────────────────────────
+let currentTab = 'active';
+let showingMore = false;
+const PAGE_SIZE = 12; // 12 items / 2 cols = 6 full rows
+
+function switchTab(tab) {
+  currentTab = tab;
+  showingMore = false;
+  
+  // Show active vs history container
+  document.getElementById('activeView').style.display = tab === 'active' ? '' : 'none';
+  document.getElementById('historyView').style.display = tab === 'history' ? '' : 'none';
+  
+  // Sync the select dropdown value if called programmatically
+  const viewSelect = document.getElementById('viewFilter');
+  if (viewSelect) viewSelect.value = tab;
+
+  // Show/Hide other filters based on view type
+  const displayState = tab === 'active' ? '' : 'none';
+  document.getElementById('searchInput').style.display = displayState;
+  document.getElementById('filterCategory').style.display = displayState;
+  document.getElementById('sortBy').style.display = displayState;
+
+  render();
+}
+
+function toggleMore() {
+  showingMore = !showingMore;
+  render();
+}
+
+// ─── SORT / FILTER HELPERS ────────────────────────────────────────────────────
+function getFilteredSorted() {
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+  const catFilter = document.getElementById('filterCategory')?.value || '';
+  const sortKey = document.getElementById('sortBy')?.value || 'status';
+
+  let arr = subs.filter(s => !s.ended);
+
+  if (search) arr = arr.filter(s => s.name.toLowerCase().includes(search));
+  if (catFilter) arr = arr.filter(s => s.category === catFilter);
+
+  if (sortKey === 'status') {
+    arr = sortByStatus(arr);
+  } else if (sortKey === 'name') {
+    arr.sort((a,b) => a.name.localeCompare(b.name));
+  } else if (sortKey === 'name_desc') {
+    arr.sort((a,b) => b.name.localeCompare(a.name));
+  } else if (sortKey === 'price_asc') {
+    arr.sort((a,b) => a.price - b.price);
+  } else if (sortKey === 'price_desc') {
+    arr.sort((a,b) => b.price - a.price);
+  } else if (sortKey === 'renewal') {
+    arr.sort((a,b) => {
+      if (!a.endDate && !b.endDate) return 0;
+      if (!a.endDate) return 1;
+      if (!b.endDate) return -1;
+      return new Date(a.endDate) - new Date(b.endDate);
+    });
+  }
+  return arr;
+}
+
 function renderSubs() {
-  const filtered = subs.filter(s => !s.ended);
-  const container1 = document.getElementById('subsContainer1');
-  const container2 = document.getElementById('subsContainer2');
-  const showMoreWrapper = document.getElementById('showMoreWrapper');
+  if (currentTab === 'history') { renderHistory(); return; }
+
+  const container = document.getElementById('subsContainer');
+  const moreWrap = document.getElementById('moreToggleWrap');
+  const moreBtn = document.getElementById('moreToggleBtn');
+
+  const filtered = getFilteredSorted();
 
   if (filtered.length === 0) {
-    container1.innerHTML = `<div class="empty-state"><div class="empty-emoji">📦</div><p>No subscriptions yet.<br>Add one to get started!</p></div>`;
-    container2.innerHTML = '';
-    if (showMoreWrapper) showMoreWrapper.innerHTML = '';
+    container.innerHTML = `<div class="empty-state"><div class="empty-emoji">📦</div><p>No subscriptions found.</p></div>`;
+    moreWrap.style.display = 'none';
     return;
   }
 
-  const sorted = sortByStatus([...filtered]);
-  const isMobile = window.innerWidth <= 768;
-  
-  const displayLimit = 10;
-  const hasMore = sorted.length > displayLimit;
-  const visibleSubs = showAllSubs ? sorted : sorted.slice(0, displayLimit);
+  const limit = showingMore ? filtered.length : Math.min(PAGE_SIZE, filtered.length);
+  const visible = filtered.slice(0, limit);
 
-  if (isMobile) {
-    container1.innerHTML = visibleSubs.map(renderSubCard).join('');
-    container2.innerHTML = '';
+  // Directly map all visible cards to the single CSS grid container
+  container.innerHTML = visible.map(renderSubCard).join('');
+
+  // More toggle
+  if (filtered.length > PAGE_SIZE) {
+    moreWrap.style.display = 'block';
+    if (showingMore) {
+      moreBtn.textContent = '▲ Show less';
+    } else {
+      const hidden = filtered.length - PAGE_SIZE;
+      moreBtn.textContent = `▼ Show ${hidden} more`;
+    }
   } else {
-    const col1 = [], col2 = [];
-    visibleSubs.forEach((sub, i) => i % 2 === 0 ? col1.push(sub) : col2.push(sub));
-    container1.innerHTML = col1.map(renderSubCard).join('');
-    container2.innerHTML = col2.map(renderSubCard).join('');
+    moreWrap.style.display = 'none';
+  }
+}
+
+function renderHistory() {
+  const ended = subs.filter(s => s.ended);
+  const container = document.getElementById('historyContainer');
+  const moreWrap = document.getElementById('moreToggleWrap');
+  
+  moreWrap.style.display = 'none'; // hide more button on history
+  
+  if (ended.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-emoji">🗂️</div><p>No ended subscriptions yet.</p></div>`;
+    return;
   }
   
-  if (showMoreWrapper) {
-    if (hasMore) {
-      showMoreWrapper.innerHTML = `<button class="show-more-btn" onclick="toggleShowMore()">${showAllSubs ? 'Show Less ᐱ' : `Show ${sorted.length - displayLimit} More ᐯ`}</button>`;
-    } else {
-      showMoreWrapper.innerHTML = '';
-    }
-  }
+  container.innerHTML = ended.map(s => {
+    const known = matchKnown(s.name);
+    const emoji = s.customLogo ? '' : ((known && known.emoji) || '📦');
+    const logoHTML = s.customLogo ? `<img src="${s.customLogo}" alt="${s.name}">` : emoji;
+    const cycle = s.billing === 'days' ? `Every ${s.billingDays} days` : (s.billing === 'one-time' ? 'One-time' : s.billing.charAt(0).toUpperCase() + s.billing.slice(1));
+    return `
+      <div class="history-card">
+        <div class="sub-row">
+          <div class="sub-logo">${logoHTML}</div>
+          <div class="sub-info">
+            <div class="sub-name">${escHtml(s.name)}</div>
+            <div class="sub-cycle">${cycle} · ${s.category}</div>
+          </div>
+          <div class="sub-meta">
+            <div class="sub-row-price">₹${s.price.toFixed(0)}</div>
+            <span class="history-ended-badge">Ended</span>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <button class="history-reactivate-btn" onclick="reactivateSub('${s.id}')">↩ Reactivate</button>
+          <button class="history-delete-btn" onclick="deleteSub('${s.id}')">🗑 Delete</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function reactivateSub(id) {
+  const idx = subs.findIndex(s => s.id === id);
+  if (idx === -1) return;
+  subs[idx] = { ...subs[idx], ended: false };
+  save(); render();
+  showToast(`${subs[idx].name} reactivated ✓`);
+}
+
+function deleteSub(id) {
+  const idx = subs.findIndex(s => s.id === id);
+  if (idx === -1) return;
+  const name = subs[idx].name;
+  subs.splice(idx, 1);
+  save(); render();
+  showToast(`${name} deleted.`);
 }
 
 function renderSubCard(s) {
@@ -1945,6 +2246,7 @@ function renderSubCard(s) {
         ${!s.ended ? `<button class="sub-btn renew" onclick="event.stopPropagation(); renewSub('${s.id}')">Renew</button>` : ''}
         ${!s.ended ? `<button class="sub-btn end" onclick="event.stopPropagation(); endSub('${s.id}')">End</button>` : ''}
       </div>
+      ${s.notes ? `<div class="sub-notes-row"><b>📝 Notes:</b> ${escHtml(s.notes)}</div>` : ''}
     </div>`;
 }
 
@@ -1970,10 +2272,11 @@ function addSub() {
   const endDate = document.getElementById('subEndDate').value;
   const billingDays = billing === 'days' ? parseInt(document.getElementById('subDays').value) || 30 : null;
   const paymentMode = getPaymentMode('sub');
+  const notes = document.getElementById('subNotes').value.trim();
 
   if (!name || isNaN(price) || price <= 0) { showToast('Please enter a valid name and price', true); return; }
 
-  subs.push({ id: Date.now().toString(), name, price, billing, billingDays, category, startDate, endDate, paymentMode, ended: false, autoRenewed: false, customLogo: null });
+  subs.push({ id: Date.now().toString(), name, price, billing, billingDays, category, startDate, endDate, paymentMode, notes, ended: false, autoRenewed: false, customLogo: null });
   save();
   render();
 
@@ -1981,6 +2284,7 @@ function addSub() {
   document.getElementById('subPrice').value = '';
   document.getElementById('subBilling').value = 'monthly';
   document.getElementById('subCategory').value = 'Entertainment';
+  document.getElementById('subNotes').value = '';
   handleBillingChange('sub');
   document.getElementById('subStartDate').value = new Date().toISOString().split('T')[0];
   autoCalcEndDateByCycle('sub', 'monthly');
@@ -1999,6 +2303,7 @@ function openEdit(id) {
   document.getElementById('editStartDate').value = s.startDate;
   document.getElementById('editEndDate').value = s.endDate || '';
   document.getElementById('editDays').value = s.billingDays || 30;
+  document.getElementById('editNotes').value = s.notes || '';
   handleBillingChange('edit');
   selectPaymentMode('edit', s.paymentMode || 'debit');
   document.getElementById('editIconInput')._pendingLogo = null;
@@ -2030,6 +2335,7 @@ function saveEdit() {
   const endDate = document.getElementById('editEndDate').value;
   const billingDays = billing === 'days' ? parseInt(document.getElementById('editDays').value) || 30 : null;
   const paymentMode = getPaymentMode('edit');
+  const notes = document.getElementById('editNotes').value.trim();
 
   if (!name || isNaN(price) || price <= 0) { showToast('Please enter a valid name and price', true); return; }
 
@@ -2042,7 +2348,7 @@ function saveEdit() {
   if (removeLogo) customLogo = null;
   if (pendingLogo) customLogo = pendingLogo;
 
-  subs[idx] = { ...subs[idx], name, price, billing, billingDays, category, startDate, endDate, paymentMode, customLogo };
+  subs[idx] = { ...subs[idx], name, price, billing, billingDays, category, startDate, endDate, paymentMode, notes, customLogo };
   save(); render(); closeEdit();
   showToast(`${name} updated ✓`);
 }
@@ -2560,19 +2866,23 @@ async function triggerBiometric() {
 // ─── MAIN INIT ───────────────────────────────────────────────────────────────
 (function init() {
   initLock();
-  initFirebase();
-
-  // Load fallback if Firebase fails to init
-  if (!isFirebaseEnabled) {
+  
+  // Load local cache IMMEDIATELY so the app never shows a blank screen
+  try {
     subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+  } catch(e) {
+    subs = [];
   }
+  
+  initFirebase();
 
   loadTheme();
   document.getElementById('subStartDate').value = new Date().toISOString().split('T')[0];
   autoCalcEndDateByCycle('sub', 'monthly');
+  
+  // Run auto-renew and initial render instantly using cached data
   autoRenewExpired();
-
-  setTimeout(() => { render(); }, 500);
+  render();
 })();
 </script>
 

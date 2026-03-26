@@ -1225,14 +1225,6 @@
   }
   .sf-select:focus { outline: none; border-color: var(--gold); }
 
-  /* ── TWO-COL SUBS LAYOUT IN CENTER ───────────────── */
-  .subs-two-col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0 16px;
-    align-items: start;
-  }
-
   /* ── MORE TOGGLE ─────────────────────────────────── */
   .more-toggle-btn {
     background: var(--card);
@@ -1344,8 +1336,6 @@
     .center-col { order: 1; min-height: auto; }
     .left-col   { order: 2; position: static; }
     .right-col  { display: none !important; }
-
-    .subs-two-col { grid-template-columns: 1fr; }
 
     .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px; min-height: auto; }
     .summary-card { padding: 14px 12px; min-height: auto; }
@@ -1577,14 +1567,11 @@
 
       <!-- Active subscriptions -->
       <div id="activeView">
-        <div class="subs-two-col" id="subsColWrap">
-          <div class="subs-scroll" id="subsContainer1">
-            <div class="empty-state">
-              <div class="empty-emoji">📦</div>
-              <p>No subscriptions yet.<br>Add one to get started!</p>
-            </div>
+        <div class="subs-scroll" id="subsContainer1">
+          <div class="empty-state">
+            <div class="empty-emoji">📦</div>
+            <p>No subscriptions yet.<br>Add one to get started!</p>
           </div>
-          <div class="subs-scroll" id="subsContainer2Desktop"></div>
         </div>
         <div id="moreToggleWrap" style="display:none; text-align:center; margin-top:4px;">
           <button class="more-toggle-btn" id="moreToggleBtn" onclick="toggleMore()">▼ Show more</button>
@@ -1606,7 +1593,6 @@
       </div>
 
       <div class="subs-scroll" id="subsContainer2"></div>
-      <!-- right col secondary list kept for backward compat -->
     </div>
   </div>
 
@@ -2176,7 +2162,7 @@ function renderSubs() {
   if (currentTab === 'history') { renderHistory(); return; }
 
   const col1 = document.getElementById('subsContainer1');
-  const col2 = document.getElementById('subsContainer2Desktop');
+  const col2 = document.getElementById('subsContainer2');
   const moreWrap = document.getElementById('moreToggleWrap');
   const moreBtn = document.getElementById('moreToggleBtn');
 
@@ -2184,7 +2170,7 @@ function renderSubs() {
 
   if (filtered.length === 0) {
     col1.innerHTML = `<div class="empty-state"><div class="empty-emoji">📦</div><p>No subscriptions found.</p></div>`;
-    col2.innerHTML = '';
+    if (col2) col2.innerHTML = '';
     moreWrap.style.display = 'none';
     return;
   }
@@ -2195,17 +2181,13 @@ function renderSubs() {
 
   if (isMobile) {
     col1.innerHTML = visible.map(renderSubCard).join('');
-    col2.innerHTML = '';
+    if (col2) col2.innerHTML = '';
   } else {
-    // Fill col1 first, then col2 (left-to-right fill, not alternating)
-    const col1Items = [], col2Items = [];
-    const half = Math.ceil(visible.length / 2);
-    visible.forEach((s, i) => {
-      if (i < half) col1Items.push(s);
-      else col2Items.push(s);
-    });
-    col1.innerHTML = col1Items.map(renderSubCard).join('');
-    col2.innerHTML = col2Items.map(renderSubCard).join('');
+    // Original alternating split: even indices → col1, odd → col2
+    const c1 = [], c2 = [];
+    visible.forEach((s, i) => i % 2 === 0 ? c1.push(s) : c2.push(s));
+    col1.innerHTML = c1.map(renderSubCard).join('');
+    if (col2) col2.innerHTML = c2.map(renderSubCard).join('');
   }
 
   // More toggle

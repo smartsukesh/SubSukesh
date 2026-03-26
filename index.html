@@ -1139,34 +1139,6 @@
   .biometric-btn:hover { background: var(--border); }
   .lock-error { font-size: 12px; color: var(--danger); text-align: center; min-height: 18px; }
 
-  /* ── VIEW TABS ───────────────────────────────────── */
-  .view-tabs {
-    display: flex;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 4px;
-    gap: 4px;
-  }
-  .view-tab {
-    flex: 1;
-    padding: 8px 0;
-    border: none;
-    border-radius: 7px;
-    background: transparent;
-    color: var(--muted);
-    font-family: var(--font-body);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .view-tab.active {
-    background: linear-gradient(135deg, var(--gold2), var(--gold));
-    color: #0b0b12;
-    font-weight: 600;
-  }
-
   /* ── SORT / FILTER BAR ───────────────────────────── */
   .sort-filter-bar {
     background: var(--card);
@@ -1217,7 +1189,6 @@
     padding: 7px 20px;
     cursor: pointer;
     transition: all 0.2s;
-    margin-bottom: 4px;
   }
   .more-toggle-btn:hover { background: var(--card2); color: var(--text); border-color: var(--gold); }
 
@@ -1525,13 +1496,12 @@
         </div>
       </div>
 
-      <div class="view-tabs">
-        <button class="view-tab active" id="tabActive" onclick="switchTab('active')">Active</button>
-        <button class="view-tab" id="tabHistory" onclick="switchTab('history')">History</button>
-      </div>
-
       <div class="sort-filter-bar" id="sortFilterBar">
         <div class="sort-filter-inner">
+          <select id="viewFilter" class="sf-select" onchange="switchTab(this.value)">
+            <option value="active">View: Active</option>
+            <option value="history">View: History</option>
+          </select>
           <input type="text" id="searchInput" class="sf-search" placeholder="🔍  Search…" oninput="render()">
           <select id="filterCategory" class="sf-select" onchange="render()">
             <option value="">All Categories</option>
@@ -1552,10 +1522,6 @@
           </select>
         </div>
       </div>
-
-      <div id="moreToggleWrap" style="display:none; text-align:center;">
-        <button class="more-toggle-btn" id="moreToggleBtn" onclick="toggleMore()">▼ Show more</button>
-      </div>
     </div>
 
     <div class="cards-span">
@@ -1569,6 +1535,10 @@
       </div>
       <div id="historyView" style="display:none;">
         <div class="subs-scroll subs-grid" id="historyContainer"></div>
+      </div>
+
+      <div id="moreToggleWrap" style="display:none; text-align:center; padding-top: 10px;">
+        <button class="more-toggle-btn" id="moreToggleBtn" onclick="toggleMore()">▼ Show more</button>
       </div>
     </div>
 
@@ -2102,16 +2072,26 @@ function sortByStatus(arr) {
 // ─── TAB STATE ────────────────────────────────────────────────────────────────
 let currentTab = 'active';
 let showingMore = false;
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 12; // 12 items / 2 cols = 6 full rows
 
 function switchTab(tab) {
   currentTab = tab;
   showingMore = false;
-  document.getElementById('tabActive').classList.toggle('active', tab === 'active');
-  document.getElementById('tabHistory').classList.toggle('active', tab === 'history');
+  
+  // Show active vs history container
   document.getElementById('activeView').style.display = tab === 'active' ? '' : 'none';
   document.getElementById('historyView').style.display = tab === 'history' ? '' : 'none';
-  document.getElementById('sortFilterBar').style.display = tab === 'active' ? '' : 'none';
+  
+  // Sync the select dropdown value if called programmatically
+  const viewSelect = document.getElementById('viewFilter');
+  if (viewSelect) viewSelect.value = tab;
+
+  // Optional: Hide/Show other filters based on view type
+  const displayState = tab === 'active' ? '' : 'none';
+  document.getElementById('searchInput').style.display = displayState;
+  document.getElementById('filterCategory').style.display = displayState;
+  document.getElementById('sortBy').style.display = displayState;
+
   render();
 }
 
@@ -2190,10 +2170,15 @@ function renderSubs() {
 function renderHistory() {
   const ended = subs.filter(s => s.ended);
   const container = document.getElementById('historyContainer');
+  const moreWrap = document.getElementById('moreToggleWrap');
+  
+  moreWrap.style.display = 'none'; // hide more button on history
+  
   if (ended.length === 0) {
     container.innerHTML = `<div class="empty-state"><div class="empty-emoji">🗂️</div><p>No ended subscriptions yet.</p></div>`;
     return;
   }
+  
   container.innerHTML = ended.map(s => {
     const known = matchKnown(s.name);
     const emoji = s.customLogo ? '' : ((known && known.emoji) || '📦');
@@ -2821,100 +2806,3 @@ async function registerBiometric() {
     });
 
     if (credential) {
-      const credId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
-      localStorage.setItem(WEBAUTHN_KEY, credId);
-      console.log('✅ Biometric registered!');
-      return true;
-    }
-  } catch(e) {
-    console.log('Biometric registration skipped:', e.message);
-  }
-  return false;
-}
-
-async function authenticateBiometric() {
-  const storedCredId = localStorage.getItem(WEBAUTHN_KEY);
-  if (!storedCredId) return false;
-
-  try {
-    const challenge = crypto.getRandomValues(new Uint8Array(32));
-    const credIdBytes = Uint8Array.from(atob(storedCredId), c => c.charCodeAt(0));
-
-    const assertion = await navigator.credentials.get({
-      publicKey: {
-        challenge,
-        rpId: getRpId(),
-        allowCredentials: [{
-          type: 'public-key',
-          id: credIdBytes,
-          transports: ['internal']
-        }],
-        userVerification: 'required',
-        timeout: 60000
-      }
-    });
-
-    return !!assertion;
-  } catch(e) {
-    console.log('Biometric auth failed:', e.message);
-    return false;
-  }
-}
-
-async function checkBiometricSupport() {
-  const btn = document.getElementById('biometricBtn');
-  const available = await isBiometricAvailable();
-  if (available) {
-    btn.style.display = 'flex';
-    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-    document.getElementById('biometricIcon').textContent = isIOS ? '🔐' : '👆';
-    document.getElementById('biometricLabel').textContent = isIOS ? 'Use Face ID' : 'Use Fingerprint';
-  }
-  return available;
-}
-
-async function triggerBiometric() {
-  if (!localStorage.getItem(SETTING_KEY)) return;
-  const available = await isBiometricAvailable();
-  if (!available) return;
-
-  const hasRegistered = localStorage.getItem(WEBAUTHN_KEY);
-
-  if (!hasRegistered) {
-    document.getElementById('lockSubtitle').textContent = 'Setting up biometric for this device...';
-    const registered = await registerBiometric();
-    if (registered) {
-      unlockSuccess();
-      showToast('Face ID / Fingerprint set up! 🎉');
-    }
-  } else {
-    const success = await authenticateBiometric();
-    if (success) unlockSuccess();
-  }
-}
-
-// ─── MAIN INIT ───────────────────────────────────────────────────────────────
-(function init() {
-  initLock();
-  
-  // Load local cache IMMEDIATELY so the app never shows a blank screen
-  try {
-    subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
-  } catch(e) {
-    subs = [];
-  }
-  
-  initFirebase();
-
-  loadTheme();
-  document.getElementById('subStartDate').value = new Date().toISOString().split('T')[0];
-  autoCalcEndDateByCycle('sub', 'monthly');
-  
-  // Run auto-renew and initial render instantly using cached data
-  autoRenewExpired();
-  render();
-})();
-</script>
-
-</body>
-</html>

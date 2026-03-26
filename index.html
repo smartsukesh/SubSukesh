@@ -275,21 +275,6 @@
     gap: 12px;
   }
 
-  /* CARDS GRID LAYOUT */
-  .cards-span {
-    grid-column: 2 / 4;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    min-height: 600px;
-  }
-  .subs-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    align-items: start;
-  }
-
   .summary-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -450,31 +435,24 @@
     padding: 20px 0;
   }
 
-  .view-toggle {
+  /* ── CARDS AREA ───────────────────────────────────── */
+  .cards-span {
+    grid-column: 2 / 4;
     display: flex;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 4px;
-    gap: 4px;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 600px;
   }
-  .toggle-btn {
-    flex: 1;
-    padding: 8px 0;
-    border: none;
-    border-radius: 7px;
-    background: transparent;
-    color: var(--muted);
-    font-family: var(--font-body);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
+
+  .subs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+    align-content: start;
   }
-  .toggle-btn.active {
-    background: linear-gradient(135deg, var(--gold2), var(--gold));
-    color: #0b0b12;
-    font-weight: 600;
+  .subs-grid .empty-state {
+    grid-column: 1 / -1; /* spans full width */
   }
 
   .subs-scroll {
@@ -498,7 +476,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 14px;
-    margin-bottom: 8px;
+    margin-bottom: 0px; /* reset margin, grid handles gap */
     cursor: pointer;
     transition: all 0.2s;
   }
@@ -1249,7 +1227,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 14px;
-    margin-bottom: 8px;
+    margin-bottom: 0px;
     opacity: 0.72;
     transition: all 0.2s;
   }
@@ -1339,10 +1317,8 @@
       gap: 16px;
     }
     .top-bar-span { order: 1; }
-    .cards-span { order: 2; min-height: auto; }
-    .left-col   { order: 3; position: static; }
-
-    .subs-grid { grid-template-columns: 1fr; }
+    .cards-span   { order: 2; min-height: auto; }
+    .left-col     { order: 3; position: static; }
 
     .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px; min-height: auto; }
     .summary-card.full { grid-column: 1 / -1; }
@@ -1360,7 +1336,8 @@
     .payment-mode-btn { font-size: 10px; padding: 7px; }
     .add-btn { padding: 11px; font-size: 13px; }
 
-    .sub-card { padding: 12px; margin-bottom: 8px; }
+    .subs-grid { grid-template-columns: 1fr; }
+    .sub-card { padding: 12px; margin-bottom: 0px; }
     .sub-logo { width: 38px; height: 38px; font-size: 18px; }
     .sub-name { font-size: 13px; }
     .sub-cycle { font-size: 10px; }
@@ -1395,7 +1372,6 @@
 
     .subs-scroll { padding-right: 4px; overflow-y: visible; }
     .subs-scroll::-webkit-scrollbar { width: 4px; }
-    .toggle-btn { font-size: 11px; padding: 7px 0; }
     .empty-emoji { font-size: 40px; }
     .empty-state { font-size: 12px; padding: 30px 16px; }
     .sort-filter-inner { flex-direction: column; }
@@ -1583,16 +1559,16 @@
     </div>
 
     <div class="cards-span">
-      <div id="activeView" class="subs-scroll">
-        <div class="subs-grid" id="subsContainer">
-          <div class="empty-state" style="grid-column: 1 / -1;">
+      <div id="activeView">
+        <div class="subs-scroll subs-grid" id="subsContainer">
+          <div class="empty-state">
             <div class="empty-emoji">📦</div>
             <p>No subscriptions yet.<br>Add one to get started!</p>
           </div>
         </div>
       </div>
-      <div id="historyView" style="display:none;" class="subs-scroll">
-        <div class="subs-grid" id="historyContainer"></div>
+      <div id="historyView" style="display:none;">
+        <div class="subs-scroll subs-grid" id="historyContainer"></div>
       </div>
     </div>
 
@@ -2170,7 +2146,7 @@ function renderSubs() {
   const filtered = getFilteredSorted();
 
   if (filtered.length === 0) {
-    container.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1;"><div class="empty-emoji">📦</div><p>No subscriptions found.</p></div>`;
+    container.innerHTML = `<div class="empty-state"><div class="empty-emoji">📦</div><p>No subscriptions found.</p></div>`;
     moreWrap.style.display = 'none';
     return;
   }
@@ -2178,7 +2154,7 @@ function renderSubs() {
   const limit = showingMore ? filtered.length : Math.min(PAGE_SIZE, filtered.length);
   const visible = filtered.slice(0, limit);
 
-  // Directly map all visible cards to the CSS Grid container
+  // Directly map all visible cards to the single CSS grid container
   container.innerHTML = visible.map(renderSubCard).join('');
 
   // More toggle
@@ -2199,7 +2175,7 @@ function renderHistory() {
   const ended = subs.filter(s => s.ended);
   const container = document.getElementById('historyContainer');
   if (ended.length === 0) {
-    container.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1;"><div class="empty-emoji">🗂️</div><p>No ended subscriptions yet.</p></div>`;
+    container.innerHTML = `<div class="empty-state"><div class="empty-emoji">🗂️</div><p>No ended subscriptions yet.</p></div>`;
     return;
   }
   container.innerHTML = ended.map(s => {
@@ -2484,3 +2460,441 @@ function updateEditIconPreview(logoUri, name) {
     img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:10px;position:absolute;inset:0;';
     preview.insertBefore(img, preview.querySelector('.icon-preview-overlay'));
     removeBtn.classList.add('visible');
+  } else {
+    fallback.style.display = '';
+    const known = matchKnown(name);
+    fallback.textContent = (known && known.emoji) || name.slice(0,2).toUpperCase() || '📦';
+    removeBtn.classList.remove('visible');
+  }
+}
+
+function getExpiringSoon() {
+  return subs.filter(s => {
+    if (!s.endDate) return false;
+    const h = hoursLeft(s.endDate);
+    return h !== null && h <= 72 && h >= -24;
+  }).sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+}
+
+function hoursLeft(dateStr) {
+  if (!dateStr) return null;
+  const end = new Date(dateStr); end.setHours(23,59,59,0);
+  return (end - new Date()) / 3600000;
+}
+
+function getDaysLeft(s) {
+  if (!s.endDate) return null;
+  const h = hoursLeft(s.endDate);
+  return h === null ? null : Math.ceil(h / 24);
+}
+
+function formatDaysLeft(days) {
+  if (days === null) return null;
+  if (days < 0) return 'Expired';
+  if (days === 0) return 'Today';
+  if (days === 1) return '1 day';
+  if (days <= 7) return `${days} days`;
+  const weeks = Math.floor(days / 7);
+  if (weeks === 1) return '1 week';
+  if (days <= 30) return `${weeks} weeks`;
+  const months = Math.floor(days / 30);
+  return months === 1 ? '1 month' : `${months} months`;
+}
+
+function updateNotifBell() {
+  const expiring = getExpiringSoon();
+  const btn = document.getElementById('notifBellBtn');
+  const badge = document.getElementById('notifBadge');
+  if (expiring.length > 0) {
+    btn.classList.add('has-alerts');
+    badge.style.display = 'flex';
+    badge.textContent = expiring.length;
+  } else {
+    btn.classList.remove('has-alerts');
+    badge.style.display = 'none';
+  }
+}
+
+function openNotifPanel() {
+  const expiring = getExpiringSoon();
+  const list = document.getElementById('notifList');
+  const countEl = document.getElementById('notifPanelCount');
+
+  if (expiring.length === 0) {
+    countEl.textContent = '';
+    list.innerHTML = `<div class="notif-empty"><div class="big-emoji">✅</div><p>No subscriptions expiring<br>within the next 72 hours!</p></div>`;
+  } else {
+    countEl.textContent = `· ${expiring.length} alert${expiring.length !== 1 ? 's' : ''}`;
+    list.innerHTML = expiring.map(s => {
+      const known = matchKnown(s.name);
+      const emoji = known ? known.emoji : '📦';
+      const h = hoursLeft(s.endDate);
+      let timeLabel, timeClass, itemClass;
+      if (h < 0) { timeLabel = 'Expired'; timeClass = 'red'; itemClass = 'urgent'; }
+      else if (h <= 1) { timeLabel = '< 1 hr left'; timeClass = 'red'; itemClass = 'urgent'; }
+      else if (h <= 24) { timeLabel = `${Math.ceil(h)}h left`; timeClass = 'red'; itemClass = 'urgent'; }
+      else { const hrs = Math.round(h); timeLabel = `~${Math.floor(hrs/24)}d ${hrs%24}h left`; timeClass = 'orange'; itemClass = 'warning'; }
+      return `
+        <div class="notif-item ${itemClass}">
+          <div class="notif-emoji">${emoji}</div>
+          <div class="notif-info">
+            <div class="notif-name">${escHtml(s.name)}</div>
+            <div class="notif-desc">${s.category} · ends ${fmtDate(s.endDate)}</div>
+          </div>
+          <div class="notif-time ${timeClass}">${timeLabel}</div>
+        </div>`;
+    }).join('');
+  }
+
+  document.getElementById('notifPanel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.addEventListener('keydown', handleNotifEscKey);
+}
+
+function closeNotifPanel() {
+  document.getElementById('notifPanel').classList.remove('open');
+  document.body.style.overflow = '';
+  document.removeEventListener('keydown', handleNotifEscKey);
+}
+
+function handleNotifEscKey(e) { if (e.key === 'Escape') closeNotifPanel(); }
+function handleNotifOverlayClick(e) { if (e.target === document.getElementById('notifPanel')) closeNotifPanel(); }
+
+function toggleChart() {
+  const chartModal = document.getElementById('chartModal');
+  const isOpen = chartModal.classList.contains('open');
+  if (isOpen) {
+    chartModal.classList.remove('open');
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', handleChartEscKey);
+  } else {
+    chartModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleChartEscKey);
+  }
+}
+
+function handleChartEscKey(e) { if (e.key === 'Escape') toggleChart(); }
+function handleChartModalClick(e) { if (e.target === document.getElementById('chartModal')) toggleChart(); }
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}/${y.slice(2)}`;
+}
+
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast' + (isError ? ' error' : '');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function handleBillingChange(prefix) {
+  const val = document.getElementById(prefix + 'Billing').value;
+  document.getElementById(prefix + 'DaysWrapper').classList.toggle('active', val === 'days');
+  autoCalcEndDateByCycle(prefix);
+}
+
+function autoCalcEndDateByCycle(prefix, overrideBilling) {
+  const startVal = document.getElementById(prefix + 'StartDate').value;
+  if (!startVal) return;
+  const billing = overrideBilling || document.getElementById(prefix + 'Billing').value;
+  const d = new Date(startVal);
+  if (billing === 'monthly') d.setDate(d.getDate() + 30);
+  else if (billing === 'annual') { d.setFullYear(d.getFullYear() + 1); d.setDate(d.getDate() - 1); }
+  else if (billing === 'weekly') d.setDate(d.getDate() + 7);
+  else if (billing === 'days') d.setDate(d.getDate() + (parseInt(document.getElementById(prefix + 'Days').value) || 30));
+  else if (billing === 'one-time') return; 
+  else d.setDate(d.getDate() + 30);
+  document.getElementById(prefix + 'EndDate').value = d.toISOString().split('T')[0];
+}
+
+function selectPaymentMode(prefix, mode) {
+  document.getElementById(prefix + 'PaymentMode').querySelectorAll('.payment-mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+}
+
+function getPaymentMode(prefix) {
+  const active = document.getElementById(prefix + 'PaymentMode').querySelector('.payment-mode-btn.active');
+  return active ? active.dataset.mode : 'debit';
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LOCK / AUTH SYSTEM
+// ═══════════════════════════════════════════════════════════════════════════
+const LOCK_DURATION = 30 * 24 * 60 * 60 * 1000;
+const PIN_KEY = 'subsukesh_pin';
+const UNLOCK_KEY = 'subsukesh_unlocked_until';
+const SETTING_KEY = 'subsukesh_pin_set';
+
+let pinBuffer = '';
+let isSettingPin = false;
+let pinConfirmBuffer = '';
+let awaitingConfirm = false;
+
+function initLock() {
+  const pinSet = localStorage.getItem(SETTING_KEY);
+  const unlockedUntil = parseInt(localStorage.getItem(UNLOCK_KEY) || '0');
+  const now = Date.now();
+  if (!pinSet) {
+    showLockScreen(true);
+  } else if (now < unlockedUntil) {
+    hideLockScreen();
+  } else {
+    showLockScreen(false);
+  }
+}
+
+function showLockScreen(setup) {
+  isSettingPin = setup;
+  awaitingConfirm = false;
+  pinBuffer = '';
+  pinConfirmBuffer = '';
+  document.getElementById('lockScreen').classList.remove('hidden');
+  document.getElementById('lockError').textContent = '';
+  updateDots();
+  if (setup) {
+    document.getElementById('lockTitle').textContent = 'Set your PIN';
+    document.getElementById('lockSubtitle').textContent = 'Choose a 4-digit PIN to protect your app';
+    document.getElementById('biometricBtn').style.display = 'none';
+  } else {
+    document.getElementById('lockTitle').textContent = 'Welcome back';
+    document.getElementById('lockSubtitle').textContent = 'Enter your PIN to continue';
+    checkBiometricSupport().then(() => {
+      triggerBiometric();
+    });
+  }
+}
+
+function hideLockScreen() {
+  document.getElementById('lockScreen').classList.add('hidden');
+}
+
+function lockApp() {
+  localStorage.removeItem(UNLOCK_KEY);
+  pinBuffer = '';
+  showLockScreen(false);
+}
+
+function pinKey(digit) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += digit;
+  updateDots();
+  document.getElementById('lockError').textContent = '';
+  if (pinBuffer.length === 4) setTimeout(() => handlePinComplete(), 150);
+}
+
+function pinBackspace() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  updateDots();
+}
+
+function updateDots() {
+  const len = isSettingPin && awaitingConfirm ? pinConfirmBuffer.length : pinBuffer.length;
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('dot' + i);
+    dot.classList.toggle('filled', i < len);
+    dot.classList.remove('error');
+  }
+}
+
+function handlePinComplete() {
+  if (isSettingPin) {
+    localStorage.setItem(PIN_KEY, hashPin(pinBuffer));
+    localStorage.setItem(SETTING_KEY, '1');
+    unlockSuccess();
+  } else {
+    const stored = localStorage.getItem(PIN_KEY);
+    if (hashPin(pinBuffer) === stored) {
+      unlockSuccess();
+    } else {
+      showPinError('Incorrect PIN. Try again.');
+      pinBuffer = '';
+    }
+  }
+}
+
+async function unlockSuccess() {
+  localStorage.setItem(UNLOCK_KEY, Date.now() + LOCK_DURATION);
+  hideLockScreen();
+
+  const hasRegistered = localStorage.getItem(WEBAUTHN_KEY);
+  if (!hasRegistered && localStorage.getItem(SETTING_KEY)) {
+    const available = await isBiometricAvailable();
+    if (available) {
+      setTimeout(async () => {
+        const registered = await registerBiometric();
+        if (registered) showToast('Face ID / Fingerprint enabled for next time! 🔐');
+      }, 800);
+    }
+  }
+}
+
+function showPinError(msg) {
+  document.getElementById('lockError').textContent = msg;
+  for (let i = 0; i < 4; i++) document.getElementById('dot' + i).classList.add('error');
+  setTimeout(() => {
+    for (let i = 0; i < 4; i++) document.getElementById('dot' + i).classList.remove('error', 'filled');
+  }, 600);
+}
+
+function hashPin(pin) {
+  let hash = 0;
+  const str = pin + 'subsukesh_salt_2024';
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash.toString(36);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WEBAUTHN — FULL BIOMETRIC REGISTRATION & AUTHENTICATION
+// ═══════════════════════════════════════════════════════════════════════════
+const WEBAUTHN_KEY = 'subsukesh_webauthn_id';
+
+function getRpId() {
+  const host = window.location.hostname;
+  return host === '' || host === 'localhost' ? 'localhost' : host;
+}
+
+async function isBiometricAvailable() {
+  if (!window.PublicKeyCredential) return false;
+  try {
+    return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+  } catch(e) { return false; }
+}
+
+async function registerBiometric() {
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const userId = crypto.getRandomValues(new Uint8Array(16));
+
+    const credential = await navigator.credentials.create({
+      publicKey: {
+        challenge,
+        rp: { name: 'SubSukesh', id: getRpId() },
+        user: {
+          id: userId,
+          name: 'subsukesh_user',
+          displayName: 'SubSukesh User'
+        },
+        pubKeyCredParams: [
+          { type: 'public-key', alg: -7 },
+          { type: 'public-key', alg: -257 }
+        ],
+        authenticatorSelection: {
+          authenticatorAttachment: 'platform',
+          userVerification: 'required',
+          requireResidentKey: false
+        },
+        timeout: 60000,
+        attestation: 'none'
+      }
+    });
+
+    if (credential) {
+      const credId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+      localStorage.setItem(WEBAUTHN_KEY, credId);
+      console.log('✅ Biometric registered!');
+      return true;
+    }
+  } catch(e) {
+    console.log('Biometric registration skipped:', e.message);
+  }
+  return false;
+}
+
+async function authenticateBiometric() {
+  const storedCredId = localStorage.getItem(WEBAUTHN_KEY);
+  if (!storedCredId) return false;
+
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const credIdBytes = Uint8Array.from(atob(storedCredId), c => c.charCodeAt(0));
+
+    const assertion = await navigator.credentials.get({
+      publicKey: {
+        challenge,
+        rpId: getRpId(),
+        allowCredentials: [{
+          type: 'public-key',
+          id: credIdBytes,
+          transports: ['internal']
+        }],
+        userVerification: 'required',
+        timeout: 60000
+      }
+    });
+
+    return !!assertion;
+  } catch(e) {
+    console.log('Biometric auth failed:', e.message);
+    return false;
+  }
+}
+
+async function checkBiometricSupport() {
+  const btn = document.getElementById('biometricBtn');
+  const available = await isBiometricAvailable();
+  if (available) {
+    btn.style.display = 'flex';
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    document.getElementById('biometricIcon').textContent = isIOS ? '🔐' : '👆';
+    document.getElementById('biometricLabel').textContent = isIOS ? 'Use Face ID' : 'Use Fingerprint';
+  }
+  return available;
+}
+
+async function triggerBiometric() {
+  if (!localStorage.getItem(SETTING_KEY)) return;
+  const available = await isBiometricAvailable();
+  if (!available) return;
+
+  const hasRegistered = localStorage.getItem(WEBAUTHN_KEY);
+
+  if (!hasRegistered) {
+    document.getElementById('lockSubtitle').textContent = 'Setting up biometric for this device...';
+    const registered = await registerBiometric();
+    if (registered) {
+      unlockSuccess();
+      showToast('Face ID / Fingerprint set up! 🎉');
+    }
+  } else {
+    const success = await authenticateBiometric();
+    if (success) unlockSuccess();
+  }
+}
+
+// ─── MAIN INIT ───────────────────────────────────────────────────────────────
+(function init() {
+  initLock();
+  initFirebase();
+
+  // Load fallback if Firebase fails to init
+  if (!isFirebaseEnabled) {
+    subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+  }
+
+  loadTheme();
+  document.getElementById('subStartDate').value = new Date().toISOString().split('T')[0];
+  autoCalcEndDateByCycle('sub', 'monthly');
+  autoRenewExpired();
+
+  setTimeout(() => { render(); }, 500);
+})();
+</script>
+
+</body>
+</html>

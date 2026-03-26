@@ -1159,6 +1159,159 @@
   .biometric-btn:hover { background: var(--border); }
   .lock-error { font-size: 12px; color: var(--danger); text-align: center; min-height: 18px; }
 
+  /* ── VIEW TABS ───────────────────────────────────── */
+  .view-tabs {
+    display: flex;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    gap: 4px;
+  }
+  .view-tab {
+    flex: 1;
+    padding: 8px 0;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .view-tab.active {
+    background: linear-gradient(135deg, var(--gold2), var(--gold));
+    color: #0b0b12;
+    font-weight: 600;
+  }
+
+  /* ── SORT / FILTER BAR ───────────────────────────── */
+  .sort-filter-bar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+  }
+  .sort-filter-inner {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .sf-search {
+    flex: 1;
+    min-width: 120px;
+    padding: 8px 10px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 12px;
+  }
+  .sf-search:focus { outline: none; border-color: var(--gold); }
+  .sf-search::placeholder { color: var(--muted); }
+  .sf-select {
+    padding: 8px 10px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .sf-select:focus { outline: none; border-color: var(--gold); }
+
+  /* ── TWO-COL SUBS LAYOUT IN CENTER ───────────────── */
+  .subs-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
+    align-items: start;
+  }
+
+  /* ── MORE TOGGLE ─────────────────────────────────── */
+  .more-toggle-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 7px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 4px;
+  }
+  .more-toggle-btn:hover { background: var(--card2); color: var(--text); border-color: var(--gold); }
+
+  /* ── HISTORY TAB CARDS ───────────────────────────── */
+  .history-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    margin-bottom: 8px;
+    opacity: 0.72;
+    transition: all 0.2s;
+  }
+  .history-card:hover { opacity: 1; background: var(--card2); border-color: rgba(255,255,255,0.12); }
+  .history-ended-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(255,94,114,0.12);
+    border: 1px solid rgba(255,94,114,0.25);
+    color: var(--danger);
+    white-space: nowrap;
+  }
+  .history-reactivate-btn {
+    padding: 7px 14px;
+    border: 1px solid rgba(76,217,160,0.3);
+    border-radius: 7px;
+    background: rgba(76,217,160,0.08);
+    color: var(--success);
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .history-reactivate-btn:hover { background: rgba(76,217,160,0.18); }
+  .history-delete-btn {
+    padding: 7px 14px;
+    border: 1px solid rgba(255,94,114,0.3);
+    border-radius: 7px;
+    background: rgba(255,94,114,0.08);
+    color: var(--danger);
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .history-delete-btn:hover { background: rgba(255,94,114,0.18); }
+
+  /* ── NOTES IN CARD DETAILS ───────────────────────── */
+  .sub-notes-row {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+    display: none;
+  }
+  .sub-card.expanded .sub-notes-row { display: block; }
+  .sub-notes-row b { color: var(--text); font-weight: 500; }
+
   @media (max-width: 1400px) {
     .main-grid { grid-template-columns: 300px 1fr 1fr; }
   }
@@ -1191,6 +1344,8 @@
     .center-col { order: 1; min-height: auto; }
     .left-col   { order: 2; position: static; }
     .right-col  { display: none !important; }
+
+    .subs-two-col { grid-template-columns: 1fr; }
 
     .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px; min-height: auto; }
     .summary-card { padding: 14px 12px; min-height: auto; }
@@ -1245,6 +1400,8 @@
     .toggle-btn { font-size: 11px; padding: 7px 0; }
     .empty-emoji { font-size: 40px; }
     .empty-state { font-size: 12px; padding: 30px 16px; }
+    .sort-filter-inner { flex-direction: column; }
+    .sf-search, .sf-select { width: 100%; }
   }
 
   @media (max-width: 375px) {
@@ -1367,6 +1524,11 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label class="form-label">Notes (optional)</label>
+          <textarea id="subNotes" class="form-input" rows="2" placeholder="e.g. account email, login info, reminders…" style="resize:vertical; min-height:56px;"></textarea>
+        </div>
+
         <button class="add-btn" onclick="addSub()">Add Subscription</button>
       </div>
     </div>
@@ -1383,11 +1545,55 @@
         </div>
       </div>
 
-      <div class="subs-scroll" id="subsContainer1">
-        <div class="empty-state">
-          <div class="empty-emoji">📦</div>
-          <p>No subscriptions yet.<br>Add one to get started!</p>
+      <!-- Tabs: Active / History -->
+      <div class="view-tabs">
+        <button class="view-tab active" id="tabActive" onclick="switchTab('active')">Active</button>
+        <button class="view-tab" id="tabHistory" onclick="switchTab('history')">History</button>
+      </div>
+
+      <!-- Sort & Filter bar (Active tab only) -->
+      <div class="sort-filter-bar" id="sortFilterBar">
+        <div class="sort-filter-inner">
+          <input type="text" id="searchInput" class="sf-search" placeholder="🔍  Search…" oninput="render()">
+          <select id="filterCategory" class="sf-select" onchange="render()">
+            <option value="">All Categories</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Productivity">Productivity</option>
+            <option value="Cloud">Cloud</option>
+            <option value="Education">Education</option>
+            <option value="Fitness">Fitness</option>
+            <option value="Other">Other</option>
+          </select>
+          <select id="sortBy" class="sf-select" onchange="render()">
+            <option value="status">Sort: Status</option>
+            <option value="name">Sort: Name A–Z</option>
+            <option value="name_desc">Sort: Name Z–A</option>
+            <option value="price_asc">Sort: Price ↑</option>
+            <option value="price_desc">Sort: Price ↓</option>
+            <option value="renewal">Sort: Renewal</option>
+          </select>
         </div>
+      </div>
+
+      <!-- Active subscriptions -->
+      <div id="activeView">
+        <div class="subs-two-col" id="subsColWrap">
+          <div class="subs-scroll" id="subsContainer1">
+            <div class="empty-state">
+              <div class="empty-emoji">📦</div>
+              <p>No subscriptions yet.<br>Add one to get started!</p>
+            </div>
+          </div>
+          <div class="subs-scroll" id="subsContainer2Desktop"></div>
+        </div>
+        <div id="moreToggleWrap" style="display:none; text-align:center; margin-top:4px;">
+          <button class="more-toggle-btn" id="moreToggleBtn" onclick="toggleMore()">▼ Show more</button>
+        </div>
+      </div>
+
+      <!-- History tab -->
+      <div id="historyView" style="display:none;">
+        <div class="subs-scroll" id="historyContainer"></div>
       </div>
     </div>
 
@@ -1400,6 +1606,7 @@
       </div>
 
       <div class="subs-scroll" id="subsContainer2"></div>
+      <!-- right col secondary list kept for backward compat -->
     </div>
   </div>
 
@@ -1501,6 +1708,11 @@
         <button type="button" class="payment-mode-btn" data-mode="wallet" onclick="selectPaymentMode('edit','wallet')">Wallet</button>
         <button type="button" class="payment-mode-btn" data-mode="points" onclick="selectPaymentMode('edit','points')">Points</button>
       </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Notes (optional)</label>
+      <textarea id="editNotes" class="form-input" rows="2" placeholder="e.g. account email, login info, reminders…" style="resize:vertical; min-height:56px;"></textarea>
     </div>
 
     <div class="modal-actions">
@@ -1907,29 +2119,157 @@ function sortByStatus(arr) {
   });
 }
 
+// ─── TAB STATE ────────────────────────────────────────────────────────────────
+let currentTab = 'active';
+let showingMore = false;
+const PAGE_SIZE = 12;
+
+function switchTab(tab) {
+  currentTab = tab;
+  showingMore = false;
+  document.getElementById('tabActive').classList.toggle('active', tab === 'active');
+  document.getElementById('tabHistory').classList.toggle('active', tab === 'history');
+  document.getElementById('activeView').style.display = tab === 'active' ? '' : 'none';
+  document.getElementById('historyView').style.display = tab === 'history' ? '' : 'none';
+  document.getElementById('sortFilterBar').style.display = tab === 'active' ? '' : 'none';
+  render();
+}
+
+function toggleMore() {
+  showingMore = !showingMore;
+  render();
+}
+
+// ─── SORT / FILTER HELPERS ────────────────────────────────────────────────────
+function getFilteredSorted() {
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+  const catFilter = document.getElementById('filterCategory')?.value || '';
+  const sortKey = document.getElementById('sortBy')?.value || 'status';
+
+  let arr = subs.filter(s => !s.ended);
+
+  if (search) arr = arr.filter(s => s.name.toLowerCase().includes(search));
+  if (catFilter) arr = arr.filter(s => s.category === catFilter);
+
+  if (sortKey === 'status') {
+    arr = sortByStatus(arr);
+  } else if (sortKey === 'name') {
+    arr.sort((a,b) => a.name.localeCompare(b.name));
+  } else if (sortKey === 'name_desc') {
+    arr.sort((a,b) => b.name.localeCompare(a.name));
+  } else if (sortKey === 'price_asc') {
+    arr.sort((a,b) => a.price - b.price);
+  } else if (sortKey === 'price_desc') {
+    arr.sort((a,b) => b.price - a.price);
+  } else if (sortKey === 'renewal') {
+    arr.sort((a,b) => {
+      if (!a.endDate && !b.endDate) return 0;
+      if (!a.endDate) return 1;
+      if (!b.endDate) return -1;
+      return new Date(a.endDate) - new Date(b.endDate);
+    });
+  }
+  return arr;
+}
+
 function renderSubs() {
-  const filtered = subs.filter(s => !s.ended);
-  const container1 = document.getElementById('subsContainer1');
-  const container2 = document.getElementById('subsContainer2');
+  if (currentTab === 'history') { renderHistory(); return; }
+
+  const col1 = document.getElementById('subsContainer1');
+  const col2 = document.getElementById('subsContainer2Desktop');
+  const moreWrap = document.getElementById('moreToggleWrap');
+  const moreBtn = document.getElementById('moreToggleBtn');
+
+  const filtered = getFilteredSorted();
 
   if (filtered.length === 0) {
-    container1.innerHTML = `<div class="empty-state"><div class="empty-emoji">📦</div><p>No subscriptions yet.<br>Add one to get started!</p></div>`;
-    container2.innerHTML = '';
+    col1.innerHTML = `<div class="empty-state"><div class="empty-emoji">📦</div><p>No subscriptions found.</p></div>`;
+    col2.innerHTML = '';
+    moreWrap.style.display = 'none';
     return;
   }
 
-  const sorted = sortByStatus([...filtered]);
   const isMobile = window.innerWidth <= 768;
+  const limit = showingMore ? filtered.length : Math.min(PAGE_SIZE, filtered.length);
+  const visible = filtered.slice(0, limit);
 
   if (isMobile) {
-    container1.innerHTML = sorted.map(renderSubCard).join('');
-    container2.innerHTML = '';
+    col1.innerHTML = visible.map(renderSubCard).join('');
+    col2.innerHTML = '';
   } else {
-    const col1 = [], col2 = [];
-    sorted.forEach((sub, i) => i % 2 === 0 ? col1.push(sub) : col2.push(sub));
-    container1.innerHTML = col1.map(renderSubCard).join('');
-    container2.innerHTML = col2.map(renderSubCard).join('');
+    // Fill col1 first, then col2 (left-to-right fill, not alternating)
+    const col1Items = [], col2Items = [];
+    const half = Math.ceil(visible.length / 2);
+    visible.forEach((s, i) => {
+      if (i < half) col1Items.push(s);
+      else col2Items.push(s);
+    });
+    col1.innerHTML = col1Items.map(renderSubCard).join('');
+    col2.innerHTML = col2Items.map(renderSubCard).join('');
   }
+
+  // More toggle
+  if (filtered.length > PAGE_SIZE) {
+    moreWrap.style.display = 'block';
+    if (showingMore) {
+      moreBtn.textContent = '▲ Show less';
+    } else {
+      const hidden = filtered.length - PAGE_SIZE;
+      moreBtn.textContent = `▼ Show ${hidden} more`;
+    }
+  } else {
+    moreWrap.style.display = 'none';
+  }
+}
+
+function renderHistory() {
+  const ended = subs.filter(s => s.ended);
+  const container = document.getElementById('historyContainer');
+  if (ended.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-emoji">🗂️</div><p>No ended subscriptions yet.</p></div>`;
+    return;
+  }
+  container.innerHTML = ended.map(s => {
+    const known = matchKnown(s.name);
+    const emoji = s.customLogo ? '' : ((known && known.emoji) || '📦');
+    const logoHTML = s.customLogo ? `<img src="${s.customLogo}" alt="${s.name}">` : emoji;
+    const cycle = s.billing === 'days' ? `Every ${s.billingDays} days` : (s.billing === 'one-time' ? 'One-time' : s.billing.charAt(0).toUpperCase() + s.billing.slice(1));
+    return `
+      <div class="history-card">
+        <div class="sub-row">
+          <div class="sub-logo">${logoHTML}</div>
+          <div class="sub-info">
+            <div class="sub-name">${escHtml(s.name)}</div>
+            <div class="sub-cycle">${cycle} · ${s.category}</div>
+          </div>
+          <div class="sub-meta">
+            <div class="sub-row-price">₹${s.price.toFixed(0)}</div>
+            <span class="history-ended-badge">Ended</span>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <button class="history-reactivate-btn" onclick="reactivateSub('${s.id}')">↩ Reactivate</button>
+          <button class="history-delete-btn" onclick="deleteSub('${s.id}')">🗑 Delete</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function reactivateSub(id) {
+  const idx = subs.findIndex(s => s.id === id);
+  if (idx === -1) return;
+  subs[idx] = { ...subs[idx], ended: false };
+  save(); render();
+  showToast(`${subs[idx].name} reactivated ✓`);
+}
+
+function deleteSub(id) {
+  const idx = subs.findIndex(s => s.id === id);
+  if (idx === -1) return;
+  const name = subs[idx].name;
+  subs.splice(idx, 1);
+  save(); render();
+  showToast(`${name} deleted.`);
 }
 
 function renderSubCard(s) {
@@ -1971,6 +2311,7 @@ function renderSubCard(s) {
         ${!s.ended ? `<button class="sub-btn renew" onclick="event.stopPropagation(); renewSub('${s.id}')">Renew</button>` : ''}
         ${!s.ended ? `<button class="sub-btn end" onclick="event.stopPropagation(); endSub('${s.id}')">End</button>` : ''}
       </div>
+      ${s.notes ? `<div class="sub-notes-row"><b>📝 Notes:</b> ${escHtml(s.notes)}</div>` : ''}
     </div>`;
 }
 
@@ -1996,10 +2337,11 @@ function addSub() {
   const endDate = document.getElementById('subEndDate').value;
   const billingDays = billing === 'days' ? parseInt(document.getElementById('subDays').value) || 30 : null;
   const paymentMode = getPaymentMode('sub');
+  const notes = document.getElementById('subNotes').value.trim();
 
   if (!name || isNaN(price) || price <= 0) { showToast('Please enter a valid name and price', true); return; }
 
-  subs.push({ id: Date.now().toString(), name, price, billing, billingDays, category, startDate, endDate, paymentMode, ended: false, autoRenewed: false, customLogo: null });
+  subs.push({ id: Date.now().toString(), name, price, billing, billingDays, category, startDate, endDate, paymentMode, notes, ended: false, autoRenewed: false, customLogo: null });
   save();
   render();
 
@@ -2007,6 +2349,7 @@ function addSub() {
   document.getElementById('subPrice').value = '';
   document.getElementById('subBilling').value = 'monthly';
   document.getElementById('subCategory').value = 'Entertainment';
+  document.getElementById('subNotes').value = '';
   handleBillingChange('sub');
   document.getElementById('subStartDate').value = new Date().toISOString().split('T')[0];
   autoCalcEndDateByCycle('sub', 'monthly');
@@ -2025,6 +2368,7 @@ function openEdit(id) {
   document.getElementById('editStartDate').value = s.startDate;
   document.getElementById('editEndDate').value = s.endDate || '';
   document.getElementById('editDays').value = s.billingDays || 30;
+  document.getElementById('editNotes').value = s.notes || '';
   handleBillingChange('edit');
   selectPaymentMode('edit', s.paymentMode || 'debit');
   document.getElementById('editIconInput')._pendingLogo = null;
@@ -2056,6 +2400,7 @@ function saveEdit() {
   const endDate = document.getElementById('editEndDate').value;
   const billingDays = billing === 'days' ? parseInt(document.getElementById('editDays').value) || 30 : null;
   const paymentMode = getPaymentMode('edit');
+  const notes = document.getElementById('editNotes').value.trim();
 
   if (!name || isNaN(price) || price <= 0) { showToast('Please enter a valid name and price', true); return; }
 
@@ -2068,7 +2413,7 @@ function saveEdit() {
   if (removeLogo) customLogo = null;
   if (pendingLogo) customLogo = pendingLogo;
 
-  subs[idx] = { ...subs[idx], name, price, billing, billingDays, category, startDate, endDate, paymentMode, customLogo };
+  subs[idx] = { ...subs[idx], name, price, billing, billingDays, category, startDate, endDate, paymentMode, notes, customLogo };
   save(); render(); closeEdit();
   showToast(`${name} updated ✓`);
 }

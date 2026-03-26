@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>SUBTracker&reg; – Developed by Sukesh</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -12,10 +16,12 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   :root {
+    /* Dark Mode Defaults */
     --bg: #0b0b12;
     --card: #13131f;
     --card2: #1a1a2a;
     --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.12); /* New variable for smooth hover transitions */
     --gold: #f5c542;
     --gold2: #e6a817;
     --purple: #9b7fe8;
@@ -24,69 +30,34 @@
     --muted: #7a7a9a;
     --danger: #ff5e72;
     --success: #4cd9a0;
-    --font-head: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    
+    /* Premium Font Update */
+    --font-head: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    
     --radius: 16px;
     --radius-sm: 10px;
   }
 
-  /* Light mode - Professional palette */
+  /* NEW Light Mode - Clean, Modern, High Contrast */
   body.light-mode {
-    --bg: #d9934a;
-    --card: #4a5f7a;
-    --card2: #3d5066;
-    --border: rgba(255,255,255,0.2);
-    --text: #ffffff;
-    --muted: #f5f0e8;
+    --bg: #f3f4f6;       /* Soft modern gray background */
+    --card: #ffffff;     /* Crisp white cards */
+    --card2: #f9fafb;    /* Slightly darker contrast for inputs/secondary spaces */
+    --border: rgba(0, 0, 0, 0.08); /* Subtle dark border */
+    --border-hover: rgba(0, 0, 0, 0.15); /* Darker border on hover */
+    --text: #111827;     /* High contrast dark slate text */
+    --muted: #6b7280;    /* Accessible medium gray for secondary text */
   }
 
+  /* Soften the ambient glow for light mode */
   body.light-mode::before {
-    background: radial-gradient(circle, rgba(74,95,122,0.15) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(155, 127, 232, 0.08) 0%, transparent 70%);
   }
   body.light-mode::after {
-    background: radial-gradient(circle, rgba(217,147,74,0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(245, 197, 66, 0.08) 0%, transparent 70%);
   }
-  
-  body.light-mode .summary-card .label,
-  body.light-mode .sub-cycle,
-  body.light-mode .sub-row-enddate,
-  body.light-mode .detail-label,
-  body.light-mode .form-label,
-  body.light-mode .notif-desc,
-  body.light-mode .cat-label {
-    color: #f5f0e8;
-  }
-  
-  body.light-mode .summary-card .amount,
-  body.light-mode .sub-name,
-  body.light-mode .detail-value,
-  body.light-mode .section-title,
-  body.light-mode .modal-title,
-  body.light-mode .notif-name,
-  body.light-mode header h1 {
-    color: #ffffff;
-  }
-  
-  body.light-mode header p {
-    color: #f5f0e8;
-  }
-  
-  body.light-mode .form-input,
-  body.light-mode .form-select {
-    color: #ffffff;
-    background: rgba(0,0,0,0.1);
-    border-color: rgba(255,255,255,0.2);
-  }
-  
-  body.light-mode .form-input::placeholder {
-    color: #d0c8bc;
-  }
-  
-  body.light-mode .pay-badge {
-    color: #f5f0e8;
-    background: rgba(255,255,255,0.15);
-    border-color: rgba(255,255,255,0.25);
-  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -95,6 +66,7 @@
     font-family: var(--font-body);
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme flip */
   }
 
   body::before {
@@ -295,7 +267,7 @@
   }
   .summary-card:hover {
     background: var(--card2);
-    border-color: rgba(255,255,255,0.12);
+    border-color: var(--border-hover);
   }
   .summary-card::before {
     content: '';
@@ -463,7 +435,7 @@
   .subs-scroll::-webkit-scrollbar { width: 6px; }
   .subs-scroll::-webkit-scrollbar-track { background: transparent; }
   .subs-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  .subs-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.12); }
+  .subs-scroll::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
 
   .sub-card {
     background: var(--card);
@@ -474,7 +446,7 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  .sub-card:hover { background: var(--card2); border-color: rgba(255,255,255,0.12); }
+  .sub-card:hover { background: var(--card2); border-color: var(--border-hover); }
   .sub-card.just-renewed { 
     background: rgba(76,217,160,0.1) !important; 
     border-color: var(--success) !important; 
@@ -537,20 +509,18 @@
   }
   .sub-row-enddate {
     font-size: 12px;
-    color: #ffffff;
+    font-weight: 500;
+    color: var(--text); /* Fixed for dynamic theming */
     white-space: nowrap;
     min-width: 60px;
     text-align: right;
   }
   
-  body.light-mode .sub-row-enddate {
-    color: #f5f0e8;
-  }
   .pay-badge {
     font-size: 10px;
     font-weight: 500;
     color: var(--muted);
-    background: rgba(255,255,255,0.03);
+    background: var(--card2);
     padding: 3px 7px;
     border-radius: 6px;
     border: 1px solid var(--border);
@@ -773,7 +743,7 @@
     align-items: center;
     justify-content: center;
   }
-  .notif-bell-btn:hover { background: var(--card2); border-color: rgba(255,255,255,0.12); }
+  .notif-bell-btn:hover { background: var(--card2); border-color: var(--border-hover); }
   .notif-bell-btn.has-alerts { color: var(--gold); border-color: var(--gold); }
   .notif-badge {
     position: absolute;
@@ -1183,6 +1153,7 @@
     padding: 7px 20px;
     cursor: pointer;
     transition: all 0.2s;
+    margin-bottom: 4px;
   }
   .more-toggle-btn:hover { background: var(--card2); color: var(--text); border-color: var(--gold); }
 
@@ -1192,11 +1163,11 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 14px;
-    margin-bottom: 0px; /* Reset for grid */
+    margin-bottom: 8px;
     opacity: 0.72;
     transition: all 0.2s;
   }
-  .history-card:hover { opacity: 1; background: var(--card2); border-color: rgba(255,255,255,0.12); }
+  .history-card:hover { opacity: 1; background: var(--card2); border-color: var(--border-hover); }
   .history-ended-badge {
     font-size: 10px;
     font-weight: 600;

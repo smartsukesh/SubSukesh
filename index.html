@@ -1189,6 +1189,7 @@
     padding: 7px 20px;
     cursor: pointer;
     transition: all 0.2s;
+    margin-bottom: 4px;
   }
   .more-toggle-btn:hover { background: var(--card2); color: var(--text); border-color: var(--gold); }
 
@@ -1198,7 +1199,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 14px;
-    margin-bottom: 0px;
+    margin-bottom: 8px;
     opacity: 0.72;
     transition: all 0.2s;
   }
@@ -1261,13 +1262,13 @@
   @media (max-width: 1200px) {
     .main-grid { grid-template-columns: 280px 1fr; grid-template-rows: auto; }
     .left-col { grid-row: auto; }
-    .top-bar-span, .cards-span { grid-column: 2 / 3; }
-    .subs-grid { grid-template-columns: 1fr; }
+    .top-bar-span { grid-column: 2 / 3; }
+    .right-col { display: none; }
   }
   @media (max-width: 1000px) {
     .main-grid { grid-template-columns: 1fr; }
     .left-col { position: static; grid-row: auto; }
-    .top-bar-span, .cards-span { grid-column: auto; }
+    .top-bar-span { grid-column: auto; }
   }
 
   @media (max-width: 768px) {
@@ -1288,8 +1289,9 @@
       gap: 16px;
     }
     .top-bar-span { order: 1; }
-    .cards-span   { order: 2; min-height: auto; }
-    .left-col     { order: 3; position: static; }
+    .center-col { order: 2; min-height: auto; }
+    .left-col   { order: 3; position: static; }
+    .right-col  { display: none !important; }
 
     .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px; min-height: auto; }
     .summary-card.full { grid-column: 1 / -1; }
@@ -1307,8 +1309,7 @@
     .payment-mode-btn { font-size: 10px; padding: 7px; }
     .add-btn { padding: 11px; font-size: 13px; }
 
-    .subs-grid { grid-template-columns: 1fr; }
-    .sub-card { padding: 12px; margin-bottom: 0px; }
+    .sub-card { padding: 12px; margin-bottom: 8px; }
     .sub-logo { width: 38px; height: 38px; font-size: 18px; }
     .sub-name { font-size: 13px; }
     .sub-cycle { font-size: 10px; }
@@ -1343,6 +1344,7 @@
 
     .subs-scroll { padding-right: 4px; overflow-y: visible; }
     .subs-scroll::-webkit-scrollbar { width: 4px; }
+    .toggle-btn { font-size: 11px; padding: 7px 0; }
     .empty-emoji { font-size: 40px; }
     .empty-state { font-size: 12px; padding: 30px 16px; }
     .sort-filter-inner { flex-direction: column; }
@@ -1758,7 +1760,11 @@ function setupAuthListener() {
       
       if (dbListenerRef) dbListenerRef.off(); 
       
-      subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+      try {
+        subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+      } catch(e) {
+        subs = [];
+      }
       render();
     }
   });
@@ -1787,11 +1793,11 @@ function loadFromFirebase() {
     .then((snapshot) => {
       if (snapshot.exists()) {
         const val = snapshot.val();
-        // Force data into an array (Prevents Firebase Object crash)
+        // FORCE FIREBASE OBJECT BACK INTO AN ARRAY TO PREVENT CRASH
         subs = Array.isArray(val) ? val : Object.values(val || {});
         
         console.log("📥 Loaded", subs.length, "subscriptions from Cloud");
-        autoRenewExpired(); // Check auto-renews on fresh cloud data
+        autoRenewExpired();
         render();
       } else {
         const localData = localStorage.getItem('subsukesh_subs');
@@ -1802,7 +1808,7 @@ function loadFromFirebase() {
         } else {
           subs = [];
         }
-        render(); // Ensure UI updates if cloud is empty or migrating
+        render();
       }
     })
     .catch((error) => console.error("❌ Error loading from Firebase:", error));
@@ -1828,7 +1834,7 @@ function setupFirebaseListener() {
   dbListenerRef.on('value', (snapshot) => {
     if (snapshot.exists()) {
       const val = snapshot.val();
-      // Force data into an array
+      // FORCE FIREBASE OBJECT BACK INTO AN ARRAY TO PREVENT CRASH
       const newSubs = Array.isArray(val) ? val : Object.values(val || {});
       
       if (JSON.stringify(newSubs) !== JSON.stringify(subs)) {
@@ -1837,7 +1843,6 @@ function setupFirebaseListener() {
         render();
       }
     } else {
-      // If user deletes their last subscription from another device, clear the screen
       if (subs.length > 0) {
         subs = [];
         render();
@@ -2806,3 +2811,100 @@ async function registerBiometric() {
     });
 
     if (credential) {
+      const credId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+      localStorage.setItem(WEBAUTHN_KEY, credId);
+      console.log('✅ Biometric registered!');
+      return true;
+    }
+  } catch(e) {
+    console.log('Biometric registration skipped:', e.message);
+  }
+  return false;
+}
+
+async function authenticateBiometric() {
+  const storedCredId = localStorage.getItem(WEBAUTHN_KEY);
+  if (!storedCredId) return false;
+
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const credIdBytes = Uint8Array.from(atob(storedCredId), c => c.charCodeAt(0));
+
+    const assertion = await navigator.credentials.get({
+      publicKey: {
+        challenge,
+        rpId: getRpId(),
+        allowCredentials: [{
+          type: 'public-key',
+          id: credIdBytes,
+          transports: ['internal']
+        }],
+        userVerification: 'required',
+        timeout: 60000
+      }
+    });
+
+    return !!assertion;
+  } catch(e) {
+    console.log('Biometric auth failed:', e.message);
+    return false;
+  }
+}
+
+async function checkBiometricSupport() {
+  const btn = document.getElementById('biometricBtn');
+  const available = await isBiometricAvailable();
+  if (available) {
+    btn.style.display = 'flex';
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    document.getElementById('biometricIcon').textContent = isIOS ? '🔐' : '👆';
+    document.getElementById('biometricLabel').textContent = isIOS ? 'Use Face ID' : 'Use Fingerprint';
+  }
+  return available;
+}
+
+async function triggerBiometric() {
+  if (!localStorage.getItem(SETTING_KEY)) return;
+  const available = await isBiometricAvailable();
+  if (!available) return;
+
+  const hasRegistered = localStorage.getItem(WEBAUTHN_KEY);
+
+  if (!hasRegistered) {
+    document.getElementById('lockSubtitle').textContent = 'Setting up biometric for this device...';
+    const registered = await registerBiometric();
+    if (registered) {
+      unlockSuccess();
+      showToast('Face ID / Fingerprint set up! 🎉');
+    }
+  } else {
+    const success = await authenticateBiometric();
+    if (success) unlockSuccess();
+  }
+}
+
+// ─── MAIN INIT ───────────────────────────────────────────────────────────────
+(function init() {
+  initLock();
+  
+  // Load local cache IMMEDIATELY so the app never shows a blank screen
+  try {
+    subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+  } catch(e) {
+    subs = [];
+  }
+  
+  initFirebase();
+
+  loadTheme();
+  document.getElementById('subStartDate').value = new Date().toISOString().split('T')[0];
+  autoCalcEndDateByCycle('sub', 'monthly');
+  
+  // Run auto-renew and initial render instantly using cached data
+  autoRenewExpired();
+  render();
+})();
+</script>
+
+</body>
+</html>

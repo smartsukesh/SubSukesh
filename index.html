@@ -21,7 +21,7 @@
     --card: #13131f;
     --card2: #1a1a2a;
     --border: rgba(255,255,255,0.07);
-    --border-hover: rgba(255,255,255,0.12); /* New variable for smooth hover transitions */
+    --border-hover: rgba(255,255,255,0.12);
     --gold: #f5c542;
     --gold2: #e6a817;
     --purple: #9b7fe8;
@@ -1207,6 +1207,19 @@
   }
   .history-delete-btn:hover { background: rgba(255,94,114,0.18); }
 
+  /* ── NOTES IN CARD DETAILS ───────────────────────── */
+  .sub-notes-row {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+    display: none;
+  }
+  .sub-card.expanded .sub-notes-row { display: block; }
+  .sub-notes-row b { color: var(--text); font-weight: 500; }
+
   @media (max-width: 1400px) {
     .main-grid { grid-template-columns: 300px 1fr 1fr; }
   }
@@ -1711,18 +1724,26 @@ function setupAuthListener() {
       
       if (dbListenerRef) dbListenerRef.off(); 
       
-      try {
-        subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
-      } catch(e) {
-        subs = [];
-      }
+      // IMMEDIATE WIPE ON SIGNOUT
+      subs = [];
       render();
     }
   });
 }
 
+function toggleAuth() {
+  if (currentUser) {
+    firebase.auth().signOut().then(() => showToast('Signed out successfully'));
+  } else {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider).catch(error => {
+      showToast('Sign in failed: ' + error.message, true);
+    });
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
-// FIREBASE SYNC — USER SCOPED
+// FIREBASE SYNC — CLOUD ONLY (NO LOCAL STORAGE)
 // ═══════════════════════════════════════════════════════════════════════════
 
 function loadFromFirebase() {
@@ -1733,21 +1754,12 @@ function loadFromFirebase() {
     .then((snapshot) => {
       if (snapshot.exists()) {
         const val = snapshot.val();
-        // FORCE FIREBASE OBJECT BACK INTO AN ARRAY TO PREVENT CRASH
         subs = Array.isArray(val) ? val : Object.values(val || {});
-        
         console.log("📥 Loaded", subs.length, "subscriptions from Cloud");
         autoRenewExpired();
         render();
       } else {
-        const localData = localStorage.getItem('subsukesh_subs');
-        if (localData) {
-          try { subs = JSON.parse(localData); } catch(e) { subs = []; }
-          saveToFirebase();
-          console.log("📤 Migrated local subscriptions to Cloud");
-        } else {
-          subs = [];
-        }
+        subs = [];
         render();
       }
     })
@@ -1755,9 +1767,10 @@ function loadFromFirebase() {
 }
 
 function saveToFirebase() {
-  localStorage.setItem('subsukesh_subs', JSON.stringify(subs));
-  
-  if (!isFirebaseEnabled || !currentUser) return;
+  if (!isFirebaseEnabled || !currentUser) {
+    showToast("Sign in to save your data to the cloud!", true);
+    return;
+  }
 
   const userRef = database.ref(`users/${currentUser.uid}/subscriptions`);
   userRef.set(subs)
@@ -1774,7 +1787,6 @@ function setupFirebaseListener() {
   dbListenerRef.on('value', (snapshot) => {
     if (snapshot.exists()) {
       const val = snapshot.val();
-      // FORCE FIREBASE OBJECT BACK INTO AN ARRAY TO PREVENT CRASH
       const newSubs = Array.isArray(val) ? val : Object.values(val || {});
       
       if (JSON.stringify(newSubs) !== JSON.stringify(subs)) {
@@ -1789,17 +1801,6 @@ function setupFirebaseListener() {
       }
     }
   });
-}
-
-function toggleAuth() {
-  if (currentUser) {
-    firebase.auth().signOut().then(() => showToast('Signed out successfully'));
-  } else {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider).catch(error => {
-      showToast('Sign in failed: ' + error.message, true);
-    });
-  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2235,6 +2236,11 @@ function toggleCard(id) {
 }
 
 function addSub() {
+  if (!currentUser) {
+    showToast("Sign in to save your data to the cloud!", true);
+    return;
+  }
+
   const name = document.getElementById('subName').value.trim();
   const price = parseFloat(document.getElementById('subPrice').value);
   const billing = document.getElementById('subBilling').value;
@@ -2838,12 +2844,9 @@ async function triggerBiometric() {
 (function init() {
   initLock();
   
-  // Load local cache IMMEDIATELY so the app never shows a blank screen
-  try {
-    subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
-  } catch(e) {
-    subs = [];
-  }
+  // App starts with blank memory.
+  // Data will only populate once Firebase verifies the user is signed in.
+  subs = [];
   
   initFirebase();
 
@@ -2851,8 +2854,6 @@ async function triggerBiometric() {
   document.getElementById('subStartDate').value = new Date().toISOString().split('T')[0];
   autoCalcEndDateByCycle('sub', 'monthly');
   
-  // Run auto-renew and initial render instantly using cached data
-  autoRenewExpired();
   render();
 })();
 </script>

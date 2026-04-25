@@ -1819,7 +1819,6 @@ function setupAuthListener() {
         menuAuthBtn.title = `Sign Out (${user.displayName ? user.displayName.split(' ')[0] : 'User'})`;
       }
       showToast(`Welcome, ${user.displayName ? user.displayName.split(' ')[0] : 'User'}!`);
-      
       loadFromFirebase();
       setupFirebaseListener();
     } else {
@@ -1828,10 +1827,9 @@ function setupAuthListener() {
         menuAuthBtn.innerHTML = '👤 Sign In'; 
         menuAuthBtn.title = 'Sign In with Google';
       }
-      
       if (dbListenerRef) dbListenerRef.off(); 
-      
       subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+      autoRenewExpired();
       render();
     }
   });
@@ -1861,7 +1859,6 @@ function loadFromFirebase() {
       if (snapshot.exists()) {
         subs = snapshot.val() || [];
         console.log("📥 Loaded", subs.length, "subscriptions from Cloud");
-        render();
       } else {
         const localData = localStorage.getItem('subsukesh_subs');
         if (localData) {
@@ -1870,8 +1867,10 @@ function loadFromFirebase() {
           console.log("📤 Migrated local subscriptions to Cloud");
         }
       }
+      autoRenewExpired();
+      render();
     })
-    .catch((error) => console.error("❌ Error loading from Firebase:", error));
+    .catch((error) => { console.error("❌ Error loading from Firebase:", error); render(); });
 }
 
 function saveToFirebase() {
@@ -2783,6 +2782,7 @@ function handlePinComplete() {
 async function unlockSuccess() {
   localStorage.setItem(UNLOCK_KEY, Date.now() + LOCK_DURATION);
   hideLockScreen();
+  render();
 
   const hasRegistered = localStorage.getItem(WEBAUTHN_KEY);
   if (!hasRegistered && localStorage.getItem(SETTING_KEY)) {
@@ -2935,19 +2935,19 @@ async function triggerBiometric() {
 // ─── MAIN INIT ───────────────────────────────────────────────────────────────
 (function init() {
   initLock();
-  initFirebase();
-
-  // Load fallback if Firebase fails to init
-  if (!isFirebaseEnabled) {
-    subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
-  }
-
   loadTheme();
   document.getElementById('subStartDate').value = new Date().toISOString().split('T')[0];
   autoCalcEndDateByCycle('sub', 'monthly');
-  autoRenewExpired();
 
-  setTimeout(() => { render(); }, 500);
+  const firebaseReady = initFirebase();
+
+  // If Firebase failed, fall back to localStorage immediately
+  if (!firebaseReady) {
+    subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+    autoRenewExpired();
+    render();
+  }
+  // If Firebase is ready, setupAuthListener() handles loading + render()
 })();
 </script>
 

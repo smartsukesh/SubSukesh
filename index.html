@@ -5,10 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>SUBTracker&reg; – Developed by Sukesh</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -16,12 +12,10 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    /* Dark Mode Defaults */
     --bg: #0b0b12;
     --card: #13131f;
     --card2: #1a1a2a;
     --border: rgba(255,255,255,0.07);
-    --border-hover: rgba(255,255,255,0.12);
     --gold: #f5c542;
     --gold2: #e6a817;
     --purple: #9b7fe8;
@@ -30,34 +24,69 @@
     --muted: #7a7a9a;
     --danger: #ff5e72;
     --success: #4cd9a0;
-    
-    /* Premium Font Update */
-    --font-head: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    
+    --font-head: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --radius: 16px;
     --radius-sm: 10px;
   }
 
-  /* NEW Light Mode - Clean, Modern, High Contrast */
+  /* Light mode - Professional palette */
   body.light-mode {
-    --bg: #f3f4f6;       /* Soft modern gray background */
-    --card: #ffffff;     /* Crisp white cards */
-    --card2: #f9fafb;    /* Slightly darker contrast for inputs/secondary spaces */
-    --border: rgba(0, 0, 0, 0.08); /* Subtle dark border */
-    --border-hover: rgba(0, 0, 0, 0.15); /* Darker border on hover */
-    --text: #111827;     /* High contrast dark slate text */
-    --muted: #6b7280;    /* Accessible medium gray for secondary text */
+    --bg: #d9934a;
+    --card: #4a5f7a;
+    --card2: #3d5066;
+    --border: rgba(255,255,255,0.2);
+    --text: #ffffff;
+    --muted: #f5f0e8;
   }
 
-  /* Soften the ambient glow for light mode */
   body.light-mode::before {
-    background: radial-gradient(circle, rgba(155, 127, 232, 0.08) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(74,95,122,0.15) 0%, transparent 70%);
   }
   body.light-mode::after {
-    background: radial-gradient(circle, rgba(245, 197, 66, 0.08) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(217,147,74,0.2) 0%, transparent 70%);
   }
-
+  
+  body.light-mode .summary-card .label,
+  body.light-mode .sub-cycle,
+  body.light-mode .sub-row-enddate,
+  body.light-mode .detail-label,
+  body.light-mode .form-label,
+  body.light-mode .notif-desc,
+  body.light-mode .cat-label {
+    color: #f5f0e8;
+  }
+  
+  body.light-mode .summary-card .amount,
+  body.light-mode .sub-name,
+  body.light-mode .detail-value,
+  body.light-mode .section-title,
+  body.light-mode .modal-title,
+  body.light-mode .notif-name,
+  body.light-mode header h1 {
+    color: #ffffff;
+  }
+  
+  body.light-mode header p {
+    color: #f5f0e8;
+  }
+  
+  body.light-mode .form-input,
+  body.light-mode .form-select {
+    color: #ffffff;
+    background: rgba(0,0,0,0.1);
+    border-color: rgba(255,255,255,0.2);
+  }
+  
+  body.light-mode .form-input::placeholder {
+    color: #d0c8bc;
+  }
+  
+  body.light-mode .pay-badge {
+    color: #f5f0e8;
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.25);
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -66,7 +95,6 @@
     font-family: var(--font-body);
     min-height: 100vh;
     overflow-x: hidden;
-    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme flip */
   }
 
   body::before {
@@ -226,7 +254,7 @@
   .main-grid {
     display: grid;
     grid-template-columns: 320px 1fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto 1fr;
     gap: 20px;
     align-items: start;
   }
@@ -237,14 +265,37 @@
     gap: 16px;
     position: sticky;
     top: 20px;
+    grid-column: 1;
     grid-row: 1 / 3;
   }
 
   .top-bar-span {
     grid-column: 2 / 4;
+    grid-row: 1;
     display: flex;
     flex-direction: column;
     gap: 12px;
+  }
+
+  .center-col {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 200px;
+  }
+
+  .right-col {
+    grid-column: 3;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 200px;
+    position: sticky;
+    top: 20px;
+    align-self: start;
   }
 
   .summary-grid {
@@ -267,7 +318,7 @@
   }
   .summary-card:hover {
     background: var(--card2);
-    border-color: var(--border-hover);
+    border-color: rgba(255,255,255,0.12);
   }
   .summary-card::before {
     content: '';
@@ -407,24 +458,31 @@
     padding: 20px 0;
   }
 
-  /* ── CARDS AREA ───────────────────────────────────── */
-  .cards-span {
-    grid-column: 2 / 4;
+  .view-toggle {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
-    min-height: 600px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    gap: 4px;
   }
-
-  .subs-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    align-items: start;
-    align-content: start;
+  .toggle-btn {
+    flex: 1;
+    padding: 8px 0;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
   }
-  .subs-grid .empty-state {
-    grid-column: 1 / -1; /* spans full width */
+  .toggle-btn.active {
+    background: linear-gradient(135deg, var(--gold2), var(--gold));
+    color: #0b0b12;
+    font-weight: 600;
   }
 
   .subs-scroll {
@@ -435,18 +493,24 @@
   .subs-scroll::-webkit-scrollbar { width: 6px; }
   .subs-scroll::-webkit-scrollbar-track { background: transparent; }
   .subs-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  .subs-scroll::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+  .subs-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.12); }
+
+  .category-block { margin-bottom:18px; }
+  .cat-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .cat-label  { display:flex; align-items:center; gap:7px; font-size:11px; font-weight:600; color:var(--muted); }
+  .cat-icon   { font-size:13px; }
+  .cat-total  { font-size:11px; color:var(--gold); font-weight:600; }
 
   .sub-card {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 14px;
-    margin-bottom: 0px; /* grid handles gap */
+    margin-bottom: 8px;
     cursor: pointer;
     transition: all 0.2s;
   }
-  .sub-card:hover { background: var(--card2); border-color: var(--border-hover); }
+  .sub-card:hover { background: var(--card2); border-color: rgba(255,255,255,0.12); }
   .sub-card.just-renewed { 
     background: rgba(76,217,160,0.1) !important; 
     border-color: var(--success) !important; 
@@ -509,18 +573,20 @@
   }
   .sub-row-enddate {
     font-size: 12px;
-    font-weight: 500;
-    color: var(--text); /* Fixed for dynamic theming */
+    color: #ffffff;
     white-space: nowrap;
     min-width: 60px;
     text-align: right;
   }
   
+  body.light-mode .sub-row-enddate {
+    color: #f5f0e8;
+  }
   .pay-badge {
     font-size: 10px;
     font-weight: 500;
     color: var(--muted);
-    background: var(--card2);
+    background: rgba(255,255,255,0.03);
     padding: 3px 7px;
     border-radius: 6px;
     border: 1px solid var(--border);
@@ -743,7 +809,7 @@
     align-items: center;
     justify-content: center;
   }
-  .notif-bell-btn:hover { background: var(--card2); border-color: var(--border-hover); }
+  .notif-bell-btn:hover { background: var(--card2); border-color: rgba(255,255,255,0.12); }
   .notif-bell-btn.has-alerts { color: var(--gold); border-color: var(--gold); }
   .notif-badge {
     position: absolute;
@@ -1103,6 +1169,34 @@
   .biometric-btn:hover { background: var(--border); }
   .lock-error { font-size: 12px; color: var(--danger); text-align: center; min-height: 18px; }
 
+  /* ── VIEW TABS ───────────────────────────────────── */
+  .view-tabs {
+    display: flex;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    gap: 4px;
+  }
+  .view-tab {
+    flex: 1;
+    padding: 8px 0;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .view-tab.active {
+    background: linear-gradient(135deg, var(--gold2), var(--gold));
+    color: #0b0b12;
+    font-weight: 600;
+  }
+
   /* ── SORT / FILTER BAR ───────────────────────────── */
   .sort-filter-bar {
     background: var(--card);
@@ -1167,7 +1261,7 @@
     opacity: 0.72;
     transition: all 0.2s;
   }
-  .history-card:hover { opacity: 1; background: var(--card2); border-color: var(--border-hover); }
+  .history-card:hover { opacity: 1; background: var(--card2); border-color: rgba(255,255,255,0.12); }
   .history-ended-badge {
     font-size: 10px;
     font-weight: 600;
@@ -1224,15 +1318,16 @@
     .main-grid { grid-template-columns: 300px 1fr 1fr; }
   }
   @media (max-width: 1200px) {
-    .main-grid { grid-template-columns: 280px 1fr; grid-template-rows: auto; }
-    .left-col { grid-row: auto; }
-    .top-bar-span, .cards-span { grid-column: 2 / 3; }
-    .subs-grid { grid-template-columns: 1fr; }
+    .main-grid { grid-template-columns: 280px 1fr; }
+    .top-bar-span { grid-column: 2 / 3; }
+    .center-col { grid-column: 2; }
+    .right-col { display: none; }
   }
   @media (max-width: 1000px) {
-    .main-grid { grid-template-columns: 1fr; }
-    .left-col { position: static; grid-row: auto; }
-    .top-bar-span, .cards-span { grid-column: auto; }
+    .main-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .left-col { grid-column: 1; grid-row: auto; position: static; }
+    .top-bar-span { grid-column: 1; }
+    .center-col { grid-column: 1; }
   }
 
   @media (max-width: 768px) {
@@ -1253,8 +1348,9 @@
       gap: 16px;
     }
     .top-bar-span { order: 1; }
-    .cards-span   { order: 2; min-height: auto; }
-    .left-col     { order: 3; position: static; }
+    .center-col { order: 2; min-height: auto; }
+    .left-col   { order: 3; position: static; }
+    .right-col  { display: none !important; }
 
     .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px; min-height: auto; }
     .summary-card.full { grid-column: 1 / -1; }
@@ -1272,8 +1368,7 @@
     .payment-mode-btn { font-size: 10px; padding: 7px; }
     .add-btn { padding: 11px; font-size: 13px; }
 
-    .subs-grid { grid-template-columns: 1fr; }
-    .sub-card { padding: 12px; margin-bottom: 0px; }
+    .sub-card { padding: 12px; margin-bottom: 8px; }
     .sub-logo { width: 38px; height: 38px; font-size: 18px; }
     .sub-name { font-size: 13px; }
     .sub-cycle { font-size: 10px; }
@@ -1308,6 +1403,7 @@
 
     .subs-scroll { padding-right: 4px; overflow-y: visible; }
     .subs-scroll::-webkit-scrollbar { width: 4px; }
+    .toggle-btn { font-size: 11px; padding: 7px 0; }
     .empty-emoji { font-size: 40px; }
     .empty-state { font-size: 12px; padding: 30px 16px; }
     .sort-filter-inner { flex-direction: column; }
@@ -1443,6 +1539,7 @@
       </div>
     </div>
 
+    <!-- TOP BAR: spans center + right columns -->
     <div class="top-bar-span">
       <div class="summary-grid">
         <div class="summary-card" onclick="toggleChart()">
@@ -1461,12 +1558,15 @@
         </div>
       </div>
 
+      <!-- Tabs: Active / History -->
+      <div class="view-tabs">
+        <button class="view-tab active" id="tabActive" onclick="switchTab('active')">Active</button>
+        <button class="view-tab" id="tabHistory" onclick="switchTab('history')">History</button>
+      </div>
+
+      <!-- Sort & Filter bar -->
       <div class="sort-filter-bar" id="sortFilterBar">
         <div class="sort-filter-inner">
-          <select id="viewFilter" class="sf-select" onchange="switchTab(this.value)">
-            <option value="active">View: Active</option>
-            <option value="history">View: History</option>
-          </select>
           <input type="text" id="searchInput" class="sf-search" placeholder="🔍  Search…" oninput="render()">
           <select id="filterCategory" class="sf-select" onchange="render()">
             <option value="">All Categories</option>
@@ -1487,27 +1587,34 @@
           </select>
         </div>
       </div>
+
+      <!-- More toggle (spans both cols) -->
+      <div id="moreToggleWrap" style="display:none; text-align:center;">
+        <button class="more-toggle-btn" id="moreToggleBtn" onclick="toggleMore()">▼ Show more</button>
+      </div>
     </div>
 
-    <div class="cards-span">
+    <!-- CENTER COL: active subs col1 + history -->
+    <div class="center-col">
       <div id="activeView">
-        <div class="subs-scroll subs-grid" id="subsContainer">
+        <div class="subs-scroll" id="subsContainer1">
           <div class="empty-state">
             <div class="empty-emoji">📦</div>
             <p>No subscriptions yet.<br>Add one to get started!</p>
           </div>
         </div>
       </div>
-      
       <div id="historyView" style="display:none;">
-        <div class="subs-scroll subs-grid" id="historyContainer"></div>
-      </div>
-
-      <div id="moreToggleWrap" style="display:none; text-align:center; padding-top: 10px;">
-        <button class="more-toggle-btn" id="moreToggleBtn" onclick="toggleMore()">▼ Show more</button>
+        <div class="subs-scroll" id="historyContainer"></div>
       </div>
     </div>
 
+    <!-- RIGHT COL: active subs col2 -->
+    <div class="right-col">
+      <div id="activeView2">
+        <div class="subs-scroll" id="subsContainer2"></div>
+      </div>
+    </div>
   </div>
 
   <footer class="app-footer">
@@ -1724,8 +1831,7 @@ function setupAuthListener() {
       
       if (dbListenerRef) dbListenerRef.off(); 
       
-      // IMMEDIATE WIPE ON SIGNOUT
-      subs = [];
+      subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
       render();
     }
   });
@@ -1743,7 +1849,7 @@ function toggleAuth() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FIREBASE SYNC — CLOUD ONLY (NO LOCAL STORAGE)
+// FIREBASE SYNC — USER SCOPED
 // ═══════════════════════════════════════════════════════════════════════════
 
 function loadFromFirebase() {
@@ -1753,24 +1859,25 @@ function loadFromFirebase() {
   userRef.once('value')
     .then((snapshot) => {
       if (snapshot.exists()) {
-        const val = snapshot.val();
-        subs = Array.isArray(val) ? val : Object.values(val || {});
+        subs = snapshot.val() || [];
         console.log("📥 Loaded", subs.length, "subscriptions from Cloud");
-        autoRenewExpired();
         render();
       } else {
-        subs = [];
-        render();
+        const localData = localStorage.getItem('subsukesh_subs');
+        if (localData) {
+          subs = JSON.parse(localData);
+          saveToFirebase();
+          console.log("📤 Migrated local subscriptions to Cloud");
+        }
       }
     })
     .catch((error) => console.error("❌ Error loading from Firebase:", error));
 }
 
 function saveToFirebase() {
-  if (!isFirebaseEnabled || !currentUser) {
-    showToast("Sign in to save your data to the cloud!", true);
-    return;
-  }
+  localStorage.setItem('subsukesh_subs', JSON.stringify(subs));
+  
+  if (!isFirebaseEnabled || !currentUser) return;
 
   const userRef = database.ref(`users/${currentUser.uid}/subscriptions`);
   userRef.set(subs)
@@ -1786,17 +1893,10 @@ function setupFirebaseListener() {
   dbListenerRef = database.ref(`users/${currentUser.uid}/subscriptions`);
   dbListenerRef.on('value', (snapshot) => {
     if (snapshot.exists()) {
-      const val = snapshot.val();
-      const newSubs = Array.isArray(val) ? val : Object.values(val || {});
-      
+      const newSubs = snapshot.val() || [];
       if (JSON.stringify(newSubs) !== JSON.stringify(subs)) {
         subs = newSubs;
         console.log("🔄 Real-time update received!");
-        render();
-      }
-    } else {
-      if (subs.length > 0) {
-        subs = [];
         render();
       }
     }
@@ -2029,26 +2129,17 @@ function sortByStatus(arr) {
 // ─── TAB STATE ────────────────────────────────────────────────────────────────
 let currentTab = 'active';
 let showingMore = false;
-const PAGE_SIZE = 12; // 12 items / 2 cols = 6 full rows
+const PAGE_SIZE = 12;
 
 function switchTab(tab) {
   currentTab = tab;
   showingMore = false;
-  
-  // Show active vs history container
+  document.getElementById('tabActive').classList.toggle('active', tab === 'active');
+  document.getElementById('tabHistory').classList.toggle('active', tab === 'history');
   document.getElementById('activeView').style.display = tab === 'active' ? '' : 'none';
+  document.getElementById('activeView2').style.display = tab === 'active' ? '' : 'none';
   document.getElementById('historyView').style.display = tab === 'history' ? '' : 'none';
-  
-  // Sync the select dropdown value if called programmatically
-  const viewSelect = document.getElementById('viewFilter');
-  if (viewSelect) viewSelect.value = tab;
-
-  // Show/Hide other filters based on view type
-  const displayState = tab === 'active' ? '' : 'none';
-  document.getElementById('searchInput').style.display = displayState;
-  document.getElementById('filterCategory').style.display = displayState;
-  document.getElementById('sortBy').style.display = displayState;
-
+  document.getElementById('sortFilterBar').style.display = tab === 'active' ? '' : 'none';
   render();
 }
 
@@ -2092,23 +2183,34 @@ function getFilteredSorted() {
 function renderSubs() {
   if (currentTab === 'history') { renderHistory(); return; }
 
-  const container = document.getElementById('subsContainer');
+  const col1 = document.getElementById('subsContainer1');
+  const col2 = document.getElementById('subsContainer2');
   const moreWrap = document.getElementById('moreToggleWrap');
   const moreBtn = document.getElementById('moreToggleBtn');
 
   const filtered = getFilteredSorted();
 
   if (filtered.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-emoji">📦</div><p>No subscriptions found.</p></div>`;
+    col1.innerHTML = `<div class="empty-state"><div class="empty-emoji">📦</div><p>No subscriptions found.</p></div>`;
+    if (col2) col2.innerHTML = '';
     moreWrap.style.display = 'none';
     return;
   }
 
+  const isMobile = window.innerWidth <= 768;
   const limit = showingMore ? filtered.length : Math.min(PAGE_SIZE, filtered.length);
   const visible = filtered.slice(0, limit);
 
-  // Directly map all visible cards to the single CSS grid container
-  container.innerHTML = visible.map(renderSubCard).join('');
+  if (isMobile) {
+    col1.innerHTML = visible.map(renderSubCard).join('');
+    if (col2) col2.innerHTML = '';
+  } else {
+    // Original alternating split: even indices → col1, odd → col2
+    const c1 = [], c2 = [];
+    visible.forEach((s, i) => i % 2 === 0 ? c1.push(s) : c2.push(s));
+    col1.innerHTML = c1.map(renderSubCard).join('');
+    if (col2) col2.innerHTML = c2.map(renderSubCard).join('');
+  }
 
   // More toggle
   if (filtered.length > PAGE_SIZE) {
@@ -2127,15 +2229,10 @@ function renderSubs() {
 function renderHistory() {
   const ended = subs.filter(s => s.ended);
   const container = document.getElementById('historyContainer');
-  const moreWrap = document.getElementById('moreToggleWrap');
-  
-  moreWrap.style.display = 'none'; // hide more button on history
-  
   if (ended.length === 0) {
     container.innerHTML = `<div class="empty-state"><div class="empty-emoji">🗂️</div><p>No ended subscriptions yet.</p></div>`;
     return;
   }
-  
   container.innerHTML = ended.map(s => {
     const known = matchKnown(s.name);
     const emoji = s.customLogo ? '' : ((known && known.emoji) || '📦');
@@ -2236,11 +2333,6 @@ function toggleCard(id) {
 }
 
 function addSub() {
-  if (!currentUser) {
-    showToast("Sign in to save your data to the cloud!", true);
-    return;
-  }
-
   const name = document.getElementById('subName').value.trim();
   const price = parseFloat(document.getElementById('subPrice').value);
   const billing = document.getElementById('subBilling').value;
@@ -2843,18 +2935,19 @@ async function triggerBiometric() {
 // ─── MAIN INIT ───────────────────────────────────────────────────────────────
 (function init() {
   initLock();
-  
-  // App starts with blank memory.
-  // Data will only populate once Firebase verifies the user is signed in.
-  subs = [];
-  
   initFirebase();
+
+  // Load fallback if Firebase fails to init
+  if (!isFirebaseEnabled) {
+    subs = JSON.parse(localStorage.getItem('subsukesh_subs') || '[]');
+  }
 
   loadTheme();
   document.getElementById('subStartDate').value = new Date().toISOString().split('T')[0];
   autoCalcEndDateByCycle('sub', 'monthly');
-  
-  render();
+  autoRenewExpired();
+
+  setTimeout(() => { render(); }, 500);
 })();
 </script>
 
